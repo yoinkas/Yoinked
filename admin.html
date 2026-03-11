@@ -1,0 +1,129 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin | Box & Ladder</title>
+  <meta name="description" content="Local admin panel for Box & Ladder posts." />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="index.html">Box & Ladder</a>
+      <nav class="nav">
+        <a href="posts/index.html">Writeups</a>
+        <a href="admin.html">Admin</a>
+        <a href="index.html#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container admin-layout">
+        <section class="admin-panel">
+          <div class="section-header">
+            <h1>Admin Panel</h1>
+            <p>Write, edit, publish, export, and import posts. Cover images and screenshots are stored locally in this browser.</p>
+          </div>
+
+          <form id="admin-form" class="admin-form">
+            <input type="hidden" name="id" />
+            <input type="hidden" name="existingCoverImage" />
+            <input type="hidden" name="existingGalleryImages" value="[]" />
+
+            <label>
+              <span>Title</span>
+              <input type="text" name="title" placeholder="Windows PrivEsc Notes" required />
+            </label>
+
+            <div class="admin-grid">
+              <label>
+                <span>Slug</span>
+                <input type="text" name="slug" placeholder="auto-from-title" />
+              </label>
+              <label>
+                <span>Category</span>
+                <input type="text" name="category" placeholder="TryHackMe" />
+              </label>
+            </div>
+
+            <label>
+              <span>Excerpt</span>
+              <textarea name="excerpt" rows="3" placeholder="Short summary shown on cards and in the post hero."></textarea>
+            </label>
+
+            <label>
+              <span>Tags</span>
+              <input type="text" name="tags" placeholder="nmap, smb, windows, privesc" />
+            </label>
+
+            <label>
+              <span>Body</span>
+              <textarea name="content" rows="14" placeholder="Write the post here. Separate paragraphs with blank lines. Use ``` blocks for code and # / ## for headings." required></textarea>
+            </label>
+
+            <div class="admin-grid">
+              <label>
+                <span>Status</span>
+                <select name="status">
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </label>
+              <label>
+                <span>Cover image</span>
+                <input type="file" name="coverImage" accept="image/*" />
+              </label>
+            </div>
+
+            <label>
+              <span>Gallery images</span>
+              <input type="file" name="galleryImages" accept="image/*" multiple />
+            </label>
+
+            <div id="cover-preview" class="cover-preview">
+              <p class="inline-note">No cover image selected.</p>
+            </div>
+
+            <div class="hero-actions">
+              <button type="submit" class="btn">Save post</button>
+              <button type="button" class="btn ghost" id="reset-form">New post</button>
+              <button type="button" class="btn ghost" id="export-posts">Export JSON</button>
+              <label class="btn ghost file-button">
+                <span>Import JSON</span>
+                <input type="file" id="import-posts" accept="application/json" />
+              </label>
+            </div>
+
+            <p class="inline-note" id="admin-status"></p>
+          </form>
+        </section>
+
+        <aside class="admin-sidebar">
+          <div class="section-header">
+            <h2>Saved Posts</h2>
+            <p>Drafts stay out of the public site. Published posts appear on the homepage and writeups page in this browser.</p>
+          </div>
+          <div id="admin-post-list" class="admin-post-list"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Box & Ladder | Security writeups</p>
+      <p class="muted">Updated <span id="year"></span></p>
+    </div>
+  </footer>
+
+  <script src="assets/content.js"></script>
+  <script src="assets/main.js"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>

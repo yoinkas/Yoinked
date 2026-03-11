@@ -272,6 +272,24 @@ h1 span {
   overflow: hidden;
 }
 
+.stack-top {
+  margin-top: 28px;
+}
+
+.card-post {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.card-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid rgba(93, 255, 139, 0.18);
+}
+
 .meta {
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -311,6 +329,27 @@ h1 span {
 
 .muted {
   color: var(--ink-soft);
+}
+
+.empty-state,
+.inline-note {
+  color: var(--ink-soft);
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag {
+  border: 1px solid rgba(93, 255, 139, 0.22);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--accent);
+  background: rgba(93, 255, 139, 0.08);
+  font-size: 0.74rem;
+  text-transform: uppercase;
 }
 
 .post h1 {
@@ -358,6 +397,160 @@ code {
   font-family: "Share Tech Mono", monospace;
 }
 
+.post-shell {
+  display: grid;
+  gap: 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.post-cover,
+.cover-preview img,
+.image-card img {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(93, 255, 139, 0.18);
+  object-fit: cover;
+}
+
+.post-cover {
+  max-height: 420px;
+}
+
+.post-body {
+  display: grid;
+  gap: 16px;
+}
+
+.post-gallery {
+  display: grid;
+  gap: 18px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.image-card {
+  background: rgba(7, 17, 10, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.admin-panel,
+.admin-sidebar,
+.admin-post-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.admin-panel,
+.admin-sidebar {
+  padding: 24px;
+}
+
+.admin-form,
+.admin-post-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-form label,
+.file-button {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-form span,
+.file-button span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  color: var(--accent);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  width: 100%;
+  background: rgba(2, 6, 3, 0.95);
+  color: var(--ink);
+  border: 1px solid rgba(93, 255, 139, 0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.admin-form textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus {
+  outline: none;
+  border-color: rgba(93, 255, 139, 0.55);
+  box-shadow: 0 0 0 3px rgba(93, 255, 139, 0.1);
+}
+
+.cover-preview {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(93, 255, 139, 0.22);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(2, 6, 3, 0.55);
+}
+
+.admin-post-card {
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.admin-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 @keyframes rain {
   from {
     transform: translateY(-140px);
@@ -381,5 +574,10 @@ code {
 
   .contact {
     align-items: flex-start;
+  }
+
+  .admin-layout,
+  .admin-grid {
+    grid-template-columns: 1fr;
   }
 }
