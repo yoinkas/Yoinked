@@ -7,26 +7,14 @@ async function readFileAsDataUrl(file) {
   });
 }
 
-async function sha256(value) {
-  const bytes = new TextEncoder().encode(String(value || ""));
-  const digest = await window.crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const api = window.BoxLadderContent;
-  const auth = window.BoxLadderAdminAuth;
-  if (!api || !auth) {
+  if (!api) {
     return;
   }
 
-  const authPanel = document.getElementById("admin-auth-panel");
-  const authForm = document.getElementById("admin-auth-form");
-  const authStatusEl = document.getElementById("admin-auth-status");
-  const editorPanel = document.getElementById("admin-editor-panel");
-  const sidebarPanel = document.getElementById("admin-sidebar");
   const form = document.getElementById("admin-form");
-  if (!form || !authForm || !authPanel || !editorPanel || !sidebarPanel) {
+  if (!form) {
     return;
   }
 
@@ -35,29 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportButton = document.getElementById("export-posts");
   const importInput = document.getElementById("import-posts");
   const resetButton = document.getElementById("reset-form");
-  const sessionKey = auth.sessionKey || "boxladder.admin.unlocked";
-
-  function setAuthStatus(message) {
-    if (authStatusEl) {
-      authStatusEl.textContent = message;
-    }
-  }
-
-  function isUnlocked() {
-    return window.sessionStorage.getItem(sessionKey) === "1";
-  }
-
-  function showEditor() {
-    authPanel.hidden = true;
-    editorPanel.hidden = false;
-    sidebarPanel.hidden = false;
-  }
-
-  function showLockScreen() {
-    authPanel.hidden = false;
-    editorPanel.hidden = true;
-    sidebarPanel.hidden = true;
-  }
+  const logoutButton = document.getElementById("logout-button");
 
   function setStatus(message) {
     if (statusEl) {
@@ -105,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="admin-card-actions">
               <button type="button" class="btn ghost" data-action="edit" data-id="${post.id}">Edit</button>
               <button type="button" class="btn ghost" data-action="delete" data-id="${post.id}">Delete</button>
-              <a class="text-link" href="posts/post.html?slug=${encodeURIComponent(post.slug)}">Preview</a>
+              <a class="text-link" href="/posts/post.html?slug=${encodeURIComponent(post.slug)}">Preview</a>
             </div>
           </article>
         `;
@@ -222,27 +188,14 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Local storage is unavailable in this browser."
   );
 
-  authForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const password = authForm.elements.password.value;
-    const passwordHash = await sha256(password);
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
 
-    if (passwordHash !== auth.passwordHash) {
-      authForm.reset();
-      setAuthStatus("Incorrect password.");
-      return;
-    }
-
-    window.sessionStorage.setItem(sessionKey, "1");
-    authForm.reset();
-    setAuthStatus("");
-    showEditor();
-  });
-
-  if (isUnlocked()) {
-    showEditor();
-  } else {
-    showLockScreen();
-    setAuthStatus("Admin is locked.");
+      window.location.assign("/login/");
+    });
   }
 });
