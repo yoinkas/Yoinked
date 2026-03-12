@@ -74,6 +74,82 @@ function applyHomepageContent(api) {
   });
 }
 
+function applyHomepageSections(api) {
+  const content = api.loadHomepageContent();
+  const hiddenSections = new Set(content.hiddenSections || []);
+
+  document.querySelectorAll("[data-home-section]").forEach((section) => {
+    const sectionId = section.getAttribute("data-home-section");
+    section.hidden = hiddenSections.has(sectionId);
+  });
+
+  const customSectionsEl = document.getElementById("custom-home-sections");
+  if (customSectionsEl) {
+    customSectionsEl.innerHTML = (content.customSections || []).map((section) => api.renderHomepageSection(section)).join("");
+  }
+}
+
+function promptForHomepageSection(section = {}) {
+  const kicker = window.prompt("Section kicker", section.kicker || "");
+  if (kicker === null) {
+    return null;
+  }
+
+  const title = window.prompt("Section title", section.title || "");
+  if (title === null) {
+    return null;
+  }
+
+  const body = window.prompt("Section body", section.body || "");
+  if (body === null) {
+    return null;
+  }
+
+  const buttonText = window.prompt("Button text (optional)", section.buttonText || "");
+  if (buttonText === null) {
+    return null;
+  }
+
+  const buttonHref = window.prompt("Button link (optional)", section.buttonHref || "");
+  if (buttonHref === null) {
+    return null;
+  }
+
+  return { kicker, title, body, buttonText, buttonHref };
+}
+
+function buildHomeSectionControls(sectionId, isCustom = false) {
+  const controls = document.createElement("div");
+  controls.className = "home-section-controls";
+  controls.innerHTML = isCustom
+    ? `
+      <button type="button" class="home-section-btn" data-home-section-action="edit-custom" data-section-id="${sectionId}">Edit section</button>
+      <button type="button" class="home-section-btn home-section-btn-delete" data-home-section-action="delete-custom" data-section-id="${sectionId}">x</button>
+    `
+    : `
+      <button type="button" class="home-section-btn home-section-btn-delete" data-home-section-action="hide" data-section-id="${sectionId}">x</button>
+    `;
+  return controls;
+}
+
+function ensureHomepageAdminBar() {
+  let bar = document.getElementById("homepage-admin-bar");
+  if (bar) {
+    return bar;
+  }
+
+  bar = document.createElement("div");
+  bar.id = "homepage-admin-bar";
+  bar.className = "homepage-admin-bar";
+  bar.innerHTML = `
+    <span class="pill pill-alt">Admin mode</span>
+    <button type="button" class="home-section-btn" data-home-section-action="add">Add section</button>
+    <button type="button" class="home-section-btn" data-home-section-action="restore">Restore sections</button>
+  `;
+  document.body.append(bar);
+  return bar;
+}
+
 function addHomepageAdminControls(api) {
   const editableFields = document.querySelectorAll("[data-home-field]");
   editableFields.forEach((element) => {
@@ -95,6 +171,36 @@ function addHomepageAdminControls(api) {
     element.append(button);
   });
 
+  document.querySelectorAll("[data-home-section]").forEach((section) => {
+    if (section.querySelector(".home-section-controls")) {
+      return;
+    }
+
+    const sectionId = section.getAttribute("data-home-section");
+    if (!sectionId) {
+      return;
+    }
+
+    section.classList.add("home-section-editable");
+    section.append(buildHomeSectionControls(sectionId));
+  });
+
+  document.querySelectorAll("[data-custom-section-id]").forEach((section) => {
+    if (section.querySelector(".home-section-controls")) {
+      return;
+    }
+
+    const sectionId = section.getAttribute("data-custom-section-id");
+    if (!sectionId) {
+      return;
+    }
+
+    section.classList.add("home-section-editable");
+    section.append(buildHomeSectionControls(sectionId, true));
+  });
+
+  ensureHomepageAdminBar();
+
   if (document.body.dataset.homeAdminBound === "1") {
     return;
   }
@@ -108,25 +214,92 @@ function addHomepageAdminControls(api) {
     }
 
     const field = target.dataset.homeEdit;
-    if (!field) {
+    if (field) {
+      event.preventDefault();
+      const element = document.querySelector(`[data-home-field="${field}"]`);
+      if (!element) {
+        return;
+      }
+
+      const currentValue = field === "heroTitle"
+        ? element.innerHTML.replace(/<button[\s\S]*<\/button>$/, "").trim()
+        : element.childNodes[0]?.textContent?.trim() || element.textContent.trim();
+      const nextValue = window.prompt(`Edit ${field}`, currentValue);
+      if (nextValue === null) {
+        return;
+      }
+
+      api.updateHomepageField(field, nextValue);
+      applyHomepageContent(api);
+      addHomepageAdminControls(api);
+      return;
+    }
+
+    const sectionAction = target.dataset.homeSectionAction;
+    if (!sectionAction) {
       return;
     }
 
     event.preventDefault();
-    const element = document.querySelector(`[data-home-field="${field}"]`);
-    if (!element) {
+
+    if (sectionAction === "add") {
+      const nextSection = promptForHomepageSection();
+      if (!nextSection) {
+        return;
+      }
+
+      api.addHomepageSection(nextSection);
+      applyHomepageSections(api);
+      addHomepageAdminControls(api);
       return;
     }
 
-    const currentValue = field === "heroTitle" ? element.innerHTML.replace(/<button[\s\S]*<\/button>$/, "").trim() : element.childNodes[0]?.textContent?.trim() || element.textContent.trim();
-    const nextValue = window.prompt(`Edit ${field}`, currentValue);
-    if (nextValue === null) {
+    if (sectionAction === "restore") {
+      api.restoreHomepageSections();
+      applyHomepageSections(api);
+      addHomepageAdminControls(api);
       return;
     }
 
-    api.updateHomepageField(field, nextValue);
-    applyHomepageContent(api);
-    addHomepageAdminControls(api);
+    const sectionId = target.dataset.sectionId;
+    if (!sectionId) {
+      return;
+    }
+
+    if (sectionAction === "hide") {
+      api.hideHomepageSection(sectionId);
+      applyHomepageSections(api);
+      addHomepageAdminControls(api);
+      return;
+    }
+
+    if (sectionAction === "delete-custom") {
+      if (!window.confirm("Delete this section?")) {
+        return;
+      }
+
+      api.deleteHomepageSection(sectionId);
+      applyHomepageSections(api);
+      addHomepageAdminControls(api);
+      return;
+    }
+
+    if (sectionAction === "edit-custom") {
+      const content = api.loadHomepageContent();
+      const section = (content.customSections || []).find((item) => item.id === sectionId);
+      if (!section) {
+        return;
+      }
+
+      const nextSection = promptForHomepageSection(section);
+      if (!nextSection) {
+        return;
+      }
+
+      api.updateHomepageSection(sectionId, nextSection);
+      applyHomepageSections(api);
+      addHomepageAdminControls(api);
+    }
   });
 }
 
@@ -203,6 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   applyHomepageContent(api);
+  applyHomepageSections(api);
 
   const recentPostsEl = document.getElementById("recent-posts");
   let adminMode = false;

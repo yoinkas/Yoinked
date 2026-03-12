@@ -23,7 +23,7 @@
   </header>
 
   <main>
-    <section class="hero">
+    <section class="hero" data-home-section="hero">
       <div class="container hero-grid">
         <div>
           <p class="eyebrow">Security Writeups</p>
@@ -45,7 +45,7 @@
       </div>
     </section>
 
-    <section class="section" id="about">
+    <section class="section" id="about" data-home-section="about">
       <div class="container">
         <div class="section-header">
           <h2>What you will find</h2>
@@ -68,7 +68,7 @@
       </div>
     </section>
 
-    <section class="section tint">
+    <section class="section tint" data-home-section="recent">
       <div class="container">
         <div class="section-header">
           <h2>Recent writeups</h2>
@@ -78,7 +78,9 @@
       </div>
     </section>
 
-    <section class="section" id="contact">
+    <div id="custom-home-sections"></div>
+
+    <section class="section" id="contact" data-home-section="contact">
       <div class="container contact">
         <div>
           <h2 data-home-field="contactTitle">Need to ship a post fast?</h2>

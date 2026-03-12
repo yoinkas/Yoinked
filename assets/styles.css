@@ -598,6 +598,62 @@ code {
   cursor: pointer;
 }
 
+.home-section-editable,
+.custom-home-section {
+  position: relative;
+}
+
+.home-section-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.home-section-btn {
+  border: 1px solid rgba(93, 255, 139, 0.35);
+  background: rgba(2, 6, 3, 0.94);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.home-section-btn-delete {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-admin-bar {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(2, 6, 3, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.custom-home-card {
+  display: grid;
+  gap: 14px;
+}
+
 .file-button {
   position: relative;
   overflow: hidden;

@@ -275,7 +275,15 @@
       }
 
       const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
+      if (!parsed || typeof parsed !== "object") {
+        return {};
+      }
+
+      return {
+        ...parsed,
+        hiddenSections: Array.isArray(parsed.hiddenSections) ? parsed.hiddenSections : [],
+        customSections: Array.isArray(parsed.customSections) ? parsed.customSections : [],
+      };
     } catch (error) {
       return {};
     }
@@ -286,7 +294,11 @@
       return content;
     }
 
-    const normalized = content && typeof content === "object" ? content : {};
+    const normalized = {
+      ...(content && typeof content === "object" ? content : {}),
+      hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
+      customSections: Array.isArray(content?.customSections) ? content.customSections : [],
+    };
     window.localStorage.setItem(HOMEPAGE_KEY, JSON.stringify(normalized));
     return normalized;
   }
@@ -296,6 +308,82 @@
     current[field] = String(value || "");
     saveHomepageContent(current);
     return current;
+  }
+
+  function hideHomepageSection(sectionId) {
+    const current = loadHomepageContent();
+    current.hiddenSections = Array.from(new Set([...(current.hiddenSections || []), String(sectionId || "")].filter(Boolean)));
+    return saveHomepageContent(current);
+  }
+
+  function restoreHomepageSections() {
+    const current = loadHomepageContent();
+    current.hiddenSections = [];
+    return saveHomepageContent(current);
+  }
+
+  function addHomepageSection(input) {
+    const current = loadHomepageContent();
+    const nextSection = {
+      id: `section-${Date.now()}`,
+      kicker: plainText(input.kicker),
+      title: plainText(input.title) || "New section",
+      body: plainText(input.body),
+      buttonText: plainText(input.buttonText),
+      buttonHref: plainText(input.buttonHref),
+    };
+
+    current.customSections = [...(current.customSections || []), nextSection];
+    saveHomepageContent(current);
+    return nextSection;
+  }
+
+  function updateHomepageSection(sectionId, input) {
+    const current = loadHomepageContent();
+    current.customSections = (current.customSections || []).map((section) => {
+      if (section.id !== sectionId) {
+        return section;
+      }
+
+      return {
+        ...section,
+        kicker: plainText(input.kicker),
+        title: plainText(input.title) || "New section",
+        body: plainText(input.body),
+        buttonText: plainText(input.buttonText),
+        buttonHref: plainText(input.buttonHref),
+      };
+    });
+
+    saveHomepageContent(current);
+    return current.customSections.find((section) => section.id === sectionId) || null;
+  }
+
+  function deleteHomepageSection(sectionId) {
+    const current = loadHomepageContent();
+    current.customSections = (current.customSections || []).filter((section) => section.id !== sectionId);
+    return saveHomepageContent(current);
+  }
+
+  function renderHomepageSection(section) {
+    const kicker = section.kicker ? `<p class="eyebrow">${escapeHtml(section.kicker)}</p>` : "";
+    const body = section.body ? `<p class="lede">${escapeHtml(section.body).replace(/\n/g, "<br />")}</p>` : "";
+    const action = section.buttonText && section.buttonHref
+      ? `<a class="btn" href="${escapeHtml(section.buttonHref)}">${escapeHtml(section.buttonText)}</a>`
+      : "";
+
+    return `
+      <section class="section custom-home-section" data-custom-section-id="${escapeHtml(section.id)}">
+        <div class="container">
+          <div class="card custom-home-card">
+            ${kicker}
+            <h2>${escapeHtml(section.title)}</h2>
+            ${body}
+            ${action}
+          </div>
+        </div>
+      </section>
+    `;
   }
 
   window.BoxLadderContent = {
@@ -313,6 +401,12 @@
     loadHomepageContent,
     saveHomepageContent,
     updateHomepageField,
+    hideHomepageSection,
+    restoreHomepageSections,
+    addHomepageSection,
+    updateHomepageSection,
+    deleteHomepageSection,
+    renderHomepageSection,
     renderPostCard,
     renderPostPage,
   };
