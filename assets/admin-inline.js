@@ -82,7 +82,7 @@ function renderMenu(label, items) {
   `;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const api = window.BoxLadderContent;
   const homepageResetButton = document.getElementById("homepage-reset");
   const homepageAddSectionButton = document.getElementById("homepage-add-section");
@@ -374,7 +374,17 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  function updateFields(fields, message) {
+  async function persistHomepage(nextState, message) {
+    try {
+      await api.saveHomepageContentRemote(nextState);
+      renderHomepageEditor();
+      setHomepageStatus(message);
+    } catch (error) {
+      setHomepageStatus(error.message || "Failed to save homepage.");
+    }
+  }
+
+  async function updateFields(fields, message) {
     const state = getHomepageState();
     const next = promptFields(fields.map((field) => ({
       ...field,
@@ -384,39 +394,33 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    api.saveHomepageContent({ ...state, ...next });
-    renderHomepageEditor();
-    setHomepageStatus(message);
+    await persistHomepage({ ...state, ...next }, message);
   }
 
-  homepageAddSectionButton.addEventListener("click", () => {
+  homepageAddSectionButton.addEventListener("click", async () => {
     const section = promptForHomepageSection();
     if (!section) {
       return;
     }
 
     api.addHomepageSection(section);
-    renderHomepageEditor();
-    setHomepageStatus("Added custom homepage section.");
+    await persistHomepage(getHomepageState(), "Added custom homepage section.");
   });
 
-  homepageResetButton.addEventListener("click", () => {
-    api.saveHomepageContent({
+  homepageResetButton.addEventListener("click", async () => {
+    await persistHomepage({
       ...api.getHomepageDefaults(),
       hiddenSections: [],
       customSections: [],
-    });
-    renderHomepageEditor();
-    setHomepageStatus("Reset homepage to defaults.");
+    }, "Reset homepage to defaults.");
   });
 
-  homepageRestoreSectionsButton.addEventListener("click", () => {
+  homepageRestoreSectionsButton.addEventListener("click", async () => {
     api.restoreHomepageSections();
-    renderHomepageEditor();
-    setHomepageStatus("Restored hidden sections.");
+    await persistHomepage(getHomepageState(), "Restored hidden sections.");
   });
 
-  homepagePreviewEl.addEventListener("click", (event) => {
+  homepagePreviewEl.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement) || !target.dataset.adminAction) {
       return;
@@ -425,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     closeMenu(target);
 
     if (target.dataset.adminAction === "edit-hero-copy") {
-      updateFields([
+      await updateFields([
         { name: "heroEyebrow", label: "Hero eyebrow" },
         { name: "heroTitle", label: "Hero title (HTML allowed)" },
         { name: "heroLede", label: "Hero lede" },
@@ -438,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (target.dataset.adminAction === "edit-hero-card") {
-      updateFields([
+      await updateFields([
         { name: "heroPillPrimary", label: "Pill 1 text" },
         { name: "heroPillSecondary", label: "Pill 2 text" },
         { name: "heroCardTitle", label: "Card title" },
@@ -451,13 +455,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (target.dataset.adminAction === "move-hero-media") {
       api.toggleHeroMediaPosition();
-      renderHomepageEditor();
-      setHomepageStatus("Moved hero image block.");
+      await persistHomepage(getHomepageState(), "Moved hero image block.");
       return;
     }
 
     if (target.dataset.adminAction === "edit-about-section") {
-      updateFields([
+      await updateFields([
         { name: "aboutHeading", label: "About heading" },
         { name: "aboutIntro", label: "About intro" },
       ], "Updated about section.");
@@ -466,7 +469,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (target.dataset.adminAction === "edit-about-card") {
       const number = target.dataset.adminTarget;
-      updateFields([
+      await updateFields([
         { name: `aboutCard${number}Title`, label: `About card ${number} title` },
         { name: `aboutCard${number}Body`, label: `About card ${number} body` },
       ], `Updated about card ${number}.`);
@@ -474,7 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (target.dataset.adminAction === "edit-recent-section") {
-      updateFields([
+      await updateFields([
         { name: "recentHeading", label: "Tracks heading" },
         { name: "recentIntro", label: "Tracks intro" },
       ], "Updated tracks section.");
@@ -483,7 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (target.dataset.adminAction === "edit-recent-card") {
       const number = target.dataset.adminTarget;
-      updateFields([
+      await updateFields([
         { name: `recentCard${number}Title`, label: `Track ${number} title` },
         { name: `recentCard${number}Body`, label: `Track ${number} body` },
         { name: `recentCard${number}LinkText`, label: `Track ${number} link text` },
@@ -493,7 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (target.dataset.adminAction === "edit-contact-section") {
-      updateFields([
+      await updateFields([
         { name: "contactTitle", label: "Contact title" },
         { name: "contactBody", label: "Contact body" },
         { name: "contactButtonText", label: "Contact button text" },
@@ -503,7 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (target.dataset.adminAction === "edit-footer") {
-      updateFields([{ name: "footerText", label: "Footer text" }], "Updated footer.");
+      await updateFields([{ name: "footerText", label: "Footer text" }], "Updated footer.");
       return;
     }
 
@@ -519,8 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       api.updateHomepageSection(section.id, next);
-      renderHomepageEditor();
-      setHomepageStatus("Updated custom section.");
+      await persistHomepage(getHomepageState(), "Updated custom section.");
       return;
     }
 
@@ -530,41 +532,37 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       api.deleteHomepageSection(target.dataset.adminTarget);
-      renderHomepageEditor();
-      setHomepageStatus("Deleted custom section.");
+      await persistHomepage(getHomepageState(), "Deleted custom section.");
       return;
     }
 
     if (target.dataset.adminAction === "hide-section") {
       api.hideHomepageSection(target.dataset.adminTarget);
-      renderHomepageEditor();
-      setHomepageStatus("Section hidden.");
+      await persistHomepage(getHomepageState(), "Section hidden.");
       return;
     }
 
     if (target.dataset.adminAction === "move-section") {
       api.moveHomepageSection(target.dataset.adminTarget, target.dataset.adminDirection);
-      renderHomepageEditor();
-      setHomepageStatus("Section moved.");
+      await persistHomepage(getHomepageState(), "Section moved.");
       return;
     }
 
     if (target.dataset.adminAction === "move-card") {
       api.moveHomepageCard("about", target.dataset.adminTarget, target.dataset.adminDirection);
-      renderHomepageEditor();
-      setHomepageStatus("About card moved.");
+      await persistHomepage(getHomepageState(), "About card moved.");
       return;
     }
 
     if (target.dataset.adminAction === "move-recent-card") {
       api.moveHomepageCard("recent", target.dataset.adminTarget, target.dataset.adminDirection);
-      renderHomepageEditor();
-      setHomepageStatus("Track card moved.");
+      await persistHomepage(getHomepageState(), "Track card moved.");
     }
   });
 
+  await api.fetchHomepageContent();
   renderHomepageEditor();
-  setHomepageStatus(api.canUseStorage() ? "Inline homepage editor ready." : "Local storage is unavailable in this browser.");
+  setHomepageStatus("Inline homepage editor ready.");
   startAdminSessionActivityTracking();
 
   if (logoutButton) {

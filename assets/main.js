@@ -104,12 +104,13 @@ function applyHomepageSections(api) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const api = window.BoxLadderContent;
   if (!api) {
     return;
   }
 
+  await api.fetchHomepageContent();
   applyHomepageContent(api);
   applyHomepageSections(api);
   applyHomepageCardOrdering(api);

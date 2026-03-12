@@ -1,6 +1,7 @@
 (() => {
   const STORAGE_KEY = "boxladder.posts.v1";
   const HOMEPAGE_KEY = "boxladder.homepage.v1";
+  const HOMEPAGE_API_ENDPOINT = "/api/homepage";
 
   function getHomepageDefaults() {
     return {
@@ -355,17 +356,55 @@
   }
 
   function saveHomepageContent(content) {
-    if (!canUseStorage()) {
-      return normalizeHomepageContent(content);
-    }
-
     const normalized = normalizeHomepageContent({
       ...(content && typeof content === "object" ? content : {}),
       hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
       customSections: Array.isArray(content?.customSections) ? content.customSections : [],
     });
-    window.localStorage.setItem(HOMEPAGE_KEY, JSON.stringify(normalized));
+
+    if (canUseStorage()) {
+      window.localStorage.setItem(HOMEPAGE_KEY, JSON.stringify(normalized));
+    }
+
     return normalized;
+  }
+
+  async function fetchHomepageContent() {
+    try {
+      const response = await fetch(HOMEPAGE_API_ENDPOINT, {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load homepage: ${response.status}`);
+      }
+
+      const payload = await response.json();
+      return saveHomepageContent(payload.homepage || {});
+    } catch (error) {
+      return loadHomepageContent();
+    }
+  }
+
+  async function saveHomepageContentRemote(content) {
+    const normalized = saveHomepageContent(content);
+    const response = await fetch(HOMEPAGE_API_ENDPOINT, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ homepage: normalized }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || "Failed to save homepage.");
+    }
+
+    return saveHomepageContent(payload.homepage || normalized);
   }
 
   function normalizeOrder(order, validIds, fallbackOrder) {
@@ -541,6 +580,7 @@
 
   window.BoxLadderContent = {
     HOMEPAGE_KEY,
+    HOMEPAGE_API_ENDPOINT,
     STORAGE_KEY,
     getHomepageDefaults,
     canUseStorage,
@@ -554,6 +594,8 @@
     importPosts,
     loadHomepageContent,
     saveHomepageContent,
+    fetchHomepageContent,
+    saveHomepageContentRemote,
     updateHomepageField,
     hideHomepageSection,
     restoreHomepageSections,
