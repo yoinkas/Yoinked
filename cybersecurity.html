@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 </head>
-<body>
+<body class="page-cybersecurity">
   <header class="site-header">
     <div class="container">
       <a class="logo" href="index.html">Yoinked by Yoinkas</a>
@@ -24,45 +24,46 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
+    <section class="hero cyber-hero">
+      <div class="container cyber-hero-grid">
         <div>
           <p class="eyebrow">CyberSecurity</p>
-          <h1>Security notes beyond the box pop.</h1>
-          <p class="lede">A dedicated page for broader cyber thinking, operational notes, defensive ideas, and the writeups that matter enough to keep close.</p>
+          <h1>CyberSecurity as its own operating layer.</h1>
+          <p class="lede">This page stands apart from the rest of the site: cleaner, brighter, and focused on wider security thinking, defensive posture, and signal over noise.</p>
           <div class="hero-actions">
             <a class="btn" href="hacking.html">Open hacking research</a>
             <a class="btn ghost" href="posts/index.html">Browse writeups</a>
           </div>
         </div>
-        <div class="hero-card">
-          <div class="hero-card__top">
-            <span class="pill">CyberSecurity</span>
-            <span class="pill pill-alt">Separate track</span>
-          </div>
-          <h3>Strategy, notes, and core patterns</h3>
-          <p>This side of the site is for security thinking at a wider level, not just exploitation walkthroughs.</p>
-        </div>
+        <figure class="cyber-hero-media">
+          <img src="assets/cybersecurity-hero.gif" alt="Cybersecurity animation" />
+        </figure>
       </div>
     </section>
 
-    <section class="section tint">
+    <section class="section cyber-band">
       <div class="container">
         <div class="section-header">
-          <h2>Selected writeups</h2>
-          <p>Recent published work that fits the broader security picture.</p>
+          <h2>Selected signals</h2>
+          <p>Recent published work that fits the broader cyber picture without collapsing into the hacking track.</p>
         </div>
         <div class="card-grid" id="recent-posts"></div>
       </div>
     </section>
 
     <section class="section">
-      <div class="container contact">
-        <div>
-          <h2>Want the hands-on side?</h2>
-          <p>Jump into the separate hacking page for research-heavy work, labs, and offensive notes.</p>
-        </div>
-        <a class="btn" href="hacking.html">Go to hacking</a>
+      <div class="container cyber-grid">
+        <article class="card cyber-note-card">
+          <p class="eyebrow">Core Focus</p>
+          <h3>Strategy, notes, and operating patterns</h3>
+          <p>This side is for the wider frame: process, posture, review habits, and the principles that survive outside one machine or one lab.</p>
+        </article>
+        <article class="card cyber-note-card">
+          <p class="eyebrow">Separate Track</p>
+          <h3>Need the hands-on side?</h3>
+          <p>Jump into the separate hacking page for research-heavy work, labs, exploit paths, and offensive notes.</p>
+          <a class="btn" href="hacking.html">Go to hacking</a>
+        </article>
       </div>
     </section>
   </main>

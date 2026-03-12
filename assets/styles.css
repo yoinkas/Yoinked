@@ -751,3 +751,69 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+body.page-cybersecurity {
+  --bg: #f7f7f2;
+  --bg-alt: #eef1ea;
+  --ink: #17211d;
+  --ink-soft: #4f6259;
+  --accent: #0d8b6f;
+  --accent-2: #d7efe8;
+  --card: rgba(255, 255, 255, 0.92);
+  --border: rgba(13, 139, 111, 0.12);
+  --shadow: 0 20px 50px rgba(11, 34, 28, 0.12);
+  background:
+    radial-gradient(circle at top left, rgba(13, 139, 111, 0.08), transparent 30%),
+    linear-gradient(180deg, #fcfcf8 0%, #f2f5ef 55%, #edf2ec 100%);
+}
+
+body.page-cybersecurity::before,
+body.page-cybersecurity::after {
+  display: none;
+}
+
+body.page-cybersecurity .site-header {
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom: 1px solid rgba(13, 139, 111, 0.14);
+  box-shadow: 0 10px 30px rgba(11, 34, 28, 0.08);
+}
+
+body.page-cybersecurity a:hover {
+  text-shadow: none;
+}
+
+.cyber-hero {
+  padding-top: 56px;
+}
+
+.cyber-hero-grid,
+.cyber-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  align-items: center;
+}
+
+.cyber-hero-media {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(13, 139, 111, 0.14);
+  border-radius: 28px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.cyber-hero-media img {
+  width: 100%;
+  display: block;
+  border-radius: 18px;
+}
+
+.cyber-band {
+  background: linear-gradient(180deg, rgba(215, 239, 232, 0.68), rgba(255, 255, 255, 0.4));
+  border-top: 1px solid rgba(13, 139, 111, 0.1);
+  border-bottom: 1px solid rgba(13, 139, 111, 0.1);
+}
+
+.cyber-note-card {
+  min-height: 100%;
+}
