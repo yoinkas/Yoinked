@@ -7,6 +7,62 @@ async function readFileAsDataUrl(file) {
   });
 }
 
+const ADMIN_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
+
+async function logoutAdminSession() {
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+  } catch (error) {
+    // Ignore logout errors and continue redirecting.
+  }
+
+  window.location.assign("/login/");
+}
+
+async function refreshAdminSession() {
+  try {
+    const response = await fetch("/api/refresh-session", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+function startAdminSessionActivityTracking() {
+  let idleTimer = 0;
+  let refreshTimer = 0;
+
+  const resetTimers = () => {
+    window.clearTimeout(idleTimer);
+    window.clearTimeout(refreshTimer);
+
+    refreshTimer = window.setTimeout(async () => {
+      const ok = await refreshAdminSession();
+      if (!ok) {
+        logoutAdminSession();
+      }
+    }, Math.max(ADMIN_IDLE_TIMEOUT_MS - 15000, 1000));
+
+    idleTimer = window.setTimeout(() => {
+      logoutAdminSession();
+    }, ADMIN_IDLE_TIMEOUT_MS);
+  };
+
+  ["click", "keydown", "mousemove", "scroll", "touchstart"].forEach((eventName) => {
+    window.addEventListener(eventName, resetTimers, { passive: true });
+  });
+
+  resetTimers();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const api = window.BoxLadderContent;
   if (!api) {
@@ -188,14 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Local storage is unavailable in this browser."
   );
 
+  startAdminSessionActivityTracking();
+
   if (logoutButton) {
     logoutButton.addEventListener("click", async () => {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "same-origin",
-      });
-
-      window.location.assign("/login/");
+      logoutAdminSession();
     });
   }
 });

@@ -3,6 +3,10 @@ if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+const ADMIN_IDLE_TIMEOUT_MS = 2 * 60 * 1000;
+let adminIdleTimer = 0;
+let adminRefreshTimer = 0;
+
 async function isAdminSessionActive() {
   try {
     const response = await fetch("/api/session", {
@@ -20,6 +24,57 @@ async function isAdminSessionActive() {
   } catch (error) {
     return false;
   }
+}
+
+async function logoutAdminSession(redirectPath = "/login/") {
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+  } catch (error) {
+    // Ignore logout transport errors and still redirect.
+  }
+
+  window.location.assign(redirectPath);
+}
+
+async function refreshAdminSession() {
+  try {
+    const response = await fetch("/api/refresh-session", {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+function startAdminSessionActivityTracking() {
+  const resetTimers = async () => {
+    window.clearTimeout(adminIdleTimer);
+    window.clearTimeout(adminRefreshTimer);
+
+    adminRefreshTimer = window.setTimeout(async () => {
+      const ok = await refreshAdminSession();
+      if (!ok) {
+        logoutAdminSession();
+      }
+    }, Math.max(ADMIN_IDLE_TIMEOUT_MS - 15000, 1000));
+
+    adminIdleTimer = window.setTimeout(() => {
+      logoutAdminSession();
+    }, ADMIN_IDLE_TIMEOUT_MS);
+  };
+
+  ["click", "keydown", "mousemove", "scroll", "touchstart"].forEach((eventName) => {
+    window.addEventListener(eventName, resetTimers, { passive: true });
+  });
+
+  resetTimers();
 }
 
 function promptForPostEdits(post) {
@@ -303,6 +358,16 @@ function addHomepageAdminControls(api) {
   });
 }
 
+function removeHomepageAdminControls() {
+  document.querySelectorAll(".home-edit-btn").forEach((element) => element.remove());
+  document.querySelectorAll(".home-section-controls").forEach((element) => element.remove());
+  document.getElementById("homepage-admin-bar")?.remove();
+  document.querySelectorAll(".home-editable").forEach((element) => element.classList.remove("home-editable"));
+  document.querySelectorAll(".home-section-editable").forEach((element) => element.classList.remove("home-section-editable"));
+  document.body.classList.remove("admin-mode-active");
+  delete document.body.dataset.homeAdminBound;
+}
+
 function decorateAdminControls(root) {
   const posts = root.querySelectorAll("[data-post-id]");
   posts.forEach((postEl) => {
@@ -317,6 +382,10 @@ function decorateAdminControls(root) {
 
     postEl.append(buildAdminControls(postId));
   });
+}
+
+function removePostAdminControls(root) {
+  root.querySelectorAll(".post-admin-controls").forEach((element) => element.remove());
 }
 
 function attachAdminControls(root, api, rerender) {
@@ -377,6 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyHomepageContent(api);
   applyHomepageSections(api);
+  removeHomepageAdminControls();
 
   const recentPostsEl = document.getElementById("recent-posts");
   let adminMode = false;
@@ -393,6 +463,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (adminMode) {
       decorateAdminControls(recentPostsEl);
+    } else {
+      removePostAdminControls(recentPostsEl);
     }
   }
 
@@ -413,6 +485,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (adminMode) {
       decorateAdminControls(allPostsEl);
+    } else {
+      removePostAdminControls(allPostsEl);
     }
   }
 
@@ -447,6 +521,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (adminMode) {
       decorateAdminControls(postViewEl);
+    } else {
+      removePostAdminControls(postViewEl);
     }
   }
 
@@ -461,6 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     adminMode = true;
     document.body.classList.add("admin-mode-active");
+    startAdminSessionActivityTracking();
 
     if (recentPostsEl) {
       attachAdminControls(recentPostsEl, api, renderRecentPosts);
