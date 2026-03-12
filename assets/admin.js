@@ -80,11 +80,153 @@ document.addEventListener("DOMContentLoaded", () => {
   const importInput = document.getElementById("import-posts");
   const resetButton = document.getElementById("reset-form");
   const logoutButton = document.getElementById("logout-button");
+  const homepageForm = document.getElementById("homepage-form");
+  const homepageResetButton = document.getElementById("homepage-reset");
+  const homepageAddSectionButton = document.getElementById("homepage-add-section");
+  const homepageStatusEl = document.getElementById("homepage-status");
+  const homepagePreviewEl = document.getElementById("homepage-preview");
+  const homepageSectionListEl = document.getElementById("homepage-section-list");
 
   function setStatus(message) {
     if (statusEl) {
       statusEl.textContent = message;
     }
+  }
+
+  function setHomepageStatus(message) {
+    if (homepageStatusEl) {
+      homepageStatusEl.textContent = message;
+    }
+  }
+
+  function getHomepageDefaults() {
+    return {
+      heroTitle: `Clean, methodical walkthroughs for <span>TryHackMe</span> and <span>Hack The Box</span>.`,
+      heroLede: `Focused on reproducible steps, tooling notes, and what I learned along the way. Built for review before interviews and CTF sprints.`,
+      heroCardTitle: "Writeups built for review",
+      heroCardBody: "Each walkthrough focuses on clean recon notes, repeatable commands, and lessons worth keeping.",
+      aboutIntro: "Each post sticks to a repeatable workflow: recon, foothold, privilege escalation, and takeaways.",
+      recentIntro: "CyberSecurity and Hacking now live on separate pages so the site stays divided cleanly.",
+      contactTitle: "Need to ship a post fast?",
+      contactBody: "Draft locally, tighten the writeup, and publish when you are ready.",
+    };
+  }
+
+  function getHomepageState() {
+    return {
+      ...getHomepageDefaults(),
+      ...api.loadHomepageContent(),
+    };
+  }
+
+  function fillHomepageForm() {
+    if (!homepageForm) {
+      return;
+    }
+
+    const state = getHomepageState();
+    homepageForm.elements.heroTitle.value = state.heroTitle || "";
+    homepageForm.elements.heroLede.value = state.heroLede || "";
+    homepageForm.elements.heroCardTitle.value = state.heroCardTitle || "";
+    homepageForm.elements.heroCardBody.value = state.heroCardBody || "";
+    homepageForm.elements.aboutIntro.value = state.aboutIntro || "";
+    homepageForm.elements.recentIntro.value = state.recentIntro || "";
+    homepageForm.elements.contactTitle.value = state.contactTitle || "";
+    homepageForm.elements.contactBody.value = state.contactBody || "";
+  }
+
+  function renderHomepagePreview() {
+    if (!homepagePreviewEl) {
+      return;
+    }
+
+    const state = getHomepageState();
+    const customSections = Array.isArray(state.customSections) ? state.customSections : [];
+
+    homepagePreviewEl.innerHTML = `
+      <article class="hero-card">
+        <p class="eyebrow">Homepage</p>
+        <h2>${state.heroTitle}</h2>
+        <p class="lede">${state.heroLede}</p>
+        <div class="callout">
+          <h3>${state.heroCardTitle}</h3>
+          <p>${state.heroCardBody}</p>
+        </div>
+      </article>
+      <article class="card">
+        <h3>About</h3>
+        <p>${state.aboutIntro}</p>
+      </article>
+      <article class="card">
+        <h3>Track intro</h3>
+        <p>${state.recentIntro}</p>
+      </article>
+      ${customSections.map((section) => api.renderHomepageSection(section)).join("")}
+      <article class="contact">
+        <div>
+          <h3>${state.contactTitle}</h3>
+          <p>${state.contactBody}</p>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderHomepageSections() {
+    if (!homepageSectionListEl) {
+      return;
+    }
+
+    const customSections = getHomepageState().customSections || [];
+    homepageSectionListEl.innerHTML = customSections.length
+      ? customSections.map((section) => `
+          <article class="admin-post-card">
+            <div>
+              <p class="meta">Custom section</p>
+              <h3>${section.title}</h3>
+              <p>${section.body || "No body text set."}</p>
+            </div>
+            <div class="admin-card-actions">
+              <button type="button" class="btn ghost" data-home-action="edit-section" data-id="${section.id}">Edit</button>
+              <button type="button" class="btn ghost" data-home-action="delete-section" data-id="${section.id}">Delete</button>
+            </div>
+          </article>
+        `).join("")
+      : `<p class="empty-state">No custom homepage sections yet.</p>`;
+  }
+
+  function refreshHomepageUI() {
+    fillHomepageForm();
+    renderHomepagePreview();
+    renderHomepageSections();
+  }
+
+  function promptForHomepageSection(section = {}) {
+    const title = window.prompt("Section title", section.title || "");
+    if (title === null) {
+      return null;
+    }
+
+    const kicker = window.prompt("Section kicker", section.kicker || "");
+    if (kicker === null) {
+      return null;
+    }
+
+    const body = window.prompt("Section body", section.body || "");
+    if (body === null) {
+      return null;
+    }
+
+    const buttonText = window.prompt("Button text (optional)", section.buttonText || "");
+    if (buttonText === null) {
+      return null;
+    }
+
+    const buttonHref = window.prompt("Button link (optional)", section.buttonHref || "");
+    if (buttonHref === null) {
+      return null;
+    }
+
+    return { title, kicker, body, buttonText, buttonHref };
   }
 
   function populateForm(post) {
@@ -236,8 +378,91 @@ document.addEventListener("DOMContentLoaded", () => {
     setStatus("Imported posts from JSON.");
   });
 
+  if (homepageForm) {
+    homepageForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const payload = {
+        ...api.loadHomepageContent(),
+        heroTitle: homepageForm.elements.heroTitle.value,
+        heroLede: homepageForm.elements.heroLede.value,
+        heroCardTitle: homepageForm.elements.heroCardTitle.value,
+        heroCardBody: homepageForm.elements.heroCardBody.value,
+        aboutIntro: homepageForm.elements.aboutIntro.value,
+        recentIntro: homepageForm.elements.recentIntro.value,
+        contactTitle: homepageForm.elements.contactTitle.value,
+        contactBody: homepageForm.elements.contactBody.value,
+      };
+
+      api.saveHomepageContent(payload);
+      refreshHomepageUI();
+      setHomepageStatus("Saved homepage content.");
+    });
+  }
+
+  if (homepageResetButton) {
+    homepageResetButton.addEventListener("click", () => {
+      api.saveHomepageContent({
+        ...api.loadHomepageContent(),
+        ...getHomepageDefaults(),
+      });
+      refreshHomepageUI();
+      setHomepageStatus("Reset homepage copy to defaults.");
+    });
+  }
+
+  if (homepageAddSectionButton) {
+    homepageAddSectionButton.addEventListener("click", () => {
+      const section = promptForHomepageSection();
+      if (!section) {
+        return;
+      }
+
+      api.addHomepageSection(section);
+      refreshHomepageUI();
+      setHomepageStatus("Added custom homepage section.");
+    });
+  }
+
+  if (homepageSectionListEl) {
+    homepageSectionListEl.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+
+      const action = target.dataset.homeAction;
+      const id = target.dataset.id;
+      if (!action || !id) {
+        return;
+      }
+
+      const section = (api.loadHomepageContent().customSections || []).find((item) => item.id === id);
+      if (!section) {
+        return;
+      }
+
+      if (action === "edit-section") {
+        const next = promptForHomepageSection(section);
+        if (!next) {
+          return;
+        }
+
+        api.updateHomepageSection(id, next);
+        refreshHomepageUI();
+        setHomepageStatus("Updated custom homepage section.");
+      }
+
+      if (action === "delete-section") {
+        api.deleteHomepageSection(id);
+        refreshHomepageUI();
+        setHomepageStatus("Deleted custom homepage section.");
+      }
+    });
+  }
+
   populateForm(null);
   renderPosts();
+  refreshHomepageUI();
   setStatus(
     api.canUseStorage()
       ? "Local admin ready. Published posts will appear in this browser."

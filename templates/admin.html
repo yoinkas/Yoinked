@@ -115,6 +115,84 @@
         </aside>
       </div>
     </section>
+
+    <section class="section">
+      <div class="container admin-home-grid">
+        <section class="admin-panel">
+          <div class="section-header">
+            <h2>Homepage Editor</h2>
+            <p>Edit homepage copy and custom sections here. Changes should be reflected on `/index.html` in this browser.</p>
+          </div>
+
+          <form id="homepage-form" class="admin-form">
+            <label>
+              <span>Hero title</span>
+              <textarea name="heroTitle" rows="3"></textarea>
+            </label>
+
+            <label>
+              <span>Hero lede</span>
+              <textarea name="heroLede" rows="3"></textarea>
+            </label>
+
+            <div class="admin-grid">
+              <label>
+                <span>Hero card title</span>
+                <input type="text" name="heroCardTitle" />
+              </label>
+              <label>
+                <span>Hero card body</span>
+                <input type="text" name="heroCardBody" />
+              </label>
+            </div>
+
+            <div class="admin-grid">
+              <label>
+                <span>About intro</span>
+                <textarea name="aboutIntro" rows="3"></textarea>
+              </label>
+              <label>
+                <span>Contact title</span>
+                <input type="text" name="contactTitle" />
+              </label>
+            </div>
+
+            <div class="admin-grid">
+              <label>
+                <span>Recent intro</span>
+                <textarea name="recentIntro" rows="3"></textarea>
+              </label>
+              <label>
+                <span>Contact body</span>
+                <textarea name="contactBody" rows="3"></textarea>
+              </label>
+            </div>
+
+            <div class="hero-actions">
+              <button type="submit" class="btn">Save homepage</button>
+              <button type="button" class="btn ghost" id="homepage-reset">Reset homepage</button>
+              <button type="button" class="btn ghost" id="homepage-add-section">Add custom section</button>
+            </div>
+
+            <p class="inline-note" id="homepage-status"></p>
+          </form>
+
+          <div class="section-header stack-top">
+            <h3>Custom Sections</h3>
+            <p>Add, edit, or remove sections that appear between the homepage tracks and contact area.</p>
+          </div>
+          <div id="homepage-section-list" class="admin-post-list"></div>
+        </section>
+
+        <aside class="admin-sidebar">
+          <div class="section-header">
+            <h2>Homepage Preview</h2>
+            <p>Read-only preview of the current homepage content state.</p>
+          </div>
+          <div id="homepage-preview" class="homepage-preview"></div>
+        </aside>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">

@@ -3,11 +3,47 @@ if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+function applyHomepageContent(api) {
+  const content = api.loadHomepageContent();
+  document.querySelectorAll("[data-home-field]").forEach((element) => {
+    const field = element.getAttribute("data-home-field");
+    const value = content[field];
+    if (!field || typeof value !== "string" || !value.trim()) {
+      return;
+    }
+
+    if (field === "heroTitle") {
+      element.innerHTML = value;
+      return;
+    }
+
+    element.textContent = value;
+  });
+}
+
+function applyHomepageSections(api) {
+  const content = api.loadHomepageContent();
+  const hiddenSections = new Set(content.hiddenSections || []);
+
+  document.querySelectorAll("[data-home-section]").forEach((section) => {
+    const sectionId = section.getAttribute("data-home-section");
+    section.hidden = hiddenSections.has(sectionId);
+  });
+
+  const customSectionsEl = document.getElementById("custom-home-sections");
+  if (customSectionsEl) {
+    customSectionsEl.innerHTML = (content.customSections || []).map((section) => api.renderHomepageSection(section)).join("");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const api = window.BoxLadderContent;
   if (!api) {
     return;
   }
+
+  applyHomepageContent(api);
+  applyHomepageSections(api);
 
   const recentPostsEl = document.getElementById("recent-posts");
   if (recentPostsEl) {

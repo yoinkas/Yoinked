@@ -466,6 +466,13 @@ code {
   align-items: start;
 }
 
+.admin-home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  gap: 28px;
+  align-items: start;
+}
+
 .admin-panel,
 .admin-sidebar,
 .admin-post-card {
@@ -545,6 +552,17 @@ code {
   padding: 18px;
   display: grid;
   gap: 16px;
+}
+
+.homepage-preview {
+  display: grid;
+  gap: 18px;
+}
+
+.homepage-preview .card,
+.homepage-preview .contact,
+.homepage-preview .hero-card {
+  box-shadow: none;
 }
 
 .admin-card-actions {
