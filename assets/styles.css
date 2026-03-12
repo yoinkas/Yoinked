@@ -576,6 +576,28 @@ code {
   justify-content: center;
 }
 
+.home-editable {
+  position: relative;
+  display: inline-block;
+  padding-right: 72px;
+}
+
+.home-edit-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid rgba(93, 255, 139, 0.35);
+  background: rgba(2, 6, 3, 0.92);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
 .file-button {
   position: relative;
   overflow: hidden;

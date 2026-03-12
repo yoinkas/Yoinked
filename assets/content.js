@@ -1,5 +1,6 @@
 (() => {
   const STORAGE_KEY = "boxladder.posts.v1";
+  const HOMEPAGE_KEY = "boxladder.homepage.v1";
 
   function canUseStorage() {
     try {
@@ -262,7 +263,43 @@
     return parsed;
   }
 
+  function loadHomepageContent() {
+    if (!canUseStorage()) {
+      return {};
+    }
+
+    try {
+      const raw = window.localStorage.getItem(HOMEPAGE_KEY);
+      if (!raw) {
+        return {};
+      }
+
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveHomepageContent(content) {
+    if (!canUseStorage()) {
+      return content;
+    }
+
+    const normalized = content && typeof content === "object" ? content : {};
+    window.localStorage.setItem(HOMEPAGE_KEY, JSON.stringify(normalized));
+    return normalized;
+  }
+
+  function updateHomepageField(field, value) {
+    const current = loadHomepageContent();
+    current[field] = String(value || "");
+    saveHomepageContent(current);
+    return current;
+  }
+
   window.BoxLadderContent = {
+    HOMEPAGE_KEY,
     STORAGE_KEY,
     canUseStorage,
     loadPosts,
@@ -273,6 +310,9 @@
     getPost,
     exportPosts,
     importPosts,
+    loadHomepageContent,
+    saveHomepageContent,
+    updateHomepageField,
     renderPostCard,
     renderPostPage,
   };

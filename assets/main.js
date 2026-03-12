@@ -56,6 +56,80 @@ function buildAdminControls(postId) {
   return controls;
 }
 
+function applyHomepageContent(api) {
+  const content = api.loadHomepageContent();
+  document.querySelectorAll("[data-home-field]").forEach((element) => {
+    const field = element.getAttribute("data-home-field");
+    const value = content[field];
+    if (!field || typeof value !== "string" || !value.trim()) {
+      return;
+    }
+
+    if (field === "heroTitle") {
+      element.innerHTML = value;
+      return;
+    }
+
+    element.textContent = value;
+  });
+}
+
+function addHomepageAdminControls(api) {
+  const editableFields = document.querySelectorAll("[data-home-field]");
+  editableFields.forEach((element) => {
+    if (element.querySelector(".home-edit-btn")) {
+      return;
+    }
+
+    const field = element.getAttribute("data-home-field");
+    if (!field) {
+      return;
+    }
+
+    element.classList.add("home-editable");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "home-edit-btn";
+    button.textContent = "Edit";
+    button.setAttribute("data-home-edit", field);
+    element.append(button);
+  });
+
+  if (document.body.dataset.homeAdminBound === "1") {
+    return;
+  }
+
+  document.body.dataset.homeAdminBound = "1";
+  document.body.classList.add("admin-mode-active");
+  document.body.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    const field = target.dataset.homeEdit;
+    if (!field) {
+      return;
+    }
+
+    event.preventDefault();
+    const element = document.querySelector(`[data-home-field="${field}"]`);
+    if (!element) {
+      return;
+    }
+
+    const currentValue = field === "heroTitle" ? element.innerHTML.replace(/<button[\s\S]*<\/button>$/, "").trim() : element.childNodes[0]?.textContent?.trim() || element.textContent.trim();
+    const nextValue = window.prompt(`Edit ${field}`, currentValue);
+    if (nextValue === null) {
+      return;
+    }
+
+    api.updateHomepageField(field, nextValue);
+    applyHomepageContent(api);
+    addHomepageAdminControls(api);
+  });
+}
+
 function decorateAdminControls(root) {
   const posts = root.querySelectorAll("[data-post-id]");
   posts.forEach((postEl) => {
@@ -127,6 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!api) {
     return;
   }
+
+  applyHomepageContent(api);
 
   const recentPostsEl = document.getElementById("recent-posts");
   let adminMode = false;
@@ -210,6 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     adminMode = true;
+    document.body.classList.add("admin-mode-active");
 
     if (recentPostsEl) {
       attachAdminControls(recentPostsEl, api, renderRecentPosts);
@@ -221,6 +298,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (postViewEl) {
       attachAdminControls(postViewEl, api, renderPostView);
+    }
+
+    if (document.querySelector("[data-home-field]")) {
+      addHomepageAdminControls(api);
     }
   });
 });
