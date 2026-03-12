@@ -12,12 +12,23 @@ function applyHomepageContent(api) {
       return;
     }
 
-    if (field === "heroTitle") {
+    if (element.hasAttribute("data-home-html")) {
       element.innerHTML = value;
       return;
     }
 
     element.textContent = value;
+  });
+
+  document.querySelectorAll("[data-home-attr]").forEach((element) => {
+    const field = element.getAttribute("data-home-field");
+    const attribute = element.getAttribute("data-home-attr");
+    const value = content[field];
+    if (!field || !attribute || typeof value !== "string" || !value.trim()) {
+      return;
+    }
+
+    element.setAttribute(attribute, value);
   });
 }
 

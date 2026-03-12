@@ -2,6 +2,45 @@
   const STORAGE_KEY = "boxladder.posts.v1";
   const HOMEPAGE_KEY = "boxladder.homepage.v1";
 
+  function getHomepageDefaults() {
+    return {
+      heroEyebrow: "Security Writeups",
+      heroTitle: `Clean, methodical walkthroughs for <span>TryHackMe</span> and <span>Hack The Box</span>.`,
+      heroLede: "Focused on reproducible steps, tooling notes, and what I learned along the way. Built for review before interviews and CTF sprints.",
+      heroPrimaryText: "CyberSecurity",
+      heroPrimaryHref: "cybersecurity.html",
+      heroSecondaryText: "Hacking",
+      heroSecondaryHref: "hacking.html",
+      heroPillPrimary: "Latest",
+      heroPillSecondary: "Field notes",
+      heroCardTitle: "Writeups built for review",
+      heroCardBody: "Each walkthrough focuses on clean recon notes, repeatable commands, and lessons worth keeping.",
+      aboutHeading: "What you will find",
+      aboutIntro: "Each post sticks to a repeatable workflow: recon, foothold, privilege escalation, and takeaways.",
+      aboutCard1Title: "Recon snapshots",
+      aboutCard1Body: "Clean notes on scans, enumeration, and decision points.",
+      aboutCard2Title: "Tooling notes",
+      aboutCard2Body: "Commands that matter, plus the flags I forget if I do not write them down.",
+      aboutCard3Title: "Lessons learned",
+      aboutCard3Body: "What went wrong, how it was fixed, and what I will do next time.",
+      recentHeading: "Two separate tracks",
+      recentIntro: "CyberSecurity and Hacking now live on separate pages so the site stays divided cleanly.",
+      recentCard1Title: "CyberSecurity",
+      recentCard1Body: "Security notes, broader thinking, and selected material with a wider operational view.",
+      recentCard1LinkText: "Open CyberSecurity",
+      recentCard1LinkHref: "cybersecurity.html",
+      recentCard2Title: "Hacking",
+      recentCard2Body: "Hands-on research, labs, exploit paths, and offensive workflow notes all live on their own page.",
+      recentCard2LinkText: "Open Hacking",
+      recentCard2LinkHref: "hacking.html",
+      contactTitle: "Need to ship a post fast?",
+      contactBody: "Draft locally, tighten the writeup, and publish when you are ready.",
+      contactButtonText: "Browse research",
+      contactButtonHref: "hacking.html",
+      footerText: "Yoinked by Yoinkas | Security writeups",
+    };
+  }
+
   function canUseStorage() {
     try {
       const key = "__boxladder_test__";
@@ -264,28 +303,47 @@
   }
 
   function loadHomepageContent() {
+    const defaults = getHomepageDefaults();
+
     if (!canUseStorage()) {
-      return {};
+      return {
+        ...defaults,
+        hiddenSections: [],
+        customSections: [],
+      };
     }
 
     try {
       const raw = window.localStorage.getItem(HOMEPAGE_KEY);
       if (!raw) {
-        return {};
+        return {
+          ...defaults,
+          hiddenSections: [],
+          customSections: [],
+        };
       }
 
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== "object") {
-        return {};
+        return {
+          ...defaults,
+          hiddenSections: [],
+          customSections: [],
+        };
       }
 
       return {
+        ...defaults,
         ...parsed,
         hiddenSections: Array.isArray(parsed.hiddenSections) ? parsed.hiddenSections : [],
         customSections: Array.isArray(parsed.customSections) ? parsed.customSections : [],
       };
     } catch (error) {
-      return {};
+      return {
+        ...defaults,
+        hiddenSections: [],
+        customSections: [],
+      };
     }
   }
 
@@ -389,6 +447,7 @@
   window.BoxLadderContent = {
     HOMEPAGE_KEY,
     STORAGE_KEY,
+    getHomepageDefaults,
     canUseStorage,
     loadPosts,
     savePosts,
