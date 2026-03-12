@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const posts = api.getPublishedPosts().slice(0, 3);
     recentPostsEl.innerHTML = posts.length
       ? posts.map((post) => api.renderPostCard(post, { basePath: "posts/" })).join("")
-      : `<p class="empty-state">No published posts yet. Publish your first writeup from the protected admin workflow.</p>`;
+      : `<p class="empty-state">No published posts yet. Publish your first writeup when it is ready.</p>`;
   }
 
   const allPostsEl = document.getElementById("all-posts");
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const posts = api.getPublishedPosts();
     allPostsEl.innerHTML = posts.length
       ? posts.map((post) => api.renderPostCard(post, { basePath: "" })).join("")
-      : `<p class="empty-state">No published posts yet. Use the protected admin workflow to create and publish one.</p>`;
+      : `<p class="empty-state">No published posts yet. Create and publish one when you are ready.</p>`;
   }
 
   const postViewEl = document.getElementById("post-view");
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="post-shell">
           <p class="meta">Post not found</p>
           <h1>No published post matches this link.</h1>
-          <p class="lede">Return to the writeups index or publish the post from the protected admin workflow.</p>
+          <p class="lede">Return to the writeups index or publish the post when it is ready.</p>
           <a class="btn" href="index.html">Back to writeups</a>
         </article>
       `;
