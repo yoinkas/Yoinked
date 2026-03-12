@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 </head>
-<body>
+<body class="page-hacking">
   <header class="site-header">
     <div class="container">
       <a class="logo" href="index.html">Yoinked by Yoinkas</a>
@@ -24,18 +24,51 @@
   </header>
 
   <main>
-    <section class="section">
-      <div class="container">
+    <section class="hero hacking-hero">
+      <div class="container hacking-hero-grid">
         <div class="section-header">
           <p class="eyebrow">Hacking</p>
-          <h1>Research, labs, and offensive workflow</h1>
-          <p>All research-focused material lives here as a separate track from the broader cybersecurity page.</p>
+          <h1>Research, labs, and offensive workflow.</h1>
+          <p>Built as a darker lane for hands-on work: exploit paths, weird artifacts, offensive notes, and the operational mess that makes research worth keeping.</p>
         </div>
         <div class="hero-actions">
           <a class="btn" href="posts/tryhackme-template.html">THM template</a>
           <a class="btn ghost" href="posts/htb-template.html">HTB template</a>
         </div>
+        <div class="hacking-media-stack">
+          <figure class="hacking-media-card">
+            <img src="assets/hacking-hero.gif" alt="Hacking themed animation" />
+          </figure>
+          <figure class="hacking-media-card hacking-media-card-alt">
+            <img src="assets/hacking-secondary.gif" alt="Secondary hacking themed animation" />
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hacking-band">
+      <div class="container">
+        <div class="section-header">
+          <h2>Research feed</h2>
+          <p>All published work in the hacking lane, kept separate from the broader cybersecurity page.</p>
+        </div>
         <div class="card-grid stack-top" id="all-posts"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container hacking-lower-grid">
+        <article class="card hacking-note-card">
+          <p class="eyebrow">Research Bias</p>
+          <h3>Offense first, but documented cleanly</h3>
+          <p>This track is where the messy testing, lab notes, and machine-by-machine experimentation live once they are worth keeping.</p>
+        </article>
+        <article class="card hacking-note-card">
+          <p class="eyebrow">Need the broader view?</p>
+          <h3>Jump back to CyberSecurity</h3>
+          <p>Use the separate CyberSecurity page for wider defensive thinking, security process, and notes that reach beyond one target.</p>
+          <a class="btn" href="cybersecurity.html">Go to CyberSecurity</a>
+        </article>
       </div>
     </section>
   </main>

@@ -695,6 +695,77 @@ code {
   gap: 14px;
 }
 
+body.page-hacking {
+  --bg: #030303;
+  --bg-alt: #090909;
+  --ink: #f4f4f1;
+  --ink-soft: #a8a89d;
+  --accent: #ff5f2e;
+  --accent-2: #ffb080;
+  --card: rgba(13, 13, 13, 0.92);
+  --border: rgba(255, 95, 46, 0.14);
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.48);
+  background:
+    radial-gradient(circle at top right, rgba(255, 95, 46, 0.12), transparent 28%),
+    radial-gradient(circle at left center, rgba(255, 176, 128, 0.08), transparent 22%),
+    linear-gradient(180deg, #020202 0%, #090909 52%, #020202 100%);
+}
+
+body.page-hacking .site-header {
+  background: rgba(5, 5, 5, 0.82);
+  border-bottom: 1px solid rgba(255, 95, 46, 0.12);
+}
+
+body.page-hacking a:hover {
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(255, 95, 46, 0.28);
+}
+
+.hacking-hero {
+  padding-top: 56px;
+}
+
+.hacking-hero-grid,
+.hacking-lower-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+.hacking-media-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.hacking-media-card {
+  background: rgba(10, 10, 10, 0.94);
+  border: 1px solid rgba(255, 95, 46, 0.12);
+  border-radius: 24px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.hacking-media-card img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+.hacking-media-card-alt {
+  transform: translateX(18px);
+}
+
+.hacking-band {
+  background: linear-gradient(180deg, rgba(14, 14, 14, 0.96), rgba(5, 5, 5, 0.82));
+  border-top: 1px solid rgba(255, 95, 46, 0.08);
+  border-bottom: 1px solid rgba(255, 95, 46, 0.08);
+}
+
+.hacking-note-card {
+  min-height: 100%;
+}
+
 .file-button {
   position: relative;
   overflow: hidden;
