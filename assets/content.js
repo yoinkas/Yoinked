@@ -7,6 +7,9 @@
       heroEyebrow: "Security Writeups",
       heroTitle: `Clean, methodical walkthroughs for <span>TryHackMe</span> and <span>Hack The Box</span>.`,
       heroLede: "Focused on reproducible steps, tooling notes, and what I learned along the way. Built for review before interviews and CTF sprints.",
+      heroImageSrc: "assets/typing-meme.gif",
+      heroImageAlt: "Typing meme on laptop",
+      heroMediaPosition: "right",
       heroPrimaryText: "CyberSecurity",
       heroPrimaryHref: "cybersecurity.html",
       heroSecondaryText: "Hacking",
@@ -38,6 +41,9 @@
       contactButtonText: "Browse research",
       contactButtonHref: "hacking.html",
       footerText: "Yoinked by Yoinkas | Security writeups",
+      sectionOrder: ["hero", "about", "recent", "contact"],
+      aboutCardOrder: ["about-card-1", "about-card-2", "about-card-3"],
+      recentCardOrder: ["recent-card-1", "recent-card-2"],
     };
   }
 
@@ -306,59 +312,107 @@
     const defaults = getHomepageDefaults();
 
     if (!canUseStorage()) {
-      return {
+      return normalizeHomepageContent({
         ...defaults,
         hiddenSections: [],
         customSections: [],
-      };
+      });
     }
 
     try {
       const raw = window.localStorage.getItem(HOMEPAGE_KEY);
       if (!raw) {
-        return {
+        return normalizeHomepageContent({
           ...defaults,
           hiddenSections: [],
           customSections: [],
-        };
+        });
       }
 
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== "object") {
-        return {
+        return normalizeHomepageContent({
           ...defaults,
           hiddenSections: [],
           customSections: [],
-        };
+        });
       }
 
-      return {
+      const normalized = {
         ...defaults,
         ...parsed,
         hiddenSections: Array.isArray(parsed.hiddenSections) ? parsed.hiddenSections : [],
         customSections: Array.isArray(parsed.customSections) ? parsed.customSections : [],
       };
+      return normalizeHomepageContent(normalized);
     } catch (error) {
-      return {
+      return normalizeHomepageContent({
         ...defaults,
         hiddenSections: [],
         customSections: [],
-      };
+      });
     }
   }
 
   function saveHomepageContent(content) {
     if (!canUseStorage()) {
-      return content;
+      return normalizeHomepageContent(content);
     }
 
-    const normalized = {
+    const normalized = normalizeHomepageContent({
       ...(content && typeof content === "object" ? content : {}),
       hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
       customSections: Array.isArray(content?.customSections) ? content.customSections : [],
-    };
+    });
     window.localStorage.setItem(HOMEPAGE_KEY, JSON.stringify(normalized));
     return normalized;
+  }
+
+  function normalizeOrder(order, validIds, fallbackOrder) {
+    const seen = new Set();
+    const normalized = [];
+    const preferred = Array.isArray(order) ? order : fallbackOrder;
+
+    preferred.forEach((item) => {
+      if (validIds.includes(item) && !seen.has(item)) {
+        seen.add(item);
+        normalized.push(item);
+      }
+    });
+
+    validIds.forEach((item) => {
+      if (!seen.has(item)) {
+        seen.add(item);
+        normalized.push(item);
+      }
+    });
+
+    return normalized;
+  }
+
+  function normalizeHomepageContent(content) {
+    const defaults = getHomepageDefaults();
+    const customSections = Array.isArray(content?.customSections) ? content.customSections : [];
+    const sectionIds = ["hero", "about", "recent", "contact", ...customSections.map((section) => `custom:${section.id}`)];
+
+    return {
+      ...defaults,
+      ...(content && typeof content === "object" ? content : {}),
+      hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
+      customSections,
+      sectionOrder: normalizeOrder(content?.sectionOrder, sectionIds, sectionIds),
+      aboutCardOrder: normalizeOrder(
+        content?.aboutCardOrder,
+        defaults.aboutCardOrder,
+        defaults.aboutCardOrder
+      ),
+      recentCardOrder: normalizeOrder(
+        content?.recentCardOrder,
+        defaults.recentCardOrder,
+        defaults.recentCardOrder
+      ),
+      heroMediaPosition: content?.heroMediaPosition === "left" ? "left" : "right",
+    };
   }
 
   function updateHomepageField(field, value) {
@@ -392,6 +446,11 @@
     };
 
     current.customSections = [...(current.customSections || []), nextSection];
+    current.sectionOrder = [
+      ...(current.sectionOrder || []).filter((item) => item !== "contact"),
+      `custom:${nextSection.id}`,
+      "contact",
+    ];
     saveHomepageContent(current);
     return nextSection;
   }
@@ -420,6 +479,42 @@
   function deleteHomepageSection(sectionId) {
     const current = loadHomepageContent();
     current.customSections = (current.customSections || []).filter((section) => section.id !== sectionId);
+    current.sectionOrder = (current.sectionOrder || []).filter((item) => item !== `custom:${sectionId}`);
+    return saveHomepageContent(current);
+  }
+
+  function moveItem(order, itemId, direction) {
+    const currentIndex = order.indexOf(itemId);
+    if (currentIndex < 0) {
+      return order;
+    }
+
+    const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (nextIndex < 0 || nextIndex >= order.length) {
+      return order;
+    }
+
+    const nextOrder = [...order];
+    [nextOrder[currentIndex], nextOrder[nextIndex]] = [nextOrder[nextIndex], nextOrder[currentIndex]];
+    return nextOrder;
+  }
+
+  function moveHomepageSection(sectionId, direction) {
+    const current = loadHomepageContent();
+    current.sectionOrder = moveItem(current.sectionOrder || [], sectionId, direction);
+    return saveHomepageContent(current);
+  }
+
+  function moveHomepageCard(group, cardId, direction) {
+    const current = loadHomepageContent();
+    const field = group === "recent" ? "recentCardOrder" : "aboutCardOrder";
+    current[field] = moveItem(current[field] || [], cardId, direction);
+    return saveHomepageContent(current);
+  }
+
+  function toggleHeroMediaPosition() {
+    const current = loadHomepageContent();
+    current.heroMediaPosition = current.heroMediaPosition === "left" ? "right" : "left";
     return saveHomepageContent(current);
   }
 
@@ -431,7 +526,7 @@
       : "";
 
     return `
-      <section class="section custom-home-section" data-custom-section-id="${escapeHtml(section.id)}">
+      <section class="section custom-home-section" data-custom-section-id="${escapeHtml(section.id)}" data-home-order-id="${escapeHtml(`custom:${section.id}`)}">
         <div class="container">
           <div class="card custom-home-card">
             ${kicker}
@@ -465,6 +560,9 @@
     addHomepageSection,
     updateHomepageSection,
     deleteHomepageSection,
+    moveHomepageSection,
+    moveHomepageCard,
+    toggleHeroMediaPosition,
     renderHomepageSection,
     renderPostCard,
     renderPostPage,

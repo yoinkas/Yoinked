@@ -16,9 +16,11 @@
       <div class="admin-header-copy">
         <p class="eyebrow">Protected Admin</p>
         <h1>Homepage Editor</h1>
-        <p class="lede">This panel is separate from the public site and only controls the content shown on `/index.html` in this browser.</p>
+        <p class="lede">Use the three-dot menus on each section, card, or image block to edit, hide, delete, or move it.</p>
       </div>
       <div class="hero-actions">
+        <button type="button" class="btn" id="homepage-add-section">Add custom section</button>
+        <button type="button" class="btn ghost" id="homepage-reset">Reset homepage</button>
         <a class="btn ghost" href="/index.html" target="_blank" rel="noreferrer">Open homepage</a>
         <button type="button" class="btn ghost nav-button" id="logout-button">Log out</button>
       </div>
@@ -27,237 +29,12 @@
 
   <main>
     <section class="section">
-      <div class="container admin-home-grid">
-        <section class="admin-panel">
-          <div class="section-header">
-            <h2>Homepage Content</h2>
-            <p>Edit the live text and links used by the public homepage.</p>
-          </div>
-
-          <form id="homepage-form" class="admin-form">
-            <label>
-              <span>Hero eyebrow</span>
-              <input type="text" name="heroEyebrow" />
-            </label>
-
-            <label>
-              <span>Hero title</span>
-              <textarea name="heroTitle" rows="3"></textarea>
-            </label>
-
-            <label>
-              <span>Hero lede</span>
-              <textarea name="heroLede" rows="3"></textarea>
-            </label>
-
-            <div class="admin-grid">
-              <label>
-                <span>Hero primary button text</span>
-                <input type="text" name="heroPrimaryText" />
-              </label>
-              <label>
-                <span>Hero primary button link</span>
-                <input type="text" name="heroPrimaryHref" />
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Hero secondary button text</span>
-                <input type="text" name="heroSecondaryText" />
-              </label>
-              <label>
-                <span>Hero secondary button link</span>
-                <input type="text" name="heroSecondaryHref" />
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Hero pill 1</span>
-                <input type="text" name="heroPillPrimary" />
-              </label>
-              <label>
-                <span>Hero pill 2</span>
-                <input type="text" name="heroPillSecondary" />
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Hero card title</span>
-                <input type="text" name="heroCardTitle" />
-              </label>
-              <label>
-                <span>Hero card body</span>
-                <input type="text" name="heroCardBody" />
-              </label>
-            </div>
-
-            <div class="section-header stack-top">
-              <h3>About Section</h3>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>About heading</span>
-                <input type="text" name="aboutHeading" />
-              </label>
-              <label>
-                <span>About intro</span>
-                <textarea name="aboutIntro" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>About card 1 title</span>
-                <input type="text" name="aboutCard1Title" />
-              </label>
-              <label>
-                <span>About card 1 body</span>
-                <textarea name="aboutCard1Body" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>About card 2 title</span>
-                <input type="text" name="aboutCard2Title" />
-              </label>
-              <label>
-                <span>About card 2 body</span>
-                <textarea name="aboutCard2Body" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>About card 3 title</span>
-                <input type="text" name="aboutCard3Title" />
-              </label>
-              <label>
-                <span>About card 3 body</span>
-                <textarea name="aboutCard3Body" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="section-header stack-top">
-              <h3>Tracks Section</h3>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Tracks heading</span>
-                <input type="text" name="recentHeading" />
-              </label>
-              <label>
-                <span>Tracks intro</span>
-                <textarea name="recentIntro" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Track 1 title</span>
-                <input type="text" name="recentCard1Title" />
-              </label>
-              <label>
-                <span>Track 1 body</span>
-                <textarea name="recentCard1Body" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Track 1 link text</span>
-                <input type="text" name="recentCard1LinkText" />
-              </label>
-              <label>
-                <span>Track 1 link href</span>
-                <input type="text" name="recentCard1LinkHref" />
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Track 2 title</span>
-                <input type="text" name="recentCard2Title" />
-              </label>
-              <label>
-                <span>Track 2 body</span>
-                <textarea name="recentCard2Body" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Track 2 link text</span>
-                <input type="text" name="recentCard2LinkText" />
-              </label>
-              <label>
-                <span>Track 2 link href</span>
-                <input type="text" name="recentCard2LinkHref" />
-              </label>
-            </div>
-
-            <div class="section-header stack-top">
-              <h3>Contact Section</h3>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Contact title</span>
-                <input type="text" name="contactTitle" />
-              </label>
-              <label>
-                <span>Contact body</span>
-                <textarea name="contactBody" rows="3"></textarea>
-              </label>
-            </div>
-
-            <div class="admin-grid">
-              <label>
-                <span>Contact button text</span>
-                <input type="text" name="contactButtonText" />
-              </label>
-              <label>
-                <span>Contact button link</span>
-                <input type="text" name="contactButtonHref" />
-              </label>
-            </div>
-
-            <label>
-              <span>Footer text</span>
-              <input type="text" name="footerText" />
-            </label>
-
-            <div class="hero-actions">
-              <button type="submit" class="btn">Save homepage</button>
-              <button type="button" class="btn ghost" id="homepage-reset">Reset homepage</button>
-              <button type="button" class="btn ghost" id="homepage-add-section">Add custom section</button>
-            </div>
-
-            <p class="inline-note" id="homepage-status"></p>
-          </form>
-
-          <div class="section-header stack-top">
-            <h3>Homepage Sections</h3>
-            <p>Hide built-in blocks or manage custom sections below.</p>
-          </div>
-          <div class="hero-actions">
-            <button type="button" class="btn ghost" id="homepage-restore-sections">Restore hidden sections</button>
-          </div>
-          <div id="homepage-section-list" class="admin-post-list"></div>
-        </section>
-
-        <aside class="admin-sidebar">
-          <div class="section-header">
-            <h2>Homepage Preview</h2>
-            <p>Read-only preview of the homepage state stored in this browser.</p>
-          </div>
-          <div id="homepage-preview" class="homepage-preview"></div>
-        </aside>
+      <div class="container">
+        <div class="admin-toolbar">
+          <p class="inline-note" id="homepage-status"></p>
+          <button type="button" class="btn ghost" id="homepage-restore-sections">Restore hidden sections</button>
+        </div>
+        <div id="homepage-preview" class="admin-canvas"></div>
       </div>
     </section>
   </main>
@@ -271,6 +48,6 @@
 
   <script src="/assets/content.js"></script>
   <script src="/assets/main.js"></script>
-  <script src="/assets/admin.js"></script>
+  <script src="/assets/admin-inline.js"></script>
 </body>
 </html>

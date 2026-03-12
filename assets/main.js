@@ -30,6 +30,49 @@ function applyHomepageContent(api) {
 
     element.setAttribute(attribute, value);
   });
+
+  document.querySelectorAll("[data-home-alt-field]").forEach((element) => {
+    const field = element.getAttribute("data-home-alt-field");
+    const value = content[field];
+    if (!field || typeof value !== "string" || !value.trim()) {
+      return;
+    }
+
+    element.setAttribute("alt", value);
+  });
+
+  const heroGrid = document.querySelector(".hero-grid");
+  if (heroGrid) {
+    heroGrid.classList.toggle("hero-grid-reversed", content.heroMediaPosition === "left");
+  }
+}
+
+function applyHomepageCardOrdering(api) {
+  const content = api.loadHomepageContent();
+
+  document.querySelectorAll("[data-home-card-group='about']").forEach((group) => {
+    const cards = new Map(
+      Array.from(group.querySelectorAll("[data-home-card-id]")).map((card) => [card.getAttribute("data-home-card-id"), card])
+    );
+    (content.aboutCardOrder || []).forEach((cardId) => {
+      const card = cards.get(cardId);
+      if (card) {
+        group.appendChild(card);
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-home-card-group='recent']").forEach((group) => {
+    const cards = new Map(
+      Array.from(group.querySelectorAll("[data-home-card-id]")).map((card) => [card.getAttribute("data-home-card-id"), card])
+    );
+    (content.recentCardOrder || []).forEach((cardId) => {
+      const card = cards.get(cardId);
+      if (card) {
+        group.appendChild(card);
+      }
+    });
+  });
 }
 
 function applyHomepageSections(api) {
@@ -45,6 +88,20 @@ function applyHomepageSections(api) {
   if (customSectionsEl) {
     customSectionsEl.innerHTML = (content.customSections || []).map((section) => api.renderHomepageSection(section)).join("");
   }
+
+  const siteMain = document.getElementById("site-main");
+  if (siteMain) {
+    const orderedSections = new Map(
+      Array.from(siteMain.querySelectorAll("[data-home-order-id]")).map((section) => [section.getAttribute("data-home-order-id"), section])
+    );
+
+    (content.sectionOrder || []).forEach((sectionId) => {
+      const section = orderedSections.get(sectionId);
+      if (section) {
+        siteMain.appendChild(section);
+      }
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -55,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   applyHomepageContent(api);
   applyHomepageSections(api);
+  applyHomepageCardOrdering(api);
 
   const recentPostsEl = document.getElementById("recent-posts");
   if (recentPostsEl) {
