@@ -464,6 +464,12 @@ code {
   padding: 24px;
 }
 
+.admin-auth-panel {
+  grid-column: 1 / -1;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
 .admin-form,
 .admin-post-list {
   display: grid;

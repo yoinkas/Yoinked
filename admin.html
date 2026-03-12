@@ -25,7 +25,27 @@
   <main>
     <section class="section">
       <div class="container admin-layout">
-        <section class="admin-panel">
+        <section class="admin-panel admin-auth-panel" id="admin-auth-panel">
+          <div class="section-header">
+            <h1>Admin Access</h1>
+            <p>Enter the admin password to unlock the post editor for this browser tab.</p>
+          </div>
+
+          <form id="admin-auth-form" class="admin-form" autocomplete="off">
+            <label>
+              <span>Password</span>
+              <input type="password" name="password" placeholder="Admin password" required />
+            </label>
+
+            <div class="hero-actions">
+              <button type="submit" class="btn">Unlock admin</button>
+            </div>
+
+            <p class="inline-note" id="admin-auth-status"></p>
+          </form>
+        </section>
+
+        <section class="admin-panel" id="admin-editor-panel" hidden>
           <div class="section-header">
             <h1>Admin Panel</h1>
             <p>Write, edit, publish, export, and import posts. Cover images and screenshots are stored locally in this browser.</p>
@@ -104,7 +124,7 @@
           </form>
         </section>
 
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="admin-sidebar" hidden>
           <div class="section-header">
             <h2>Saved Posts</h2>
             <p>Drafts stay out of the public site. Published posts appear on the homepage and writeups page in this browser.</p>
@@ -124,6 +144,7 @@
 
   <script src="assets/content.js"></script>
   <script src="assets/main.js"></script>
+  <script src="assets/admin-auth.js"></script>
   <script src="assets/admin.js"></script>
 </body>
 </html>
