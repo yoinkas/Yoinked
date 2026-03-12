@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const homepageForm = document.getElementById("homepage-form");
   const homepageResetButton = document.getElementById("homepage-reset");
   const homepageAddSectionButton = document.getElementById("homepage-add-section");
+  const homepageRestoreSectionsButton = document.getElementById("homepage-restore-sections");
   const homepageStatusEl = document.getElementById("homepage-status");
   const homepagePreviewEl = document.getElementById("homepage-preview");
   const homepageSectionListEl = document.getElementById("homepage-section-list");
@@ -176,8 +177,31 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const customSections = getHomepageState().customSections || [];
-    homepageSectionListEl.innerHTML = customSections.length
+    const state = getHomepageState();
+    const hiddenSections = new Set(state.hiddenSections || []);
+    const builtinSections = [
+      { id: "hero", label: "Hero", body: "Main homepage intro and CTA block." },
+      { id: "about", label: "About", body: "What you will find section." },
+      { id: "recent", label: "Tracks", body: "CyberSecurity and Hacking split section." },
+      { id: "contact", label: "Contact", body: "Bottom CTA block." },
+    ];
+    const customSections = state.customSections || [];
+    const builtinMarkup = builtinSections.map((section) => `
+      <article class="admin-post-card">
+        <div>
+          <p class="meta">Built-in section${hiddenSections.has(section.id) ? " | hidden" : ""}</p>
+          <h3>${section.label}</h3>
+          <p>${section.body}</p>
+        </div>
+        <div class="admin-card-actions">
+          <button type="button" class="btn ghost" data-home-action="toggle-built-in" data-id="${section.id}">
+            ${hiddenSections.has(section.id) ? "Restore" : "Edit in form"}
+          </button>
+          <button type="button" class="section-delete-btn" data-home-action="${hiddenSections.has(section.id) ? "restore-built-in" : "hide-built-in"}" data-id="${section.id}" aria-label="${hiddenSections.has(section.id) ? "Restore" : "Hide"} section">x</button>
+        </div>
+      </article>
+    `).join("");
+    const customMarkup = customSections.length
       ? customSections.map((section) => `
           <article class="admin-post-card">
             <div>
@@ -187,11 +211,13 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="admin-card-actions">
               <button type="button" class="btn ghost" data-home-action="edit-section" data-id="${section.id}">Edit</button>
-              <button type="button" class="btn ghost" data-home-action="delete-section" data-id="${section.id}">Delete</button>
+              <button type="button" class="section-delete-btn" data-home-action="delete-section" data-id="${section.id}" aria-label="Delete section">x</button>
             </div>
           </article>
         `).join("")
       : `<p class="empty-state">No custom homepage sections yet.</p>`;
+
+    homepageSectionListEl.innerHTML = builtinMarkup + customMarkup;
   }
 
   function refreshHomepageUI() {
@@ -423,6 +449,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if (homepageRestoreSectionsButton) {
+    homepageRestoreSectionsButton.addEventListener("click", () => {
+      const state = api.loadHomepageContent();
+      api.saveHomepageContent({
+        ...state,
+        hiddenSections: [],
+      });
+      refreshHomepageUI();
+      setHomepageStatus("Restored hidden built-in sections.");
+    });
+  }
+
   if (homepageSectionListEl) {
     homepageSectionListEl.addEventListener("click", (event) => {
       const target = event.target;
@@ -433,6 +471,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const action = target.dataset.homeAction;
       const id = target.dataset.id;
       if (!action || !id) {
+        return;
+      }
+
+      if (action === "toggle-built-in") {
+        setHomepageStatus("Built-in sections are edited from the homepage form above.");
+        return;
+      }
+
+      if (action === "hide-built-in") {
+        api.hideHomepageSection(id);
+        refreshHomepageUI();
+        setHomepageStatus("Built-in homepage section hidden.");
+        return;
+      }
+
+      if (action === "restore-built-in") {
+        const state = api.loadHomepageContent();
+        api.saveHomepageContent({
+          ...state,
+          hiddenSections: (state.hiddenSections || []).filter((sectionId) => sectionId !== id),
+        });
+        refreshHomepageUI();
+        setHomepageStatus("Built-in homepage section restored.");
         return;
       }
 
@@ -453,6 +514,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (action === "delete-section") {
+        if (!window.confirm("Delete this custom section?")) {
+          return;
+        }
+
         api.deleteHomepageSection(id);
         refreshHomepageUI();
         setHomepageStatus("Deleted custom homepage section.");

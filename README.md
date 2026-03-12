@@ -1,4 +1,4 @@
-# Box & Ladder
+# Yoinked by Yoinkas
 
 A static blog for TryHackMe and Hack The Box writeups.
 

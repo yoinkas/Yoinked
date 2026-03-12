@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin | Box & Ladder</title>
-  <meta name="description" content="Protected admin panel for Box & Ladder posts." />
+  <title>Admin | Yoinked by Yoinkas</title>
+  <meta name="description" content="Protected admin panel for Yoinked by Yoinkas posts." />
   <link rel="stylesheet" href="/assets/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,7 +13,7 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a class="logo" href="/index.html">Box & Ladder</a>
+      <a class="logo" href="/index.html">Yoinked by Yoinkas</a>
       <nav class="nav">
         <a href="/index.html">Home</a>
         <a href="/cybersecurity.html">CyberSecurity</a>
@@ -178,8 +178,11 @@
           </form>
 
           <div class="section-header stack-top">
-            <h3>Custom Sections</h3>
-            <p>Add, edit, or remove sections that appear between the homepage tracks and contact area.</p>
+            <h3>Homepage Sections</h3>
+            <p>Use the small `x` to hide built-in sections or delete custom sections.</p>
+          </div>
+          <div class="hero-actions">
+            <button type="button" class="btn ghost" id="homepage-restore-sections">Restore hidden sections</button>
           </div>
           <div id="homepage-section-list" class="admin-post-list"></div>
         </section>
@@ -197,7 +200,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>Box & Ladder | Security writeups</p>
+      <p>Yoinked by Yoinkas | Security writeups</p>
       <p class="muted">Updated <span id="year"></span></p>
     </div>
   </footer>
