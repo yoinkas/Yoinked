@@ -199,7 +199,7 @@
       : "";
 
     return `
-      <article class="card card-post">
+      <article class="card card-post" data-post-id="${escapeHtml(post.id)}">
         ${image}
         <p class="meta">${escapeHtml(post.category)} | ${formatDate(post.publishedAt)}</p>
         <h3>${escapeHtml(post.title)}</h3>
@@ -234,7 +234,7 @@
       : "";
 
     return `
-      <article class="post-shell">
+      <article class="post-shell" data-post-id="${escapeHtml(post.id)}">
         <p class="meta">${escapeHtml(post.category)} | ${formatDate(post.publishedAt)}</p>
         <h1>${escapeHtml(post.title)}</h1>
         <p class="lede">${escapeHtml(post.excerpt)}</p>
