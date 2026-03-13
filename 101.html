@@ -48,41 +48,65 @@
         <article class="card page-101-card">
           <p class="eyebrow">command line exercises</p>
           <h2>Receiving files and traveling through directories</h2>
-          <p class="lede">These are basic terminal habits you will use constantly. The goal is to get comfortable moving around, finding files, and pulling files onto your machine without guessing.</p>
-          <div class="page-101-grid">
-            <section class="page-101-module">
-              <h3>Exercise 1: Know where you are</h3>
-              <p>Start by checking your current directory, then list what is inside it.</p>
-              <pre><code>pwd
+          <p class="lede">This lab gives you a fake terminal with dummy directories, flags, and simple questions. Work through it in order and use the <code>?</code> button in the top-right corner when you need a hint.</p>
+          <div class="page-101-lab">
+            <section class="terminal-shell" data-terminal-shell>
+              <div class="terminal-header">
+                <div class="terminal-chrome" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <p>starter-terminal</p>
+                <button class="terminal-hint-btn" type="button" data-terminal-hint>?</button>
+              </div>
+              <div class="terminal-output" data-terminal-output></div>
+              <form class="terminal-input-row" data-terminal-form>
+                <label class="sr-only" for="terminal-command">Terminal command</label>
+                <span class="terminal-prompt" data-terminal-prompt>student@yoinkas:/home/student$</span>
+                <input id="terminal-command" name="command" type="text" autocomplete="off" spellcheck="false" placeholder="type a command like pwd" data-terminal-input />
+              </form>
+            </section>
+
+            <aside class="page-101-sidecar">
+              <section class="page-101-module">
+                <h3>Walkthrough</h3>
+                <ol class="page-101-task-list" data-terminal-tasks>
+                  <li>Use <code>pwd</code> to see where you are.</li>
+                  <li>Use <code>ls</code> to see what is available.</li>
+                  <li>Move into the <code>missions</code> directory.</li>
+                  <li>Read <code>welcome.txt</code>.</li>
+                  <li>Find the first flag in <code>first-flag.txt</code>.</li>
+                  <li>Question: what command takes you back one directory? Use it now.</li>
+                  <li>Move into <code>Downloads</code>.</li>
+                  <li>Open <code>incoming.flag</code> and collect the second flag.</li>
+                  <li>Use <code>ls -la</code> to reveal hidden files.</li>
+                  <li>Read <code>.secret</code> to collect the final flag.</li>
+                </ol>
+              </section>
+
+              <section class="page-101-module">
+                <h3>Flags found</h3>
+                <div class="page-101-flag-list" data-terminal-flags>
+                  <p class="page-101-empty">No flags collected yet.</p>
+                </div>
+              </section>
+
+              <section class="page-101-module">
+                <h3>Useful commands</h3>
+                <pre><code>pwd
 ls
-ls -la</code></pre>
-              <p>Try to explain the difference between <code>ls</code> and <code>ls -la</code> before moving on.</p>
-            </section>
-            <section class="page-101-module">
-              <h3>Exercise 2: Move through directories</h3>
-              <p>Practice moving into folders, backing out, and jumping straight home.</p>
-              <pre><code>cd Downloads
+ls -la
+cd missions
 cd ..
-cd ~</code></pre>
-              <p>Your goal is to move around without getting lost.</p>
-            </section>
-            <section class="page-101-module">
-              <h3>Exercise 3: Create and organize</h3>
-              <p>Make a practice folder, create a file, and move it into a new location.</p>
-              <pre><code>mkdir cyber-lab
-cd cyber-lab
-touch notes.txt
-mkdir logs
-mv notes.txt logs/</code></pre>
-            </section>
-            <section class="page-101-module">
-              <h3>Exercise 4: Receive a file</h3>
-              <p>Get used to downloading or copying a file so you can inspect it locally.</p>
-              <pre><code>wget https://example.com/file.txt
-curl -O https://example.com/file.txt
-cp /path/to/file.txt .</code></pre>
-              <p>The lesson here is simple: receive the file first, then inspect it in a controlled place.</p>
-            </section>
+cat welcome.txt
+cat first-flag.txt
+cat incoming.flag
+cat .secret
+help
+clear</code></pre>
+              </section>
+            </aside>
           </div>
         </article>
       </div>
@@ -174,5 +198,6 @@ cp /path/to/file.txt .</code></pre>
 
   <script src="assets/content.js"></script>
   <script src="assets/main.js"></script>
+  <script src="assets/101.js"></script>
 </body>
 </html>
