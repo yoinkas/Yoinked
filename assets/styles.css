@@ -929,6 +929,38 @@ body.page-hacking a:hover {
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
 }
 
+.hacking-notes {
+  width: 100%;
+}
+
+.hacking-notes summary {
+  list-style: none;
+}
+
+.hacking-notes summary::-webkit-details-marker {
+  display: none;
+}
+
+.hacking-notes-body {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 95, 46, 0.16);
+  background: rgba(8, 8, 8, 0.9);
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.hacking-notes-body h4,
+.hacking-notes-body h5 {
+  margin: 0;
+}
+
+.hacking-notes-body pre {
+  margin-top: 0;
+}
+
 .file-button {
   position: relative;
   overflow: hidden;

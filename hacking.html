@@ -68,6 +68,64 @@
           <h3>Tony the Tiger</h3>
           <img class="hacking-feature-image" src="assets/tonythetiger.png" alt="Tony the Tiger" />
           <a class="btn" href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+          <details class="hacking-notes">
+            <summary class="btn ghost">Show Me The Notes</summary>
+            <div class="hacking-notes-body">
+              <h4>Tony the Tiger - TryHackMe Write-Up</h4>
+              <h5>Overview</h5>
+              <p>Tony the Tiger is a beginner-friendly Linux challenge focused on Java deserialization attacks and exploitation of a vulnerable JBoss application server.</p>
+              <p>The goal of the room is to perform reconnaissance on the target machine, identify exposed services, exploit the vulnerable JBoss application, gain shell access, escalate privileges, and retrieve the root flag.</p>
+
+              <h5>Enumeration</h5>
+              <p>The first step when attacking a machine is enumeration. I started with an Nmap scan:</p>
+              <pre><code>nmap -sC -sV -T4 &lt;TARGET-IP&gt;</code></pre>
+              <p>This revealed several open ports, with the most interesting service running on port 8080.</p>
+              <pre><code>22/tcp    SSH
+80/tcp    HTTP
+8080/tcp  JBoss / Tomcat</code></pre>
+
+              <h5>Web Enumeration</h5>
+              <p>Navigating to port 8080 revealed a Tony the Tiger themed blog page. An image on the page looked suspicious, so I downloaded it and inspected it with:</p>
+              <pre><code>strings image.jpg</code></pre>
+              <p>This exposed the first flag:</p>
+              <pre><code>THM{Tony_Sure_Loves_Frosted_Flakes}</code></pre>
+
+              <h5>Researching the Vulnerability</h5>
+              <p>After identifying JBoss, I researched common JBoss exploits. JBoss servers are known to suffer from Java deserialization issues that can lead to remote code execution.</p>
+
+              <h5>Exploiting JBoss</h5>
+              <p>To exploit the target, I used JexBoss.</p>
+              <pre><code>git clone https://github.com/joaomatosf/jexboss.git
+cd jexboss
+pip install -r requires.txt
+python jexboss.py -host http://TARGET-IP:8080</code></pre>
+              <p>Once exploitation succeeded, JexBoss deployed a payload and provided shell access.</p>
+
+              <h5>Gaining a Shell</h5>
+              <p>After landing the shell, I used basic commands to confirm access and inspect the environment:</p>
+              <pre><code>whoami
+pwd
+ls</code></pre>
+
+              <h5>SSH Access</h5>
+              <p>Further enumeration revealed credentials that allowed SSH login as the <code>jboss</code> user.</p>
+              <pre><code>ssh jboss@TARGET-IP</code></pre>
+
+              <h5>Privilege Escalation</h5>
+              <p>Checking sudo permissions showed that <code>/usr/bin/find</code> could be run as root.</p>
+              <pre><code>sudo -l
+sudo /usr/bin/find . -exec /bin/sh \; -quit</code></pre>
+              <p>This spawned a root shell.</p>
+
+              <h5>Root Access</h5>
+              <p>After gaining root, I navigated to the root directory and retrieved the final flag.</p>
+              <pre><code>cd /root
+ls</code></pre>
+
+              <h5>Key Lessons Learned</h5>
+              <p>This room reinforced several important concepts: careful enumeration, hidden data inside files, Java deserialization exploitation, and privilege escalation through unsafe sudo permissions.</p>
+            </div>
+          </details>
         </article>
       </div>
     </section>
