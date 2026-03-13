@@ -45,6 +45,25 @@ function applyHomepageContent(api) {
   if (heroGrid) {
     heroGrid.classList.toggle("hero-grid-reversed", content.heroMediaPosition === "left");
   }
+
+  const heroMediaShell = document.getElementById("hero-media-shell");
+  if (heroMediaShell) {
+    const heroEmbed = api.renderEmbedFrame(content.heroEmbedUrl, "Homepage hero media");
+    if (heroEmbed) {
+      heroMediaShell.innerHTML = heroEmbed;
+    } else {
+      heroMediaShell.innerHTML = `
+        <img
+          class="hero-meme"
+          src="${content.heroImageSrc}"
+          alt="${content.heroImageAlt}"
+          data-home-field="heroImageSrc"
+          data-home-attr="src"
+          data-home-alt-field="heroImageAlt"
+        />
+      `;
+    }
+  }
 }
 
 function applyHomepageCardOrdering(api) {

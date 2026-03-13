@@ -10,6 +10,7 @@
       heroLede: "",
       heroImageSrc: "assets/typing-meme.gif",
       heroImageAlt: "Typing meme on laptop",
+      heroEmbedUrl: "",
       heroMediaPosition: "right",
       heroPrimaryText: "CyberSecurity",
       heroPrimaryHref: "cybersecurity.html",
@@ -87,6 +88,59 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function embedUrl(value) {
+    const raw = String(value || "").trim();
+    if (!raw) {
+      return "";
+    }
+
+    try {
+      const parsed = new URL(raw, window.location.origin);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        return "";
+      }
+
+      return parsed.toString();
+    } catch (error) {
+      return "";
+    }
+  }
+
+  function renderEmbedFrame(url, title) {
+    const src = embedUrl(url);
+    if (!src) {
+      return "";
+    }
+
+    return `
+      <div class="embed-frame-shell">
+        <iframe
+          class="embed-frame"
+          src="${escapeHtml(src)}"
+          title="${escapeHtml(title || "Embedded content")}"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        ></iframe>
+      </div>
+    `;
+  }
+
+  function normalizeCustomSections(sections) {
+    return (Array.isArray(sections) ? sections : [])
+      .filter((section) => section && typeof section === "object")
+      .map((section) => ({
+        id: String(section.id || `section-${Date.now()}`),
+        kicker: plainText(section.kicker),
+        title: plainText(section.title) || "New section",
+        body: plainText(section.body),
+        buttonText: plainText(section.buttonText),
+        buttonHref: plainText(section.buttonHref),
+        embedUrl: plainText(section.embedUrl),
+      }));
   }
 
   function renderRichText(value) {
@@ -343,7 +397,7 @@
         ...defaults,
         ...parsed,
         hiddenSections: Array.isArray(parsed.hiddenSections) ? parsed.hiddenSections : [],
-        customSections: Array.isArray(parsed.customSections) ? parsed.customSections : [],
+        customSections: normalizeCustomSections(parsed.customSections),
       };
       return normalizeHomepageContent(normalized);
     } catch (error) {
@@ -359,7 +413,7 @@
     const normalized = normalizeHomepageContent({
       ...(content && typeof content === "object" ? content : {}),
       hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
-      customSections: Array.isArray(content?.customSections) ? content.customSections : [],
+      customSections: normalizeCustomSections(content?.customSections),
     });
 
     if (canUseStorage()) {
@@ -431,7 +485,7 @@
 
   function normalizeHomepageContent(content) {
     const defaults = getHomepageDefaults();
-    const customSections = Array.isArray(content?.customSections) ? content.customSections : [];
+    const customSections = normalizeCustomSections(content?.customSections);
     const sectionIds = ["hero", "about", "recent", "contact", ...customSections.map((section) => `custom:${section.id}`)];
 
     return {
@@ -450,6 +504,7 @@
         defaults.recentCardOrder,
         defaults.recentCardOrder
       ),
+      heroEmbedUrl: plainText(content?.heroEmbedUrl),
       heroMediaPosition: content?.heroMediaPosition === "left" ? "left" : "right",
     };
   }
@@ -482,6 +537,7 @@
       body: plainText(input.body),
       buttonText: plainText(input.buttonText),
       buttonHref: plainText(input.buttonHref),
+      embedUrl: plainText(input.embedUrl),
     };
 
     current.customSections = [...(current.customSections || []), nextSection];
@@ -508,6 +564,7 @@
         body: plainText(input.body),
         buttonText: plainText(input.buttonText),
         buttonHref: plainText(input.buttonHref),
+        embedUrl: plainText(input.embedUrl),
       };
     });
 
@@ -560,6 +617,7 @@
   function renderHomepageSection(section) {
     const kicker = section.kicker ? `<p class="eyebrow">${escapeHtml(section.kicker)}</p>` : "";
     const body = section.body ? `<p class="lede">${escapeHtml(section.body).replace(/\n/g, "<br />")}</p>` : "";
+    const embed = section.embedUrl ? renderEmbedFrame(section.embedUrl, section.title || "Embedded content") : "";
     const action = section.buttonText && section.buttonHref
       ? `<a class="btn" href="${escapeHtml(section.buttonHref)}">${escapeHtml(section.buttonText)}</a>`
       : "";
@@ -571,6 +629,7 @@
             ${kicker}
             <h2>${escapeHtml(section.title)}</h2>
             ${body}
+            ${embed}
             ${action}
           </div>
         </div>
@@ -605,6 +664,7 @@
     moveHomepageSection,
     moveHomepageCard,
     toggleHeroMediaPosition,
+    renderEmbedFrame,
     renderHomepageSection,
     renderPostCard,
     renderPostPage,

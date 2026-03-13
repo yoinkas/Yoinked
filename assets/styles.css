@@ -279,6 +279,28 @@ h1 span {
   box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
 }
 
+.hero-media-shell {
+  margin-top: 18px;
+}
+
+.embed-frame-shell {
+  width: 100%;
+  margin-top: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(93, 255, 139, 0.18);
+  overflow: hidden;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+  background: #010302;
+}
+
+.embed-frame {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 320px;
+  border: 0;
+}
+
 .pill {
   font-size: 0.7rem;
   text-transform: uppercase;

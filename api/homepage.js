@@ -34,7 +34,17 @@ function normalizeOrder(order, validIds, fallbackOrder) {
 function normalizeHomepageContent(input) {
   const defaults = getHomepageDefaults();
   const content = input && typeof input === "object" ? input : {};
-  const customSections = Array.isArray(content.customSections) ? content.customSections : [];
+  const customSections = (Array.isArray(content.customSections) ? content.customSections : [])
+    .filter((section) => section && typeof section === "object")
+    .map((section) => ({
+      id: String(section.id || `section-${Date.now()}`),
+      kicker: String(section.kicker || "").trim(),
+      title: String(section.title || "").trim() || "New section",
+      body: String(section.body || "").trim(),
+      buttonText: String(section.buttonText || "").trim(),
+      buttonHref: String(section.buttonHref || "").trim(),
+      embedUrl: String(section.embedUrl || "").trim(),
+    }));
   const sectionIds = ["hero", "about", "recent", "contact", ...customSections.map((section) => `custom:${section.id}`)];
 
   return {
@@ -45,6 +55,7 @@ function normalizeHomepageContent(input) {
     sectionOrder: normalizeOrder(content.sectionOrder, sectionIds, sectionIds),
     aboutCardOrder: normalizeOrder(content.aboutCardOrder, defaults.aboutCardOrder, defaults.aboutCardOrder),
     recentCardOrder: normalizeOrder(content.recentCardOrder, defaults.recentCardOrder, defaults.recentCardOrder),
+    heroEmbedUrl: String(content.heroEmbedUrl || "").trim(),
     heroMediaPosition: content.heroMediaPosition === "left" ? "left" : "right",
   };
 }

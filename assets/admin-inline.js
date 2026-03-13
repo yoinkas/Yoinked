@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       { name: "title", label: "Section title", value: section.title || "" },
       { name: "kicker", label: "Section kicker", value: section.kicker || "" },
       { name: "body", label: "Section body", value: section.body || "" },
+      { name: "embedUrl", label: "Embed URL", value: section.embedUrl || "" },
       { name: "buttonText", label: "Button text", value: section.buttonText || "" },
       { name: "buttonHref", label: "Button link", value: section.buttonHref || "" },
     ], "Custom section");
@@ -137,6 +138,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderHero(state) {
     const mediaLabel = state.heroMediaPosition === "left" ? "Move image right" : "Move image left";
+    const heroMedia = state.heroEmbedUrl
+      ? api.renderEmbedFrame(state.heroEmbedUrl, "Homepage hero media")
+      : `<img class="hero-meme" src="${escapeHtml(state.heroImageSrc)}" alt="${escapeHtml(state.heroImageAlt)}" />`;
 
     return `
       <section class="hero admin-edit-section">
@@ -171,7 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <h3>${escapeHtml(state.heroCardTitle)}</h3>
             <p>${escapeHtml(state.heroCardBody)}</p>
-            <img class="hero-meme" src="${escapeHtml(state.heroImageSrc)}" alt="${escapeHtml(state.heroImageAlt)}" />
+            ${heroMedia}
           </article>
         </div>
       </section>
@@ -305,6 +309,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${section.kicker ? `<p class="eyebrow">${escapeHtml(section.kicker)}</p>` : ""}
             <h2>${escapeHtml(section.title)}</h2>
             ${section.body ? `<p class="lede">${nl2br(section.body)}</p>` : ""}
+            ${section.embedUrl ? api.renderEmbedFrame(section.embedUrl, section.title || "Embedded content") : ""}
             ${section.buttonText && section.buttonHref ? `<span class="btn">${escapeHtml(section.buttonText)}</span><p class="meta">${escapeHtml(section.buttonHref)}</p>` : ""}
           </article>
         </div>
@@ -449,6 +454,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         { name: "heroCardBody", label: "Card body" },
         { name: "heroImageSrc", label: "Image source" },
         { name: "heroImageAlt", label: "Image alt text" },
+        { name: "heroEmbedUrl", label: "Embed URL" },
       ], "Updated hero card.");
       return;
     }
