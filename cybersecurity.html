@@ -76,7 +76,43 @@
             <details class="cyber-remediation">
               <summary class="btn ghost">Remediation Notes</summary>
               <div class="cyber-remediation-body">
-                <p>Inorder to hide this is to get a Router that encrypts all devices on the network.</p>
+                <h3>Remediation Notes</h3>
+                <p>To reduce device discovery and limit exposed information during network scans, such as those performed with Angry IP Scanner, consider the following security practices:</p>
+                <h4>Enable Network Segmentation (VLANs)</h4>
+                <p>Separate devices into different network segments so they cannot easily discover or communicate with each other.</p>
+                <p>Example command to view current network configuration on Linux:</p>
+                <pre><code>ip addr</code></pre>
+                <p>This shows your assigned IP addresses and interfaces.</p>
+                <h4>Use Wi-Fi Client Isolation</h4>
+                <p>Enable client isolation or guest network isolation on your router. This prevents devices on the same wireless network from communicating directly with each other.</p>
+                <p>To identify the gateway (router) address:</p>
+                <pre><code>ip route</code></pre>
+                <p>The gateway IP is usually something like <code>192.168.1.1</code>.</p>
+                <h4>Configure Host-Based Firewalls</h4>
+                <p>Use system firewalls to block unnecessary services and limit responses to scans.</p>
+                <p>Example using UFW on Linux:</p>
+                <pre><code>sudo ufw enable
+sudo ufw deny 23
+sudo ufw allow 22</code></pre>
+                <p>This blocks Telnet and allows SSH.</p>
+                <h4>Disable ICMP Echo Responses (Ping)</h4>
+                <p>Blocking ping responses can make systems less visible to basic scanners.</p>
+                <p>Example on Linux:</p>
+                <pre><code>sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1</code></pre>
+                <h4>Limit Exposed Services</h4>
+                <p>Regularly check which ports are open on your system.</p>
+                <p>Example command:</p>
+                <pre><code>ss -tuln</code></pre>
+                <p>This lists listening ports and services.</p>
+                <h4>Check Active Devices on Your Network</h4>
+                <p>Understanding what devices exist on your network helps identify unknown hosts.</p>
+                <p>Example command:</p>
+                <pre><code>arp -a</code></pre>
+                <p>This shows devices that have communicated with your machine on the local network.</p>
+                <h4>Learning Tip</h4>
+                <p>Students can also practice enumeration themselves:</p>
+                <pre><code>nmap -sn 192.168.1.0/24</code></pre>
+                <p>This performs a simple network discovery scan similar to what Angry IP Scanner does.</p>
               </div>
             </details>
           </div>
