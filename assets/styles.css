@@ -868,7 +868,9 @@ body.page-hacking a:hover {
 
 .hacking-media-stack {
   display: grid;
-  gap: 18px;
+  align-content: space-between;
+  min-height: 100%;
+  gap: 64px;
 }
 
 .hacking-media-card {
@@ -886,7 +888,8 @@ body.page-hacking a:hover {
 }
 
 .hacking-media-card-alt {
-  transform: translateX(18px);
+  transform: translate(18px, 48px);
+  align-self: end;
 }
 
 .hacking-band {
@@ -987,6 +990,14 @@ body.page-hacking a:hover {
   .admin-home-grid,
   .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hacking-media-stack {
+    gap: 18px;
+  }
+
+  .hacking-media-card-alt {
+    transform: translateX(18px);
   }
 }
 
