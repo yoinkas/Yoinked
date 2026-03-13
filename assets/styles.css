@@ -1203,8 +1203,22 @@ body.page-cybersecurity a:hover {
 }
 
 .cyber-investigation-body {
+  width: 100%;
+}
+
+.cyber-investigation-body summary {
+  list-style: none;
+  width: fit-content;
+}
+
+.cyber-investigation-body summary::-webkit-details-marker {
+  display: none;
+}
+
+.cyber-investigation-content {
   display: grid;
   gap: 18px;
+  margin-top: 14px;
 }
 
 .cyber-investigation-header {

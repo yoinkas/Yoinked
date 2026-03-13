@@ -178,38 +178,40 @@ sudo ufw allow 22</code></pre>
             </div>
           </div>
 
-          <div class="cyber-investigation-body">
-            <div class="cyber-investigation-header">
-              <p class="eyebrow">Case Notes</p>
-              <p class="meta">Source: Wireshark packet capture review</p>
-            </div>
+          <details class="cyber-investigation-body" open>
+            <summary class="btn ghost">Wireshark .pcap file</summary>
+            <div class="cyber-investigation-content">
+              <div class="cyber-investigation-header">
+                <p class="eyebrow">Case Notes</p>
+                <p class="meta">Source: Wireshark packet capture review</p>
+              </div>
 
-            <div class="cyber-steps">
-              <section class="cyber-step">
-                <h3>1. Initial Network Traffic Observation</h3>
-                <p>The first step was to inspect FTP communication between the two hosts in the packet capture.</p>
-                <pre><code>Source IP:      192.168.0.147
+              <div class="cyber-steps">
+                <section class="cyber-step">
+                  <h3>1. Initial Network Traffic Observation</h3>
+                  <p>The first step was to inspect FTP communication between the two hosts in the packet capture.</p>
+                  <pre><code>Source IP:      192.168.0.147
 Destination IP: 192.168.0.115</code></pre>
-                <p>The trace showed a normal TCP handshake followed by an FTP banner response:</p>
-                <pre><code>220 Hello FTP World!</code></pre>
-                <p>This confirmed the FTP service was active and accepting connections.</p>
-              </section>
+                  <p>The trace showed a normal TCP handshake followed by an FTP banner response:</p>
+                  <pre><code>220 Hello FTP World!</code></pre>
+                  <p>This confirmed the FTP service was active and accepting connections.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>2. Username Enumeration</h3>
-                <p>Shortly after the banner response, repeated login attempts targeted the same FTP account:</p>
-                <pre><code>USER jenny
+                <section class="cyber-step">
+                  <h3>2. Username Enumeration</h3>
+                  <p>Shortly after the banner response, repeated login attempts targeted the same FTP account:</p>
+                  <pre><code>USER jenny
 USER jenny
 USER jenny</code></pre>
-                <p>The repeated requests show the attacker already knew, or had enumerated, the username <code>jenny</code>.</p>
-              </section>
+                  <p>The repeated requests show the attacker already knew, or had enumerated, the username <code>jenny</code>.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>3. Password Brute Force Attempts</h3>
-                <p>The server repeatedly answered with:</p>
-                <pre><code>331 Please specify the password.</code></pre>
-                <p>That was followed by a sequence of common dictionary passwords:</p>
-                <pre><code>PASS 12345
+                <section class="cyber-step">
+                  <h3>3. Password Brute Force Attempts</h3>
+                  <p>The server repeatedly answered with:</p>
+                  <pre><code>331 Please specify the password.</code></pre>
+                  <p>That was followed by a sequence of common dictionary passwords:</p>
+                  <pre><code>PASS 12345
 PASS password
 PASS 12345678
 PASS dragon
@@ -222,40 +224,40 @@ PASS michael
 PASS shadow
 PASS letmein
 PASS daniel</code></pre>
-                <p>This pattern is consistent with automated brute-force tools such as Hydra, Medusa, or Ncrack.</p>
-              </section>
+                  <p>This pattern is consistent with automated brute-force tools such as Hydra, Medusa, or Ncrack.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>4. Successful Login</h3>
-                <p>Eventually the correct password appeared in the capture:</p>
-                <pre><code>PASS password123
+                <section class="cyber-step">
+                  <h3>4. Successful Login</h3>
+                  <p>Eventually the correct password appeared in the capture:</p>
+                  <pre><code>PASS password123
 230 Login successful.</code></pre>
-                <p>This confirmed the compromised credentials:</p>
-                <pre><code>Username: jenny
+                  <p>This confirmed the compromised credentials:</p>
+                  <pre><code>Username: jenny
 Password: password123</code></pre>
-              </section>
+                </section>
 
-              <section class="cyber-step">
-                <h3>5. FTP Post-Login Activity</h3>
-                <p>Once authenticated, the attacker began working inside the Apache web root:</p>
-                <pre><code>257 "/var/www/html" is the current directory</code></pre>
-                <p>This directory is critical because files placed there can be served directly by the web server.</p>
-              </section>
+                <section class="cyber-step">
+                  <h3>5. FTP Post-Login Activity</h3>
+                  <p>Once authenticated, the attacker began working inside the Apache web root:</p>
+                  <pre><code>257 "/var/www/html" is the current directory</code></pre>
+                  <p>This directory is critical because files placed there can be served directly by the web server.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>6. File Upload and Permission Changes</h3>
-                <p>The capture then showed an uploaded PHP file:</p>
-                <pre><code>STOR shell.php</code></pre>
-                <p>Wireshark also revealed the FTP data transfer and a permission change:</p>
-                <pre><code>FTP-DATA: STOR shell.php
+                <section class="cyber-step">
+                  <h3>6. File Upload and Permission Changes</h3>
+                  <p>The capture then showed an uploaded PHP file:</p>
+                  <pre><code>STOR shell.php</code></pre>
+                  <p>Wireshark also revealed the FTP data transfer and a permission change:</p>
+                  <pre><code>FTP-DATA: STOR shell.php
 SITE CHMOD 777 shell.php</code></pre>
-                <p>That sequence strongly suggests a web shell deployment. Permission <code>777</code> grants read, write, and execute access to everyone.</p>
-              </section>
+                  <p>That sequence strongly suggests a web shell deployment. Permission <code>777</code> grants read, write, and execute access to everyone.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>7. Attack Chain Summary</h3>
-                <p>The packet capture reconstructs the attack path clearly:</p>
-                <pre><code>1. FTP service discovered
+                <section class="cyber-step">
+                  <h3>7. Attack Chain Summary</h3>
+                  <p>The packet capture reconstructs the attack path clearly:</p>
+                  <pre><code>1. FTP service discovered
 2. Username jenny targeted
 3. Dictionary password attack launched
 4. Login succeeds with password123
@@ -263,32 +265,33 @@ SITE CHMOD 777 shell.php</code></pre>
 6. shell.php is uploaded
 7. chmod 777 shell.php is applied
 8. The shell can be triggered through the web server</code></pre>
-              </section>
+                </section>
 
-              <section class="cyber-step">
-                <h3>8. Security Weaknesses Identified</h3>
-                <p>The compromise succeeded because several weak controls aligned:</p>
-                <p><strong>Weak password:</strong> <code>password123</code> was easily guessed from a dictionary list.</p>
-                <p><strong>Plaintext FTP:</strong> credentials and commands were visible directly in the packet capture.</p>
-                <p><strong>Web root write access:</strong> the FTP user could upload straight into <code>/var/www/html</code>, enabling a web-shell drop.</p>
-              </section>
+                <section class="cyber-step">
+                  <h3>8. Security Weaknesses Identified</h3>
+                  <p>The compromise succeeded because several weak controls aligned:</p>
+                  <p><strong>Weak password:</strong> <code>password123</code> was easily guessed from a dictionary list.</p>
+                  <p><strong>Plaintext FTP:</strong> credentials and commands were visible directly in the packet capture.</p>
+                  <p><strong>Web root write access:</strong> the FTP user could upload straight into <code>/var/www/html</code>, enabling a web-shell drop.</p>
+                </section>
 
-              <section class="cyber-step">
-                <h3>9. Defensive Recommendations</h3>
-                <p>Several controls would reduce or prevent this attack path:</p>
-                <pre><code>- Enforce strong password policies
+                <section class="cyber-step">
+                  <h3>9. Defensive Recommendations</h3>
+                  <p>Several controls would reduce or prevent this attack path:</p>
+                  <pre><code>- Enforce strong password policies
 - Replace FTP with SFTP or FTPS
 - Restrict upload access to non-web-root directories
 - Alert on repeated failed logins
 - Use a WAF to inspect and block suspicious uploads</code></pre>
-              </section>
+                </section>
 
-              <section class="cyber-step">
-                <h3>10. Real Pentester Skill</h3>
-                <p>PCAP files are valuable because they can expose credentials, malware downloads, command execution, attacker tooling, and lateral movement. In unencrypted traffic, one capture can reveal the full compromise timeline.</p>
-              </section>
+                <section class="cyber-step">
+                  <h3>10. Real Pentester Skill</h3>
+                  <p>PCAP files are valuable because they can expose credentials, malware downloads, command execution, attacker tooling, and lateral movement. In unencrypted traffic, one capture can reveal the full compromise timeline.</p>
+                </section>
+              </div>
             </div>
-          </div>
+          </details>
         </article>
       </div>
     </section>
