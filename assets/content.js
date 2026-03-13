@@ -6,8 +6,8 @@
   function getHomepageDefaults() {
     return {
       heroEyebrow: "Security Writeups",
-      heroTitle: "Welcome, fellow hackers and cybersecurity enthusiasts!",
-      heroLede: "This is a place for absolute beginners to learn, grow, and become hacking wizards through TryHackMe and Hack The Box write-ups.",
+      heroTitle: "<strong>Welcome, fellow hackers and cybersecurity enthusiasts!<br />This is a place for absolute beginners to learn, grow, and become hacking wizards through TryHackMe and Hack The Box write-ups.</strong>",
+      heroLede: "",
       heroImageSrc: "assets/typing-meme.gif",
       heroImageAlt: "Typing meme on laptop",
       heroMediaPosition: "right",
