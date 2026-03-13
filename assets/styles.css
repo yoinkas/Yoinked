@@ -911,10 +911,15 @@ body.page-hacking a:hover {
   padding-bottom: 10px;
 }
 
+.hacking-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+  justify-content: center;
+  gap: 24px;
+}
+
 .hacking-feature-card {
-  max-width: 360px;
-  justify-self: center;
-  margin: 0 auto;
+  width: 100%;
   display: grid;
   gap: 16px;
 }
