@@ -30,10 +30,136 @@
           <p class="eyebrow">Starting Point</p>
           <h1>101</h1>
           <p class="lede">If you found this page, you are probably wondering where to begin. If you are unsure how to start your cybersecurity career, this is where we slow it down with simple exercises and quizzes so you can build momentum and get back into the flow.</p>
+          <div class="hero-actions page-101-actions">
+            <a class="btn" href="#command-line-exercises">command line exercises</a>
+            <a class="btn ghost" href="#quizzes">quizzes</a>
+            <a class="btn ghost" href="#matching-game">matching game</a>
+          </div>
           <video class="cyber-video" autoplay muted loop playsinline preload="auto">
             <source src="assets/101-intro.mp4" type="video/mp4" />
             <source src="assets/101-intro.mov" type="video/quicktime" />
           </video>
+        </article>
+      </div>
+    </section>
+
+    <section class="section page-101-section" id="command-line-exercises">
+      <div class="container">
+        <article class="card page-101-card">
+          <p class="eyebrow">command line exercises</p>
+          <h2>Receiving files and traveling through directories</h2>
+          <p class="lede">These are basic terminal habits you will use constantly. The goal is to get comfortable moving around, finding files, and pulling files onto your machine without guessing.</p>
+          <div class="page-101-grid">
+            <section class="page-101-module">
+              <h3>Exercise 1: Know where you are</h3>
+              <p>Start by checking your current directory, then list what is inside it.</p>
+              <pre><code>pwd
+ls
+ls -la</code></pre>
+              <p>Try to explain the difference between <code>ls</code> and <code>ls -la</code> before moving on.</p>
+            </section>
+            <section class="page-101-module">
+              <h3>Exercise 2: Move through directories</h3>
+              <p>Practice moving into folders, backing out, and jumping straight home.</p>
+              <pre><code>cd Downloads
+cd ..
+cd ~</code></pre>
+              <p>Your goal is to move around without getting lost.</p>
+            </section>
+            <section class="page-101-module">
+              <h3>Exercise 3: Create and organize</h3>
+              <p>Make a practice folder, create a file, and move it into a new location.</p>
+              <pre><code>mkdir cyber-lab
+cd cyber-lab
+touch notes.txt
+mkdir logs
+mv notes.txt logs/</code></pre>
+            </section>
+            <section class="page-101-module">
+              <h3>Exercise 4: Receive a file</h3>
+              <p>Get used to downloading or copying a file so you can inspect it locally.</p>
+              <pre><code>wget https://example.com/file.txt
+curl -O https://example.com/file.txt
+cp /path/to/file.txt .</code></pre>
+              <p>The lesson here is simple: receive the file first, then inspect it in a controlled place.</p>
+            </section>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section page-101-section" id="quizzes">
+      <div class="container">
+        <article class="card page-101-card">
+          <p class="eyebrow">quizzes</p>
+          <h2>Beginner-friendly questions</h2>
+          <p class="lede">Use these to check whether the basics are starting to stick. Try answering them before revealing the answers.</p>
+          <div class="page-101-stack">
+            <details class="page-101-detail">
+              <summary class="btn ghost">Quiz 1</summary>
+              <div class="page-101-detail-body">
+                <p><strong>Question:</strong> What command shows you your current working directory?</p>
+                <p><strong>Answer:</strong> <code>pwd</code></p>
+              </div>
+            </details>
+            <details class="page-101-detail">
+              <summary class="btn ghost">Quiz 2</summary>
+              <div class="page-101-detail-body">
+                <p><strong>Question:</strong> What does FTP do wrong from a security perspective?</p>
+                <p><strong>Answer:</strong> It sends credentials and traffic in plaintext.</p>
+              </div>
+            </details>
+            <details class="page-101-detail">
+              <summary class="btn ghost">Quiz 3</summary>
+              <div class="page-101-detail-body">
+                <p><strong>Question:</strong> What command is commonly used to list files in a directory on Linux?</p>
+                <p><strong>Answer:</strong> <code>ls</code></p>
+              </div>
+            </details>
+            <details class="page-101-detail">
+              <summary class="btn ghost">Quiz 4</summary>
+              <div class="page-101-detail-body">
+                <p><strong>Question:</strong> Why is a password like <code>password123</code> weak?</p>
+                <p><strong>Answer:</strong> It is common, predictable, and easy to guess with a dictionary attack.</p>
+              </div>
+            </details>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section page-101-section" id="matching-game">
+      <div class="container">
+        <article class="card page-101-card">
+          <p class="eyebrow">matching game</p>
+          <h2>Match the term to the definition</h2>
+          <p class="lede">Read the terms on the left and match them to the correct meaning. This is a simple memory drill for beginner cyber vocabulary.</p>
+          <div class="page-101-match-grid">
+            <article class="page-101-match-card">
+              <h3>Directory</h3>
+              <p>A folder used to organize files.</p>
+            </article>
+            <article class="page-101-match-card">
+              <h3>FTP</h3>
+              <p>A file transfer protocol that is insecure because it does not encrypt traffic by default.</p>
+            </article>
+            <article class="page-101-match-card">
+              <h3>Packet Capture</h3>
+              <p>A recorded set of network traffic that can be reviewed in tools like Wireshark.</p>
+            </article>
+            <article class="page-101-match-card">
+              <h3>Brute Force</h3>
+              <p>A method of trying many passwords or values until one works.</p>
+            </article>
+            <article class="page-101-match-card">
+              <h3>Web Shell</h3>
+              <p>A malicious script uploaded to a web server to execute commands remotely.</p>
+            </article>
+            <article class="page-101-match-card">
+              <h3>Privilege Escalation</h3>
+              <p>The act of gaining higher-level permissions after initial access.</p>
+            </article>
+          </div>
         </article>
       </div>
     </section>
