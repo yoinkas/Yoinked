@@ -1114,6 +1114,38 @@ body.page-cybersecurity a:hover {
   gap: 18px;
 }
 
+.cyber-video-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cyber-remediation {
+  max-width: 360px;
+}
+
+.cyber-remediation summary {
+  list-style: none;
+}
+
+.cyber-remediation summary::-webkit-details-marker {
+  display: none;
+}
+
+.cyber-remediation-body {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(13, 139, 111, 0.14);
+  background: rgba(215, 239, 232, 0.48);
+}
+
+.cyber-remediation-body p {
+  margin: 0;
+}
+
 .cyber-video {
   width: 100%;
   display: block;
