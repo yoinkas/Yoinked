@@ -899,9 +899,17 @@ body.page-hacking a:hover {
   min-height: 100%;
 }
 
+.hacking-feature-section {
+  padding-top: 28px;
+  padding-bottom: 10px;
+}
+
 .hacking-feature-card {
   max-width: 360px;
   justify-self: center;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
 }
 
 .hacking-feature-image {
@@ -910,7 +918,7 @@ body.page-hacking a:hover {
   object-fit: cover;
   border-radius: 14px;
   border: 1px solid rgba(255, 95, 46, 0.16);
-  margin: 8px 0 18px;
+  margin: 0;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
 }
 
