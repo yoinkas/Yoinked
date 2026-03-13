@@ -1174,6 +1174,16 @@ body.page-cybersecurity a:hover {
   top: 96px;
 }
 
+.cyber-investigation-tip {
+  margin: -4px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid rgba(13, 139, 111, 0.9);
+  border-radius: 10px;
+  background: rgba(13, 139, 111, 0.12);
+  color: #0b5b48;
+  box-shadow: 0 10px 22px rgba(13, 139, 111, 0.08);
+}
+
 .cyber-screenshot-stack {
   display: grid;
   gap: 14px;
