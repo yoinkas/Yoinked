@@ -124,6 +124,176 @@ sudo ufw allow 22</code></pre>
     </section>
 
     <section class="section">
+      <div class="container">
+        <article class="card cyber-investigation-card">
+          <div class="cyber-investigation-preview">
+            <p class="eyebrow">Wireshark Investigation</p>
+            <h2>FTP Brute Force Attack</h2>
+            <p class="lede">Step-by-step packet analysis showing how weak credentials and plaintext FTP led to a web-shell upload.</p>
+            <div class="cyber-screenshot-stack">
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-01.png" alt="Wireshark capture showing FTP traffic and initial service response" />
+                <figcaption>Step 1: Initial FTP communication between <code>192.168.0.147</code> and <code>192.168.0.115</code>.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-02.png" alt="Wireshark capture showing FTP banner response" />
+                <figcaption>Step 2: The FTP server replies with <code>220 Hello FTP World!</code>, confirming the service is live.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-03.png" alt="Wireshark capture showing repeated USER jenny requests" />
+                <figcaption>Step 3: Multiple <code>USER jenny</code> attempts reveal the attacker is targeting a known account.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-04.png" alt="Wireshark capture showing repeated password prompts on FTP" />
+                <figcaption>Step 4: The server keeps returning <code>331 Please specify the password.</code> during brute-force attempts.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-05.png" alt="Wireshark capture showing common password guesses" />
+                <figcaption>Step 5: Common dictionary passwords are tried in sequence, consistent with automated tooling.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-06.png" alt="Wireshark capture showing successful FTP login" />
+                <figcaption>Step 6: The correct credential pair succeeds with <code>PASS password123</code> and <code>230 Login successful.</code></figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-07.png" alt="Wireshark capture showing the current FTP directory" />
+                <figcaption>Step 7: Post-login activity confirms the attacker is operating in <code>/var/www/html</code>.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-08.png" alt="Wireshark capture showing shell.php upload through FTP" />
+                <figcaption>Step 8: The attacker uploads a backdoor using <code>STOR shell.php</code>.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-09.png" alt="Wireshark capture showing FTP data transfer for shell.php" />
+                <figcaption>Step 9: FTP data traffic confirms the <code>shell.php</code> file transfer completed.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-10.png" alt="Wireshark capture showing chmod command applied to shell.php" />
+                <figcaption>Step 10: The attacker runs <code>SITE CHMOD 777 shell.php</code> to make the payload executable.</figcaption>
+              </figure>
+              <figure class="cyber-screenshot-card">
+                <img src="assets/wireshark-h4cked/step-11.png" alt="Wireshark capture showing the final malicious FTP activity in sequence" />
+                <figcaption>Step 11: The final sequence ties together brute force, login success, file upload, and permission change.</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="cyber-investigation-body">
+            <div class="cyber-investigation-header">
+              <p class="eyebrow">Case Notes</p>
+              <p class="meta">Source: Wireshark packet capture review</p>
+            </div>
+
+            <div class="cyber-steps">
+              <section class="cyber-step">
+                <h3>1. Initial Network Traffic Observation</h3>
+                <p>The first step was to inspect FTP communication between the two hosts in the packet capture.</p>
+                <pre><code>Source IP:      192.168.0.147
+Destination IP: 192.168.0.115</code></pre>
+                <p>The trace showed a normal TCP handshake followed by an FTP banner response:</p>
+                <pre><code>220 Hello FTP World!</code></pre>
+                <p>This confirmed the FTP service was active and accepting connections.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>2. Username Enumeration</h3>
+                <p>Shortly after the banner response, repeated login attempts targeted the same FTP account:</p>
+                <pre><code>USER jenny
+USER jenny
+USER jenny</code></pre>
+                <p>The repeated requests show the attacker already knew, or had enumerated, the username <code>jenny</code>.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>3. Password Brute Force Attempts</h3>
+                <p>The server repeatedly answered with:</p>
+                <pre><code>331 Please specify the password.</code></pre>
+                <p>That was followed by a sequence of common dictionary passwords:</p>
+                <pre><code>PASS 12345
+PASS password
+PASS 12345678
+PASS dragon
+PASS sunshine
+PASS qwerty
+PASS football
+PASS computer
+PASS monkey
+PASS michael
+PASS shadow
+PASS letmein
+PASS daniel</code></pre>
+                <p>This pattern is consistent with automated brute-force tools such as Hydra, Medusa, or Ncrack.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>4. Successful Login</h3>
+                <p>Eventually the correct password appeared in the capture:</p>
+                <pre><code>PASS password123
+230 Login successful.</code></pre>
+                <p>This confirmed the compromised credentials:</p>
+                <pre><code>Username: jenny
+Password: password123</code></pre>
+              </section>
+
+              <section class="cyber-step">
+                <h3>5. FTP Post-Login Activity</h3>
+                <p>Once authenticated, the attacker began working inside the Apache web root:</p>
+                <pre><code>257 "/var/www/html" is the current directory</code></pre>
+                <p>This directory is critical because files placed there can be served directly by the web server.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>6. File Upload and Permission Changes</h3>
+                <p>The capture then showed an uploaded PHP file:</p>
+                <pre><code>STOR shell.php</code></pre>
+                <p>Wireshark also revealed the FTP data transfer and a permission change:</p>
+                <pre><code>FTP-DATA: STOR shell.php
+SITE CHMOD 777 shell.php</code></pre>
+                <p>That sequence strongly suggests a web shell deployment. Permission <code>777</code> grants read, write, and execute access to everyone.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>7. Attack Chain Summary</h3>
+                <p>The packet capture reconstructs the attack path clearly:</p>
+                <pre><code>1. FTP service discovered
+2. Username jenny targeted
+3. Dictionary password attack launched
+4. Login succeeds with password123
+5. Attacker moves into /var/www/html
+6. shell.php is uploaded
+7. chmod 777 shell.php is applied
+8. The shell can be triggered through the web server</code></pre>
+              </section>
+
+              <section class="cyber-step">
+                <h3>8. Security Weaknesses Identified</h3>
+                <p>The compromise succeeded because several weak controls aligned:</p>
+                <p><strong>Weak password:</strong> <code>password123</code> was easily guessed from a dictionary list.</p>
+                <p><strong>Plaintext FTP:</strong> credentials and commands were visible directly in the packet capture.</p>
+                <p><strong>Web root write access:</strong> the FTP user could upload straight into <code>/var/www/html</code>, enabling a web-shell drop.</p>
+              </section>
+
+              <section class="cyber-step">
+                <h3>9. Defensive Recommendations</h3>
+                <p>Several controls would reduce or prevent this attack path:</p>
+                <pre><code>- Enforce strong password policies
+- Replace FTP with SFTP or FTPS
+- Restrict upload access to non-web-root directories
+- Alert on repeated failed logins
+- Use a WAF to inspect and block suspicious uploads</code></pre>
+              </section>
+
+              <section class="cyber-step">
+                <h3>10. Real Pentester Skill</h3>
+                <p>PCAP files are valuable because they can expose credentials, malware downloads, command execution, attacker tooling, and lateral movement. In unencrypted traffic, one capture can reveal the full compromise timeline.</p>
+              </section>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
       <div class="container cyber-grid">
         <article class="card cyber-note-card">
           <p class="eyebrow">Core Focus</p>
