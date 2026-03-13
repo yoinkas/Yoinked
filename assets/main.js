@@ -146,11 +146,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (allPostsEl) {
     const posts = api.getPublishedPosts();
     const emptyMessage = document.body.classList.contains("page-hacking")
-      ? "What I post here is for research purposes and must be researched ;)"
+      ? ""
       : "No published posts yet. Create and publish one when you are ready.";
     allPostsEl.innerHTML = posts.length
       ? posts.map((post) => api.renderPostCard(post, { basePath: "" })).join("")
-      : `<p class="empty-state">${emptyMessage}</p>`;
+      : emptyMessage
+        ? `<p class="empty-state">${emptyMessage}</p>`
+        : "";
   }
 
   const postViewEl = document.getElementById("post-view");

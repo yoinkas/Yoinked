@@ -898,6 +898,10 @@ body.page-hacking a:hover {
   border-bottom: 1px solid rgba(255, 95, 46, 0.08);
 }
 
+.hacking-links {
+  margin-top: 10px;
+}
+
 .hacking-note-card {
   min-height: 100%;
 }
