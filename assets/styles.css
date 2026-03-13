@@ -1099,6 +1099,16 @@ body.page-cybersecurity a:hover {
   border-bottom: 1px solid rgba(13, 139, 111, 0.1);
 }
 
+.cyber-links-section {
+  padding-top: 12px;
+  padding-bottom: 20px;
+}
+
+.cyber-links-card {
+  display: grid;
+  gap: 18px;
+}
+
 .cyber-note-card {
   min-height: 100%;
 }
