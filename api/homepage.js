@@ -44,7 +44,8 @@ function normalizeHomepageContent(input) {
       buttonText: String(item.buttonText || "").trim() || "Open Write-Up",
       buttonHref: String(item.buttonHref || "").trim(),
       notes: String(item.notes || "").trim(),
-    }));
+    }))
+    .filter((item) => !["featured-tony-the-tiger", "featured-gallery", "featured-h4cked"].includes(item.id));
   const customSections = (Array.isArray(content.customSections) ? content.customSections : [])
     .filter((section) => section && typeof section === "object")
     .map((section) => ({
