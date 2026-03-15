@@ -123,11 +123,32 @@ function applyHomepageSections(api) {
   }
 }
 
+function logVisitor() {
+  const payload = {
+    page: `${window.location.pathname}${window.location.search}${window.location.hash}`,
+    viewport: `${window.innerWidth}x${window.innerHeight}`,
+    language: navigator.language || "",
+  };
+
+  fetch("/api/track-visit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  }).catch(() => {
+    // Ignore tracking failures so they never affect page use.
+  });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const api = window.BoxLadderContent;
   if (!api) {
     return;
   }
+
+  logVisitor();
 
   await api.fetchHomepageContent();
   applyHomepageContent(api);

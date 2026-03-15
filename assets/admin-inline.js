@@ -90,9 +90,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const featuredWriteupAddButton = document.getElementById("featured-writeup-add");
   const homepageStatusEl = document.getElementById("homepage-status");
   const homepagePreviewEl = document.getElementById("homepage-preview");
+  const visitorStatusEl = document.getElementById("visitor-status");
+  const visitorRefreshButton = document.getElementById("visitor-refresh");
+  const visitorLogEl = document.getElementById("visitor-log");
   const logoutButton = document.getElementById("logout-button");
 
-  if (!api || !homepageResetButton || !homepageAddSectionButton || !homepageRestoreSectionsButton || !featuredWriteupAddButton || !homepageStatusEl || !homepagePreviewEl) {
+  if (!api || !homepageResetButton || !homepageAddSectionButton || !homepageRestoreSectionsButton || !featuredWriteupAddButton || !homepageStatusEl || !homepagePreviewEl || !visitorStatusEl || !visitorRefreshButton || !visitorLogEl) {
     return;
   }
 
@@ -100,8 +103,83 @@ document.addEventListener("DOMContentLoaded", async () => {
     homepageStatusEl.textContent = message;
   }
 
+  function setVisitorStatus(message) {
+    visitorStatusEl.textContent = message;
+  }
+
   function getHomepageState() {
     return api.loadHomepageContent();
+  }
+
+  function formatVisitorTime(value) {
+    if (!value) {
+      return "Unknown time";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "Unknown time";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+  }
+
+  function renderVisitorLog(visitors, storage) {
+    if (!visitors.length) {
+      visitorLogEl.innerHTML = `
+        <article class="card">
+          <h3>No visitors logged yet</h3>
+          <p class="muted">${storage === "logs-only" ? "Redis is not configured, so visits only appear in server logs." : "New visits will appear here after someone opens a page."}</p>
+        </article>
+      `;
+      return;
+    }
+
+    visitorLogEl.innerHTML = visitors.map((visitor) => `
+      <article class="admin-post-card">
+        <div>
+          <p class="meta">${escapeHtml(formatVisitorTime(visitor.timestamp))}</p>
+          <h3>${escapeHtml(visitor.page || "Unknown page")}</h3>
+          <p><strong>IP:</strong> ${escapeHtml(visitor.ip || "unknown")}</p>
+          <p><strong>User-Agent:</strong> ${escapeHtml(visitor.userAgent || "unknown")}</p>
+          <p><strong>Referer:</strong> ${escapeHtml(visitor.referer || "direct")}</p>
+          <p><strong>Host:</strong> ${escapeHtml(visitor.host || "unknown")}</p>
+          <p><strong>Viewport:</strong> ${escapeHtml(visitor.viewport || "unknown")}</p>
+          <p><strong>Language:</strong> ${escapeHtml(visitor.language || "unknown")}</p>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  async function loadVisitorLog() {
+    setVisitorStatus("Loading visitor log...");
+    try {
+      const response = await fetch("/api/track-visit", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to load visitor log.");
+      }
+
+      renderVisitorLog(Array.isArray(payload.visitors) ? payload.visitors : [], payload.storage);
+      setVisitorStatus(payload.storage === "logs-only"
+        ? "Visitor tracking is active, but Redis is not configured. Only server logs are persistent."
+        : "Visitor log loaded.");
+    } catch (error) {
+      visitorLogEl.innerHTML = `
+        <article class="card">
+          <h3>Visitor log unavailable</h3>
+          <p class="muted">${escapeHtml(error.message || "Failed to load visitor log.")}</p>
+        </article>
+      `;
+      setVisitorStatus(error.message || "Failed to load visitor log.");
+    }
   }
 
   function closeMenu(target) {
@@ -476,6 +554,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     await persistHomepage(getHomepageState(), "Restored hidden sections.");
   });
 
+  visitorRefreshButton.addEventListener("click", async () => {
+    await loadVisitorLog();
+  });
+
   async function addFeaturedWriteup() {
     const state = getHomepageState();
     const next = promptForFeaturedWriteup();
@@ -691,6 +773,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await api.fetchHomepageContent();
   renderHomepageEditor();
   setHomepageStatus("Inline homepage editor ready.");
+  await loadVisitorLog();
   startAdminSessionActivityTracking();
 
   if (logoutButton) {
