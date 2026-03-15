@@ -924,6 +924,19 @@ body.page-hacking a:hover {
   gap: 16px;
 }
 
+.hacking-feature-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hacking-feature-link {
+  padding: 8px 14px;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
 .hacking-feature-image {
   width: 100%;
   max-height: 220px;
@@ -1031,6 +1044,15 @@ body.page-hacking a:hover {
   .admin-home-grid,
   .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hacking-feature-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hacking-feature-link {
+    width: 100%;
   }
 
   .hacking-media-stack {
