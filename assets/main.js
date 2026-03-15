@@ -155,6 +155,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         : "";
   }
 
+  const featuredWriteupsEl = document.getElementById("featured-writeups");
+  if (featuredWriteupsEl) {
+    const content = api.loadHomepageContent();
+    const items = Array.isArray(content.featuredWriteups) ? content.featuredWriteups : [];
+    featuredWriteupsEl.innerHTML = items.length
+      ? items.map((item) => api.renderFeaturedWriteupCard(item)).join("")
+      : `<p class="empty-state">No featured write-ups yet. Add one from the admin panel.</p>`;
+  }
+
   const postViewEl = document.getElementById("post-view");
   if (postViewEl) {
     const params = new URLSearchParams(window.location.search);

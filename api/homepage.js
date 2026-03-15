@@ -34,6 +34,17 @@ function normalizeOrder(order, validIds, fallbackOrder) {
 function normalizeHomepageContent(input) {
   const defaults = getHomepageDefaults();
   const content = input && typeof input === "object" ? input : {};
+  const featuredWriteups = (Array.isArray(content.featuredWriteups) ? content.featuredWriteups : defaults.featuredWriteups)
+    .filter((item) => item && typeof item === "object")
+    .map((item, index) => ({
+      id: String(item.id || `featured-writeup-${Date.now()}-${index}`),
+      title: String(item.title || "").trim() || "New write-up",
+      imageSrc: String(item.imageSrc || "").trim(),
+      imageAlt: String(item.imageAlt || "").trim(),
+      buttonText: String(item.buttonText || "").trim() || "Open Write-Up",
+      buttonHref: String(item.buttonHref || "").trim(),
+      notes: String(item.notes || "").trim(),
+    }));
   const customSections = (Array.isArray(content.customSections) ? content.customSections : [])
     .filter((section) => section && typeof section === "object")
     .map((section) => ({
@@ -55,6 +66,7 @@ function normalizeHomepageContent(input) {
     sectionOrder: normalizeOrder(content.sectionOrder, sectionIds, sectionIds),
     aboutCardOrder: normalizeOrder(content.aboutCardOrder, defaults.aboutCardOrder, defaults.aboutCardOrder),
     recentCardOrder: normalizeOrder(content.recentCardOrder, defaults.recentCardOrder, defaults.recentCardOrder),
+    featuredWriteups,
     heroEmbedUrl: String(content.heroEmbedUrl || "").trim(),
     heroMediaPosition: content.heroMediaPosition === "left" ? "left" : "right",
   };

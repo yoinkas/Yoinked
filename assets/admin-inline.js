@@ -87,11 +87,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const homepageResetButton = document.getElementById("homepage-reset");
   const homepageAddSectionButton = document.getElementById("homepage-add-section");
   const homepageRestoreSectionsButton = document.getElementById("homepage-restore-sections");
+  const featuredWriteupAddButton = document.getElementById("featured-writeup-add");
   const homepageStatusEl = document.getElementById("homepage-status");
   const homepagePreviewEl = document.getElementById("homepage-preview");
   const logoutButton = document.getElementById("logout-button");
 
-  if (!api || !homepageResetButton || !homepageAddSectionButton || !homepageRestoreSectionsButton || !homepageStatusEl || !homepagePreviewEl) {
+  if (!api || !homepageResetButton || !homepageAddSectionButton || !homepageRestoreSectionsButton || !featuredWriteupAddButton || !homepageStatusEl || !homepagePreviewEl) {
     return;
   }
 
@@ -134,6 +135,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       { name: "buttonText", label: "Button text", value: section.buttonText || "" },
       { name: "buttonHref", label: "Button link", value: section.buttonHref || "" },
     ], "Custom section");
+  }
+
+  function promptForFeaturedWriteup(item = {}) {
+    return promptFields([
+      { name: "title", label: "Write-up title", value: item.title || "" },
+      { name: "imageSrc", label: "Image source", value: item.imageSrc || "" },
+      { name: "imageAlt", label: "Image alt text", value: item.imageAlt || "" },
+      { name: "buttonText", label: "Button text", value: item.buttonText || "Open Write-Up" },
+      { name: "buttonHref", label: "Button link", value: item.buttonHref || "" },
+      { name: "notes", label: "Notes body", value: item.notes || "" },
+    ], "Featured write-up");
   }
 
   function renderHero(state) {
@@ -359,6 +371,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  function renderFeaturedWriteups(state) {
+    const items = Array.isArray(state.featuredWriteups) ? state.featuredWriteups : [];
+
+    return `
+      <section class="section admin-edit-section">
+        <div class="container">
+          <div class="section-header admin-edit-block">
+            <div class="admin-edit-controls">
+              ${renderMenu("Featured write-up actions", [
+                { action: "add-featured-writeup", label: "Add write-up" },
+              ])}
+            </div>
+            <h2>Featured Hacking Write-Ups</h2>
+            <p>These cards power the featured section on the Hacking page and always render with the same layout.</p>
+          </div>
+          <div class="hacking-feature-grid">
+            ${items.length
+              ? items.map((item, index) => `
+                  <div class="admin-edit-block">
+                    <div class="admin-edit-controls">
+                      ${renderMenu(`${item.title} actions`, [
+                        { action: "edit-featured-writeup", target: item.id, label: "Edit section" },
+                        { action: "move-featured-writeup", target: item.id, direction: "up", label: "Move left" },
+                        { action: "move-featured-writeup", target: item.id, direction: "down", label: "Move right" },
+                        { action: "delete-featured-writeup", target: item.id, label: "Delete section", danger: true },
+                      ])}
+                    </div>
+                    ${api.renderFeaturedWriteupCard(item)}
+                    <p class="meta">Card ${index + 1}</p>
+                  </div>
+                `).join("")
+              : `<p class="empty-state">No featured write-ups yet.</p>`}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   function renderHomepageEditor() {
     const state = getHomepageState();
     const hidden = new Set(state.hiddenSections || []);
@@ -375,6 +425,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     homepagePreviewEl.innerHTML = `
       ${(state.sectionOrder || []).map((sectionId) => sections[sectionId] || "").join("")}
+      ${renderFeaturedWriteups(state)}
       ${renderFooter(state)}
     `;
   }
@@ -423,6 +474,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   homepageRestoreSectionsButton.addEventListener("click", async () => {
     api.restoreHomepageSections();
     await persistHomepage(getHomepageState(), "Restored hidden sections.");
+  });
+
+  async function addFeaturedWriteup() {
+    const state = getHomepageState();
+    const next = promptForFeaturedWriteup();
+    if (!next) {
+      return;
+    }
+
+    const featuredWriteups = [
+      ...(Array.isArray(state.featuredWriteups) ? state.featuredWriteups : []),
+      { ...next, id: `featured-writeup-${Date.now()}` },
+    ];
+    await persistHomepage({ ...state, featuredWriteups }, "Added featured write-up.");
+  }
+
+  featuredWriteupAddButton.addEventListener("click", async () => {
+    await addFeaturedWriteup();
   });
 
   homepagePreviewEl.addEventListener("click", async (event) => {
@@ -563,6 +632,59 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (target.dataset.adminAction === "move-recent-card") {
       api.moveHomepageCard("recent", target.dataset.adminTarget, target.dataset.adminDirection);
       await persistHomepage(getHomepageState(), "Track card moved.");
+      return;
+    }
+
+    if (target.dataset.adminAction === "add-featured-writeup") {
+      await addFeaturedWriteup();
+      return;
+    }
+
+    if (target.dataset.adminAction === "edit-featured-writeup") {
+      const state = getHomepageState();
+      const current = (state.featuredWriteups || []).find((item) => item.id === target.dataset.adminTarget);
+      if (!current) {
+        return;
+      }
+
+      const next = promptForFeaturedWriteup(current);
+      if (!next) {
+        return;
+      }
+
+      const featuredWriteups = (state.featuredWriteups || []).map((item) => (
+        item.id === current.id ? { ...item, ...next } : item
+      ));
+      await persistHomepage({ ...state, featuredWriteups }, "Updated featured write-up.");
+      return;
+    }
+
+    if (target.dataset.adminAction === "move-featured-writeup") {
+      const state = getHomepageState();
+      const items = [...(state.featuredWriteups || [])];
+      const currentIndex = items.findIndex((item) => item.id === target.dataset.adminTarget);
+      if (currentIndex < 0) {
+        return;
+      }
+
+      const nextIndex = target.dataset.adminDirection === "up" ? currentIndex - 1 : currentIndex + 1;
+      if (nextIndex < 0 || nextIndex >= items.length) {
+        return;
+      }
+
+      [items[currentIndex], items[nextIndex]] = [items[nextIndex], items[currentIndex]];
+      await persistHomepage({ ...state, featuredWriteups: items }, "Moved featured write-up.");
+      return;
+    }
+
+    if (target.dataset.adminAction === "delete-featured-writeup") {
+      if (!window.confirm("Delete this featured write-up?")) {
+        return;
+      }
+
+      const state = getHomepageState();
+      const featuredWriteups = (state.featuredWriteups || []).filter((item) => item.id !== target.dataset.adminTarget);
+      await persistHomepage({ ...state, featuredWriteups }, "Deleted featured write-up.");
     }
   });
 

@@ -143,6 +143,21 @@
       }));
   }
 
+  function normalizeFeaturedWriteups(items, fallbackItems = []) {
+    const source = Array.isArray(items) && items.length ? items : fallbackItems;
+    return source
+      .filter((item) => item && typeof item === "object")
+      .map((item, index) => ({
+        id: plainText(item.id) || `featured-writeup-${Date.now()}-${index}`,
+        title: plainText(item.title) || "New write-up",
+        imageSrc: plainText(item.imageSrc),
+        imageAlt: plainText(item.imageAlt),
+        buttonText: plainText(item.buttonText) || "Open Write-Up",
+        buttonHref: plainText(item.buttonHref),
+        notes: plainText(item.notes),
+      }));
+  }
+
   function renderRichText(value) {
     const blocks = plainText(value).split(/\n{2,}/).filter(Boolean);
     return blocks
@@ -493,6 +508,7 @@
       ...(content && typeof content === "object" ? content : {}),
       hiddenSections: Array.isArray(content?.hiddenSections) ? content.hiddenSections : [],
       customSections,
+      featuredWriteups: normalizeFeaturedWriteups(content?.featuredWriteups, defaults.featuredWriteups),
       sectionOrder: normalizeOrder(content?.sectionOrder, sectionIds, sectionIds),
       aboutCardOrder: normalizeOrder(
         content?.aboutCardOrder,
@@ -507,6 +523,35 @@
       heroEmbedUrl: plainText(content?.heroEmbedUrl),
       heroMediaPosition: content?.heroMediaPosition === "left" ? "left" : "right",
     };
+  }
+
+  function renderFeaturedWriteupCard(item) {
+    const image = item.imageSrc
+      ? `<img class="hacking-feature-image" src="${escapeHtml(item.imageSrc)}" alt="${escapeHtml(item.imageAlt || item.title)}" />`
+      : "";
+    const action = item.buttonHref
+      ? `<a class="btn" href="${escapeHtml(item.buttonHref)}" target="_blank" rel="noreferrer">${escapeHtml(item.buttonText || "Open Write-Up")}</a>`
+      : "";
+    const notes = item.notes
+      ? `
+        <details class="hacking-notes">
+          <summary class="btn ghost">Show Me The Notes</summary>
+          <div class="hacking-notes-body">
+            ${renderRichText(item.notes)}
+          </div>
+        </details>
+      `
+      : "";
+
+    return `
+      <article class="card hacking-note-card hacking-feature-card" data-featured-writeup-id="${escapeHtml(item.id)}">
+        <p class="eyebrow">Featured Resource</p>
+        <h3>${escapeHtml(item.title)}</h3>
+        ${image}
+        ${action}
+        ${notes}
+      </article>
+    `;
   }
 
   function updateHomepageField(field, value) {
@@ -666,6 +711,7 @@
     toggleHeroMediaPosition,
     renderEmbedFrame,
     renderHomepageSection,
+    renderFeaturedWriteupCard,
     renderPostCard,
     renderPostPage,
   };
