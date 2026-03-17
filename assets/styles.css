@@ -892,6 +892,44 @@ body.page-hacking a:hover {
   align-self: end;
 }
 
+.hacking-blob-card {
+  padding: 22px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(19, 110, 46, 0.22), transparent 38%),
+    linear-gradient(180deg, rgba(5, 10, 5, 0.98), rgba(2, 4, 2, 0.96));
+}
+
+.hacking-blob {
+  width: min(100%, 320px);
+  aspect-ratio: 1 / 1;
+  overflow: visible;
+}
+
+.hacking-blob image {
+  transform-origin: center;
+  transition: transform 0.4s ease-out;
+}
+
+.hacking-blob:hover image {
+  transform: scale(1.12);
+}
+
+.hacking-blob-outline {
+  fill: none;
+  stroke: rgba(121, 255, 134, 0.55);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 12px rgba(66, 255, 98, 0.22));
+}
+
+.hacking-blob-text {
+  font: 700 9px/1.1 "Share Tech Mono", monospace;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  fill: #90ff9f;
+}
+
 .hacking-band {
   background: linear-gradient(180deg, rgba(14, 14, 14, 0.96), rgba(5, 5, 5, 0.82));
   border-top: 1px solid rgba(255, 95, 46, 0.08);
@@ -1039,6 +1077,10 @@ body.page-hacking a:hover {
 
   .hacking-media-card-alt {
     transform: translateX(18px);
+  }
+
+  .hacking-blob-card {
+    padding: 16px;
   }
 }
 
