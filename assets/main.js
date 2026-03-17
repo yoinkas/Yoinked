@@ -215,45 +215,43 @@ function setupHackingLayoutEditor() {
     resetButton.hidden = !enabled;
   }
 
-  function pointerPosition(event) {
-    if (event.touches?.length) {
-      return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-    }
-    return { x: event.clientX, y: event.clientY };
-  }
-
   function startDrag(event) {
     if (!moveModeEnabled) {
       return;
     }
 
     const card = event.currentTarget;
-    const point = pointerPosition(event);
-
     dragState = {
       card,
-      startPointerX: point.x,
-      startPointerY: point.y,
+      pointerId: event.pointerId,
+      startPointerX: event.clientX,
+      startPointerY: event.clientY,
       startX: Number(card.dataset.moveX || 0),
       startY: Number(card.dataset.moveY || 0),
     };
 
+    card.classList.add("is-dragging");
+    card.setPointerCapture?.(event.pointerId);
     event.preventDefault();
   }
 
   function updateDrag(event) {
-    if (!dragState) {
+    if (!dragState || event.pointerId !== dragState.pointerId) {
       return;
     }
 
-    const point = pointerPosition(event);
-    const nextX = dragState.startX + (point.x - dragState.startPointerX);
-    const nextY = dragState.startY + (point.y - dragState.startPointerY);
+    const nextX = dragState.startX + (event.clientX - dragState.startPointerX);
+    const nextY = dragState.startY + (event.clientY - dragState.startPointerY);
     applyCardOffset(dragState.card, { x: nextX, y: nextY });
     event.preventDefault();
   }
 
-  function endDrag() {
+  function endDrag(event) {
+    if (!dragState || (event && event.pointerId !== dragState.pointerId)) {
+      return;
+    }
+
+    dragState.card.classList.remove("is-dragging");
     dragState = null;
   }
 
@@ -281,23 +279,26 @@ function setupHackingLayoutEditor() {
   });
 
   cards.forEach((card) => {
-    card.addEventListener("mousedown", startDrag);
-    card.addEventListener("touchstart", startDrag, { passive: false });
+    card.querySelectorAll("img").forEach((image) => {
+      image.setAttribute("draggable", "false");
+      image.addEventListener("dragstart", (event) => event.preventDefault());
+    });
+    card.addEventListener("pointerdown", startDrag);
   });
 
-  window.addEventListener("mousemove", updateDrag);
-  window.addEventListener("touchmove", updateDrag, { passive: false });
-  window.addEventListener("mouseup", endDrag);
-  window.addEventListener("touchend", endDrag);
+  window.addEventListener("pointermove", updateDrag);
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
 
   layoutState = readStoredLayout();
   applyLayout(layoutState);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  setupHackingLayoutEditor();
+
   const api = window.BoxLadderContent;
   if (!api) {
-    setupHackingLayoutEditor();
     return;
   }
 
@@ -359,6 +360,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     postViewEl.innerHTML = api.renderPostPage(post);
     document.title = `${post.title} | Box & Ladder`;
   }
-
-  setupHackingLayoutEditor();
 });
