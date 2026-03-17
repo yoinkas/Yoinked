@@ -896,6 +896,8 @@ body.page-hacking a:hover {
   padding: 22px;
   display: grid;
   place-items: center;
+  justify-self: start;
+  transform: translateX(calc(-100% - 28px));
   background:
     radial-gradient(circle at 50% 50%, rgba(19, 110, 46, 0.22), transparent 38%),
     linear-gradient(180deg, rgba(5, 10, 5, 0.98), rgba(2, 4, 2, 0.96));
@@ -1081,6 +1083,7 @@ body.page-hacking a:hover {
 
   .hacking-blob-card {
     padding: 16px;
+    transform: none;
   }
 }
 
