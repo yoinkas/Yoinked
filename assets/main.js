@@ -151,7 +151,7 @@ function setupHackingLayoutEditor() {
   const saveButton = document.getElementById("hacking-move-save");
   const resetButton = document.getElementById("hacking-move-reset");
   const cards = Array.from(document.querySelectorAll(".hacking-media-card[data-move-id]"));
-  const storageKey = "hacking-layout-v1";
+  const storageKey = "hacking-layout-v2";
   const editorPassword = "cozydk";
 
   if (!moveButton || !saveButton || !resetButton || !cards.length) {
@@ -161,9 +161,16 @@ function setupHackingLayoutEditor() {
   let moveModeEnabled = false;
   let dragState = null;
   let layoutState = {};
+  const placeholders = new Map();
 
-  function clampOffset(value) {
-    return Math.round(Math.max(-1600, Math.min(1600, value)));
+  function clampHorizontal(value, width) {
+    const max = Math.max(12, document.documentElement.scrollWidth - width - 12);
+    return Math.round(Math.max(12, Math.min(max, value)));
+  }
+
+  function clampVertical(value, height) {
+    const max = Math.max(12, document.documentElement.scrollHeight - height - 12);
+    return Math.round(Math.max(12, Math.min(max, value)));
   }
 
   function readStoredLayout() {
@@ -179,20 +186,40 @@ function setupHackingLayoutEditor() {
     window.localStorage.setItem(storageKey, JSON.stringify(nextState));
   }
 
-  function applyCardOffset(card, offset) {
-    const x = clampOffset(offset?.x || 0);
-    const y = clampOffset(offset?.y || 0);
-    card.style.setProperty("--move-x", `${x}px`);
-    card.style.setProperty("--move-y", `${y}px`);
-    card.dataset.moveX = String(x);
-    card.dataset.moveY = String(y);
+  function getPlaceholderRect(card) {
+    const placeholder = placeholders.get(card.dataset.moveId);
+    return placeholder?.getBoundingClientRect();
+  }
+
+  function defaultPositionForCard(card) {
+    const rect = getPlaceholderRect(card);
+    const width = rect?.width || card.getBoundingClientRect().width || 320;
+    const height = rect?.height || card.getBoundingClientRect().height || 220;
+    const left = (rect?.left || 0) + window.scrollX;
+    const top = (rect?.top || 0) + window.scrollY;
+    return { left, top, width, height };
+  }
+
+  function applyCardPosition(card, position) {
+    const currentRect = card.getBoundingClientRect();
+    const width = Math.round(position?.width || currentRect.width || defaultPositionForCard(card).width);
+    const height = Math.round(currentRect.height || defaultPositionForCard(card).height);
+    const left = clampHorizontal(Number(position?.left || 0), width);
+    const top = clampVertical(Number(position?.top || 0), height);
+    card.style.setProperty("--move-left", `${left}px`);
+    card.style.setProperty("--move-top", `${top}px`);
+    card.style.setProperty("--move-width", `${width}px`);
+    card.dataset.moveLeft = String(left);
+    card.dataset.moveTop = String(top);
+    card.dataset.moveWidth = String(width);
   }
 
   function applyLayout(nextState) {
     cards.forEach((card) => {
       const id = card.dataset.moveId;
-      const saved = nextState[id] || { x: 0, y: 0 };
-      applyCardOffset(card, saved);
+      const fallback = defaultPositionForCard(card);
+      applyCardPosition(card, nextState[id] || fallback);
+      card.classList.add("is-free-positioned");
     });
   }
 
@@ -200,11 +227,24 @@ function setupHackingLayoutEditor() {
     const snapshot = {};
     cards.forEach((card) => {
       snapshot[card.dataset.moveId] = {
-        x: clampOffset(Number(card.dataset.moveX || 0)),
-        y: clampOffset(Number(card.dataset.moveY || 0)),
+        left: Number(card.dataset.moveLeft || 0),
+        top: Number(card.dataset.moveTop || 0),
+        width: Number(card.dataset.moveWidth || 0),
       };
     });
     return snapshot;
+  }
+
+  function createPlaceholders() {
+    cards.forEach((card) => {
+      const rect = card.getBoundingClientRect();
+      const placeholder = document.createElement("div");
+      placeholder.className = "hacking-media-placeholder";
+      placeholder.style.width = `${Math.round(rect.width)}px`;
+      placeholder.style.height = `${Math.round(rect.height)}px`;
+      card.insertAdjacentElement("afterend", placeholder);
+      placeholders.set(card.dataset.moveId, placeholder);
+    });
   }
 
   function setMoveMode(enabled) {
@@ -226,8 +266,8 @@ function setupHackingLayoutEditor() {
       pointerId: event.pointerId,
       startPointerX: event.clientX,
       startPointerY: event.clientY,
-      startX: Number(card.dataset.moveX || 0),
-      startY: Number(card.dataset.moveY || 0),
+      startLeft: Number(card.dataset.moveLeft || 0),
+      startTop: Number(card.dataset.moveTop || 0),
     };
 
     card.classList.add("is-dragging");
@@ -240,9 +280,13 @@ function setupHackingLayoutEditor() {
       return;
     }
 
-    const nextX = dragState.startX + (event.clientX - dragState.startPointerX);
-    const nextY = dragState.startY + (event.clientY - dragState.startPointerY);
-    applyCardOffset(dragState.card, { x: nextX, y: nextY });
+    const nextLeft = dragState.startLeft + (event.clientX - dragState.startPointerX);
+    const nextTop = dragState.startTop + (event.clientY - dragState.startPointerY);
+    applyCardPosition(dragState.card, {
+      left: nextLeft,
+      top: nextTop,
+      width: Number(dragState.card.dataset.moveWidth || 0),
+    });
     event.preventDefault();
   }
 
@@ -274,7 +318,7 @@ function setupHackingLayoutEditor() {
 
   resetButton.addEventListener("click", () => {
     layoutState = {};
-    cards.forEach((card) => applyCardOffset(card, { x: 0, y: 0 }));
+    applyLayout(layoutState);
     window.localStorage.removeItem(storageKey);
   });
 
@@ -290,6 +334,7 @@ function setupHackingLayoutEditor() {
   window.addEventListener("pointerup", endDrag);
   window.addEventListener("pointercancel", endDrag);
 
+  createPlaceholders();
   layoutState = readStoredLayout();
   applyLayout(layoutState);
 }
