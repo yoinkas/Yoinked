@@ -884,12 +884,6 @@ body.page-hacking a:hover {
   gap: 64px;
 }
 
-.hacking-media-placeholder {
-  border-radius: 24px;
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .hacking-media-card {
   position: relative;
   background: rgba(10, 10, 10, 0.94);
@@ -897,23 +891,8 @@ body.page-hacking a:hover {
   border-radius: 24px;
   padding: 14px;
   box-shadow: var(--shadow);
-}
-
-.hacking-media-card.is-free-positioned {
-  position: absolute;
-  left: var(--move-left, 0px);
-  top: var(--move-top, 0px);
-  width: var(--move-width, auto);
-  margin: 0;
-  z-index: 2;
-}
-
-.hacking-media-card.is-free-positioned.hacking-media-card-alt,
-.hacking-media-card.is-free-positioned.hacking-blob-card {
-  order: initial;
-  align-self: auto;
-  justify-self: auto;
-  transform: none;
+  margin-top: var(--move-y, 0px);
+  margin-left: var(--move-x, 0px);
 }
 
 .hacking-media-card img {
