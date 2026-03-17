@@ -866,17 +866,6 @@ body.page-hacking a:hover {
   align-items: start;
 }
 
-.hacking-layout-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.hacking-layout-btn {
-  min-width: 92px;
-}
-
 .hacking-media-stack {
   display: grid;
   align-content: space-between;
@@ -885,14 +874,11 @@ body.page-hacking a:hover {
 }
 
 .hacking-media-card {
-  position: relative;
   background: rgba(10, 10, 10, 0.94);
   border: 1px solid rgba(255, 95, 46, 0.12);
   border-radius: 24px;
   padding: 14px;
   box-shadow: var(--shadow);
-  margin-top: var(--move-y, 0px);
-  margin-left: var(--move-x, 0px);
 }
 
 .hacking-media-card img {
@@ -946,35 +932,6 @@ body.page-hacking a:hover {
   letter-spacing: 1.8px;
   text-transform: uppercase;
   fill: #90ff9f;
-}
-
-body.hacking-move-mode .hacking-media-card[data-move-id] {
-  cursor: grab;
-  border-color: rgba(93, 255, 139, 0.45);
-  box-shadow:
-    var(--shadow),
-    0 0 0 1px rgba(93, 255, 139, 0.24),
-    0 0 22px rgba(93, 255, 139, 0.14);
-  user-select: none;
-}
-
-body.hacking-move-mode .hacking-media-card[data-move-id]::after {
-  content: "Drag";
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(2, 6, 3, 0.88);
-  border: 1px solid rgba(93, 255, 139, 0.32);
-  color: #90ff9f;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-body.hacking-move-mode .hacking-media-card[data-move-id]:active {
-  cursor: grabbing;
 }
 
 .hacking-band {
