@@ -956,7 +956,6 @@ body.hacking-move-mode .hacking-media-card[data-move-id] {
     0 0 0 1px rgba(93, 255, 139, 0.24),
     0 0 22px rgba(93, 255, 139, 0.14);
   user-select: none;
-  touch-action: none;
 }
 
 body.hacking-move-mode .hacking-media-card[data-move-id]::after {
@@ -976,11 +975,6 @@ body.hacking-move-mode .hacking-media-card[data-move-id]::after {
 
 body.hacking-move-mode .hacking-media-card[data-move-id]:active {
   cursor: grabbing;
-}
-
-body.hacking-move-mode .hacking-media-card[data-move-id].is-dragging {
-  cursor: grabbing;
-  z-index: 5;
 }
 
 .hacking-band {
