@@ -36,14 +36,19 @@
           <a class="btn" href="posts/tryhackme-template.html">THM template</a>
           <a class="btn ghost" href="posts/htb-template.html">HTB template</a>
         </div>
+        <div class="hacking-layout-controls" aria-label="Temporary media layout controls">
+          <button class="btn ghost hacking-layout-btn" type="button" id="hacking-move-toggle">Move</button>
+          <button class="btn hacking-layout-btn" type="button" id="hacking-move-save" hidden>Save</button>
+          <button class="btn ghost hacking-layout-btn" type="button" id="hacking-move-reset" hidden>Reset</button>
+        </div>
         <div class="hacking-media-stack">
-          <figure class="hacking-media-card">
+          <figure class="hacking-media-card" data-move-id="hero-primary">
             <img src="assets/hacking-hero.gif" alt="Hacking themed animation" />
           </figure>
-          <figure class="hacking-media-card hacking-media-card-alt">
+          <figure class="hacking-media-card hacking-media-card-alt" data-move-id="hero-secondary">
             <img src="assets/hacking-secondary.gif" alt="Secondary hacking themed animation" />
           </figure>
-          <figure class="hacking-media-card hacking-blob-card">
+          <figure class="hacking-media-card hacking-blob-card" data-move-id="hero-blob">
             <svg class="hacking-blob" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Hacking Realm blob graphic">
               <defs>
                 <clipPath id="hackingBlobClip">

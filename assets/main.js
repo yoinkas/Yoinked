@@ -142,9 +142,162 @@ function logVisitor() {
   });
 }
 
+function setupHackingLayoutEditor() {
+  if (!document.body.classList.contains("page-hacking")) {
+    return;
+  }
+
+  const moveButton = document.getElementById("hacking-move-toggle");
+  const saveButton = document.getElementById("hacking-move-save");
+  const resetButton = document.getElementById("hacking-move-reset");
+  const cards = Array.from(document.querySelectorAll(".hacking-media-card[data-move-id]"));
+  const storageKey = "hacking-layout-v1";
+  const editorPassword = "cozydk";
+
+  if (!moveButton || !saveButton || !resetButton || !cards.length) {
+    return;
+  }
+
+  let moveModeEnabled = false;
+  let dragState = null;
+  let layoutState = {};
+
+  function clampOffset(value) {
+    return Math.round(Math.max(-1600, Math.min(1600, value)));
+  }
+
+  function readStoredLayout() {
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function writeStoredLayout(nextState) {
+    window.localStorage.setItem(storageKey, JSON.stringify(nextState));
+  }
+
+  function applyCardOffset(card, offset) {
+    const x = clampOffset(offset?.x || 0);
+    const y = clampOffset(offset?.y || 0);
+    card.style.setProperty("--move-x", `${x}px`);
+    card.style.setProperty("--move-y", `${y}px`);
+    card.dataset.moveX = String(x);
+    card.dataset.moveY = String(y);
+  }
+
+  function applyLayout(nextState) {
+    cards.forEach((card) => {
+      const id = card.dataset.moveId;
+      const saved = nextState[id] || { x: 0, y: 0 };
+      applyCardOffset(card, saved);
+    });
+  }
+
+  function snapshotLayout() {
+    const snapshot = {};
+    cards.forEach((card) => {
+      snapshot[card.dataset.moveId] = {
+        x: clampOffset(Number(card.dataset.moveX || 0)),
+        y: clampOffset(Number(card.dataset.moveY || 0)),
+      };
+    });
+    return snapshot;
+  }
+
+  function setMoveMode(enabled) {
+    moveModeEnabled = enabled;
+    document.body.classList.toggle("hacking-move-mode", enabled);
+    moveButton.textContent = enabled ? "Exit Move" : "Move";
+    saveButton.hidden = !enabled;
+    resetButton.hidden = !enabled;
+  }
+
+  function pointerPosition(event) {
+    if (event.touches?.length) {
+      return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  function startDrag(event) {
+    if (!moveModeEnabled) {
+      return;
+    }
+
+    const card = event.currentTarget;
+    const point = pointerPosition(event);
+
+    dragState = {
+      card,
+      startPointerX: point.x,
+      startPointerY: point.y,
+      startX: Number(card.dataset.moveX || 0),
+      startY: Number(card.dataset.moveY || 0),
+    };
+
+    event.preventDefault();
+  }
+
+  function updateDrag(event) {
+    if (!dragState) {
+      return;
+    }
+
+    const point = pointerPosition(event);
+    const nextX = dragState.startX + (point.x - dragState.startPointerX);
+    const nextY = dragState.startY + (point.y - dragState.startPointerY);
+    applyCardOffset(dragState.card, { x: nextX, y: nextY });
+    event.preventDefault();
+  }
+
+  function endDrag() {
+    dragState = null;
+  }
+
+  moveButton.addEventListener("click", () => {
+    if (!moveModeEnabled) {
+      const password = window.prompt("Password for move mode");
+      if (password !== editorPassword) {
+        return;
+      }
+    }
+
+    setMoveMode(!moveModeEnabled);
+  });
+
+  saveButton.addEventListener("click", () => {
+    layoutState = snapshotLayout();
+    writeStoredLayout(layoutState);
+    setMoveMode(false);
+  });
+
+  resetButton.addEventListener("click", () => {
+    layoutState = {};
+    cards.forEach((card) => applyCardOffset(card, { x: 0, y: 0 }));
+    window.localStorage.removeItem(storageKey);
+  });
+
+  cards.forEach((card) => {
+    card.addEventListener("mousedown", startDrag);
+    card.addEventListener("touchstart", startDrag, { passive: false });
+  });
+
+  window.addEventListener("mousemove", updateDrag);
+  window.addEventListener("touchmove", updateDrag, { passive: false });
+  window.addEventListener("mouseup", endDrag);
+  window.addEventListener("touchend", endDrag);
+
+  layoutState = readStoredLayout();
+  applyLayout(layoutState);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const api = window.BoxLadderContent;
   if (!api) {
+    setupHackingLayoutEditor();
     return;
   }
 
@@ -206,4 +359,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     postViewEl.innerHTML = api.renderPostPage(post);
     document.title = `${post.title} | Box & Ladder`;
   }
+
+  setupHackingLayoutEditor();
 });
