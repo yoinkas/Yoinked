@@ -31,72 +31,7 @@
           <p class="eyebrow">Daily Projects</p>
           <h1>Messups, hardening, rebuilds, and the stuff that actually teaches.</h1>
           <p class="lede">Lessons-Learned and hardening my network ONE-DAY at a time!!</p>
-          <div class="hero-actions">
-            <a class="btn daily-projects-trigger" href="#network-gui">CLICK ME</a>
-          </div>
         </article>
-      </div>
-    </section>
-
-    <section class="section daily-network-section" id="network-gui">
-      <div class="container daily-network-layout">
-        <article class="card daily-network-board">
-          <div class="section-header">
-            <p class="eyebrow">Network GUI</p>
-            <h2>Daily hardening map</h2>
-            <p>Click a node to inspect what changed, what broke, and what still needs cleanup.</p>
-          </div>
-
-          <div class="daily-network-canvas">
-            <div class="daily-network-lane">
-              <button class="daily-network-node is-critical" type="button" data-network-node="internet">Internet</button>
-            </div>
-
-            <div class="daily-network-link" aria-hidden="true"></div>
-
-            <div class="daily-network-lane">
-              <button class="daily-network-node is-active" type="button" data-network-node="router">Router / Gateway</button>
-              <button class="daily-network-node is-warning" type="button" data-network-node="firewall">Firewall Rules</button>
-            </div>
-
-            <div class="daily-network-fanout" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-
-            <div class="daily-network-devices">
-              <button class="daily-network-node" type="button" data-network-node="workstation">External TLS Sessions</button>
-              <button class="daily-network-node" type="button" data-network-node="loopback">Loopback Services</button>
-              <button class="daily-network-node" type="button" data-network-node="process18148">High-Chatter PID 18148</button>
-              <button class="daily-network-node" type="button" data-network-node="mixedapps">Mixed App Traffic</button>
-            </div>
-          </div>
-        </article>
-
-        <aside class="card daily-network-panel">
-          <p class="eyebrow">Selected Node</p>
-          <h3 data-network-title>Router / Gateway</h3>
-          <p class="daily-network-status" data-network-status>Active hardening target</p>
-          <p data-network-copy>Changed admin defaults, reviewed firmware, and tightened DNS plus remote-management exposure.</p>
-          <div class="daily-network-meta">
-            <div>
-              <p class="daily-network-meta-label">Latest messup</p>
-              <p data-network-messup>Left a management port exposed longer than planned.</p>
-            </div>
-            <div>
-              <p class="daily-network-meta-label">Fix</p>
-              <p data-network-fix>Locked WAN admin access, documented the change, and rechecked from another host.</p>
-            </div>
-          </div>
-          <div class="daily-network-connections">
-            <p class="daily-network-meta-label">Masked connection view</p>
-            <p class="daily-network-mask-note">Sensitive IPs are masked on purpose before rendering.</p>
-            <ul class="daily-network-connection-list" data-network-connections>
-              <li>Loading masked connections...</li>
-            </ul>
-          </div>
-        </aside>
       </div>
     </section>
   </main>
@@ -110,6 +45,5 @@
 
   <script src="assets/content.js"></script>
   <script src="assets/main.js"></script>
-  <script src="assets/daily-projects.js"></script>
 </body>
 </html>
