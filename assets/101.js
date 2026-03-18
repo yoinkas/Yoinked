@@ -1,10 +1,54 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const terminalScore = document.querySelector("[data-score-terminal]");
+  const terminalScoreDetail = document.querySelector("[data-score-terminal-detail]");
+  const quizScore = document.querySelector("[data-score-quiz]");
+  const quizScoreDetail = document.querySelector("[data-score-quiz-detail]");
+  const matchScore = document.querySelector("[data-score-match]");
+  const matchScoreDetail = document.querySelector("[data-score-match-detail]");
+  const quizRoot = document.querySelector("[data-quiz-root]");
   const matchGame = document.querySelector("[data-match-game]");
   const termsRoot = document.querySelector("[data-match-terms]");
   const definitionsRoot = document.querySelector("[data-match-definitions]");
   const matchStatus = document.querySelector("[data-match-status]");
   const resetButton = document.querySelector("[data-match-reset]");
   let selectedTerm = null;
+  const quizQuestions = [
+    {
+      id: "quiz-1",
+      question: "What command shows your current working directory?",
+      answer: "pwd",
+      choices: ["pwd", "ls", "cd", "cat"],
+    },
+    {
+      id: "quiz-2",
+      question: "What is the main security problem with FTP?",
+      answer: "It sends credentials and traffic in plaintext.",
+      choices: [
+        "It only works on Linux.",
+        "It sends credentials and traffic in plaintext.",
+        "It blocks file downloads by default.",
+        "It always requires multi-factor authentication.",
+      ],
+    },
+    {
+      id: "quiz-3",
+      question: "Which command is commonly used to list files in a Linux directory?",
+      answer: "ls",
+      choices: ["pwd", "ls", "mv", "whoami"],
+    },
+    {
+      id: "quiz-4",
+      question: "Why is a password like password123 weak?",
+      answer: "It is common, predictable, and easy to guess with a dictionary attack.",
+      choices: [
+        "It is too long to remember.",
+        "It is common, predictable, and easy to guess with a dictionary attack.",
+        "It only works on one website.",
+        "It cannot be typed on mobile.",
+      ],
+    },
+  ];
+  const quizAnswers = new Map();
   const matchPairs = [
     {
       id: "directory",
@@ -47,6 +91,35 @@ document.addEventListener("DOMContentLoaded", () => {
     return copy;
   }
 
+  function updateTerminalScore(current = 0, total = 10) {
+    if (terminalScore) {
+      terminalScore.textContent = `${current}/${total}`;
+    }
+
+    if (terminalScoreDetail) {
+      terminalScoreDetail.textContent = `${current}/${total} complete`;
+    }
+  }
+
+  function updateQuizScore() {
+    const total = quizQuestions.length;
+    let current = 0;
+
+    quizQuestions.forEach((question) => {
+      if (quizAnswers.get(question.id) === question.answer) {
+        current += 1;
+      }
+    });
+
+    if (quizScore) {
+      quizScore.textContent = `${current}/${total}`;
+    }
+
+    if (quizScoreDetail) {
+      quizScoreDetail.textContent = `${current}/${total} correct`;
+    }
+  }
+
   function updateMatchStatus() {
     if (!matchGame || !matchStatus) {
       return;
@@ -56,9 +129,74 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentMatches = definitionsRoot?.querySelectorAll(".page-101-definition-slot.is-complete").length ?? 0;
     matchStatus.textContent = `${currentMatches} of ${totalMatches} matched.`;
 
+    if (matchScore) {
+      matchScore.textContent = `${currentMatches}/${totalMatches}`;
+    }
+
+    if (matchScoreDetail) {
+      matchScoreDetail.textContent = `${currentMatches}/${totalMatches} matched`;
+    }
+
     if (currentMatches === totalMatches) {
       matchStatus.textContent = "All 6 matched. Board cleared.";
     }
+  }
+
+  function buildQuizCards() {
+    if (!quizRoot) {
+      return;
+    }
+
+    quizRoot.innerHTML = "";
+
+    quizQuestions.forEach((question, index) => {
+      const card = document.createElement("article");
+      card.className = "page-101-quiz-card";
+      card.innerHTML = `
+        <div class="page-101-quiz-card-header">
+          <p class="eyebrow">Quiz ${index + 1}</p>
+          <h3>${question.question}</h3>
+        </div>
+        <div class="page-101-quiz-options" data-quiz-options></div>
+        <p class="page-101-quiz-feedback" data-quiz-feedback>Select an answer.</p>
+      `;
+
+      const optionsRoot = card.querySelector("[data-quiz-options]");
+      const feedback = card.querySelector("[data-quiz-feedback]");
+
+      question.choices.forEach((choice) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "page-101-quiz-option";
+        button.textContent = choice;
+        button.addEventListener("click", () => {
+          quizAnswers.set(question.id, choice);
+          card.querySelectorAll(".page-101-quiz-option").forEach((option) => {
+            option.classList.remove("is-selected", "is-correct", "is-wrong");
+          });
+
+          button.classList.add("is-selected");
+
+          if (choice === question.answer) {
+            button.classList.add("is-correct");
+            feedback.textContent = "Correct.";
+            feedback.className = "page-101-quiz-feedback is-correct";
+          } else {
+            button.classList.add("is-wrong");
+            feedback.textContent = "Not quite. Try again.";
+            feedback.className = "page-101-quiz-feedback is-wrong";
+          }
+
+          updateQuizScore();
+        });
+
+        optionsRoot?.appendChild(button);
+      });
+
+      quizRoot.appendChild(card);
+    });
+
+    updateQuizScore();
   }
 
   function wireDragEvents(termChip) {
@@ -199,6 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   resetButton?.addEventListener("click", buildMatchGame);
+  buildQuizCards();
   buildMatchGame();
 
   const shell = document.querySelector("[data-terminal-shell]");
@@ -379,6 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderTasks();
+    updateTerminalScore(completedTasks.size, tasks.length);
   }
 
   function resolvePath(target) {
@@ -517,5 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
   updatePrompt();
   renderTasks();
   renderFlags();
+  updateTerminalScore(completedTasks.size, tasks.length);
   input.focus();
 });

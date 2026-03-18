@@ -30,6 +30,23 @@
           <p class="eyebrow">Starting Point</p>
           <h1>101</h1>
           <p class="lede">If you found this page, you are probably wondering where to begin. If you are unsure how to start your cybersecurity career, this is where we slow it down with simple exercises and quizzes so you can build momentum and get back into the flow.</p>
+          <section class="page-101-scoreboard" data-scoreboard>
+            <article class="page-101-score-card">
+              <p class="eyebrow">terminal lab</p>
+              <h3 data-score-terminal>0/10</h3>
+              <p>Commands and flags completed.</p>
+            </article>
+            <article class="page-101-score-card">
+              <p class="eyebrow">quizzes</p>
+              <h3 data-score-quiz>0/4</h3>
+              <p>Multiple-choice questions answered correctly.</p>
+            </article>
+            <article class="page-101-score-card">
+              <p class="eyebrow">matching game</p>
+              <h3 data-score-match>0/6</h3>
+              <p>Terms matched with the right definitions.</p>
+            </article>
+          </section>
           <div class="hero-actions page-101-actions">
             <a class="btn" href="#command-line-exercises">command line exercises</a>
             <a class="btn ghost" href="#quizzes">quizzes</a>
@@ -49,6 +66,10 @@
           <p class="eyebrow">command line exercises</p>
           <h2>Receiving files and traveling through directories</h2>
           <p class="lede">This lab gives you a fake terminal with dummy directories, flags, and simple questions. Work through it in order and use the <code>?</code> button in the top-right corner when you need a hint.</p>
+          <div class="page-101-section-score">
+            <p class="page-101-section-score-label">Section score</p>
+            <p class="page-101-section-score-value" data-score-terminal-detail>0/10 complete</p>
+          </div>
           <div class="page-101-lab">
             <section class="terminal-shell" data-terminal-shell>
               <div class="terminal-header">
@@ -117,37 +138,12 @@ clear</code></pre>
         <article class="card page-101-card">
           <p class="eyebrow">quizzes</p>
           <h2>Beginner-friendly questions</h2>
-          <p class="lede">Use these to check whether the basics are starting to stick. Try answering them before revealing the answers.</p>
-          <div class="page-101-stack">
-            <details class="page-101-detail">
-              <summary class="btn ghost">Quiz 1</summary>
-              <div class="page-101-detail-body">
-                <p><strong>Question:</strong> What command shows you your current working directory?</p>
-                <p><strong>Answer:</strong> <code>pwd</code></p>
-              </div>
-            </details>
-            <details class="page-101-detail">
-              <summary class="btn ghost">Quiz 2</summary>
-              <div class="page-101-detail-body">
-                <p><strong>Question:</strong> What does FTP do wrong from a security perspective?</p>
-                <p><strong>Answer:</strong> It sends credentials and traffic in plaintext.</p>
-              </div>
-            </details>
-            <details class="page-101-detail">
-              <summary class="btn ghost">Quiz 3</summary>
-              <div class="page-101-detail-body">
-                <p><strong>Question:</strong> What command is commonly used to list files in a directory on Linux?</p>
-                <p><strong>Answer:</strong> <code>ls</code></p>
-              </div>
-            </details>
-            <details class="page-101-detail">
-              <summary class="btn ghost">Quiz 4</summary>
-              <div class="page-101-detail-body">
-                <p><strong>Question:</strong> Why is a password like <code>password123</code> weak?</p>
-                <p><strong>Answer:</strong> It is common, predictable, and easy to guess with a dictionary attack.</p>
-              </div>
-            </details>
+          <p class="lede">Pick the best answer for each question. The page scores you as you go instead of showing the answer up front.</p>
+          <div class="page-101-section-score">
+            <p class="page-101-section-score-label">Section score</p>
+            <p class="page-101-section-score-value" data-score-quiz-detail>0/4 correct</p>
           </div>
+          <div class="page-101-quiz-stack" data-quiz-root></div>
         </article>
       </div>
     </section>
@@ -158,6 +154,10 @@ clear</code></pre>
           <p class="eyebrow">matching game</p>
           <h2>Match the term to the definition</h2>
           <p class="lede">Drag each term from the left side onto the correct definition on the right. This keeps the terms and meanings separate so you have to actually match them.</p>
+          <div class="page-101-section-score">
+            <p class="page-101-section-score-label">Section score</p>
+            <p class="page-101-section-score-value" data-score-match-detail>0/6 matched</p>
+          </div>
           <section class="page-101-match-board" data-match-game>
             <div class="page-101-match-columns">
               <div class="page-101-match-column">
