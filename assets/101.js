@@ -1,4 +1,206 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const matchGame = document.querySelector("[data-match-game]");
+  const termsRoot = document.querySelector("[data-match-terms]");
+  const definitionsRoot = document.querySelector("[data-match-definitions]");
+  const matchStatus = document.querySelector("[data-match-status]");
+  const resetButton = document.querySelector("[data-match-reset]");
+  let selectedTerm = null;
+  const matchPairs = [
+    {
+      id: "directory",
+      term: "Directory",
+      definition: "A folder used to organize files.",
+    },
+    {
+      id: "ftp",
+      term: "FTP",
+      definition: "A file transfer protocol that is insecure because it does not encrypt traffic by default.",
+    },
+    {
+      id: "packet-capture",
+      term: "Packet Capture",
+      definition: "A recorded set of network traffic that can be reviewed in tools like Wireshark.",
+    },
+    {
+      id: "brute-force",
+      term: "Brute Force",
+      definition: "A method of trying many passwords or values until one works.",
+    },
+    {
+      id: "web-shell",
+      term: "Web Shell",
+      definition: "A malicious script uploaded to a web server to execute commands remotely.",
+    },
+    {
+      id: "privilege-escalation",
+      term: "Privilege Escalation",
+      definition: "The act of gaining higher-level permissions after initial access.",
+    },
+  ];
+
+  function shuffle(items) {
+    const copy = [...items];
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+    return copy;
+  }
+
+  function updateMatchStatus() {
+    if (!matchGame || !matchStatus) {
+      return;
+    }
+
+    const totalMatches = matchPairs.length;
+    const currentMatches = definitionsRoot?.querySelectorAll(".page-101-definition-slot.is-complete").length ?? 0;
+    matchStatus.textContent = `${currentMatches} of ${totalMatches} matched.`;
+
+    if (currentMatches === totalMatches) {
+      matchStatus.textContent = "All 6 matched. Board cleared.";
+    }
+  }
+
+  function wireDragEvents(termChip) {
+    termChip.addEventListener("dragstart", () => {
+      termChip.classList.add("is-dragging");
+    });
+
+    termChip.addEventListener("dragend", () => {
+      termChip.classList.remove("is-dragging");
+    });
+
+    termChip.addEventListener("click", () => {
+      if (termChip.classList.contains("is-locked")) {
+        return;
+      }
+
+      document.querySelectorAll(".page-101-term-chip.is-selected").forEach((chip) => {
+        chip.classList.remove("is-selected");
+      });
+
+      if (selectedTerm === termChip) {
+        selectedTerm = null;
+        return;
+      }
+
+      selectedTerm = termChip;
+      termChip.classList.add("is-selected");
+    });
+  }
+
+  function clearSelectedTerm() {
+    selectedTerm?.classList.remove("is-selected");
+    selectedTerm = null;
+  }
+
+  function lockMatch(slot, dropzone, termChip) {
+    slot.classList.add("is-complete");
+    dropzone.innerHTML = "";
+    termChip.draggable = false;
+    termChip.classList.remove("is-selected");
+    termChip.classList.add("is-locked");
+    dropzone.appendChild(termChip);
+    clearSelectedTerm();
+    updateMatchStatus();
+  }
+
+  function flashWrong(slot) {
+    slot.classList.add("is-wrong");
+    window.setTimeout(() => slot.classList.remove("is-wrong"), 500);
+  }
+
+  function buildMatchGame() {
+    if (!matchGame || !termsRoot || !definitionsRoot) {
+      return;
+    }
+
+    const shuffledTerms = shuffle(matchPairs);
+    const shuffledDefinitions = shuffle(matchPairs);
+    clearSelectedTerm();
+
+    termsRoot.innerHTML = "";
+    definitionsRoot.innerHTML = "";
+
+    shuffledTerms.forEach((pair) => {
+      const termButton = document.createElement("button");
+      termButton.type = "button";
+      termButton.className = "page-101-term-chip";
+      termButton.draggable = true;
+      termButton.dataset.matchId = pair.id;
+      termButton.textContent = pair.term;
+      wireDragEvents(termButton);
+      termsRoot.appendChild(termButton);
+    });
+
+    shuffledDefinitions.forEach((pair) => {
+      const slot = document.createElement("article");
+      slot.className = "page-101-definition-slot";
+      slot.dataset.matchId = pair.id;
+      slot.innerHTML = `
+        <div class="page-101-definition-dropzone" data-dropzone>
+          <span>Drop the matching term here</span>
+        </div>
+        <p>${pair.definition}</p>
+      `;
+
+      const dropzone = slot.querySelector("[data-dropzone]");
+      dropzone?.addEventListener("dragover", (event) => {
+        if (slot.classList.contains("is-complete")) {
+          return;
+        }
+
+        event.preventDefault();
+        slot.classList.add("is-hover");
+      });
+
+      dropzone?.addEventListener("dragleave", () => {
+        slot.classList.remove("is-hover");
+      });
+
+      dropzone?.addEventListener("drop", (event) => {
+        event.preventDefault();
+        slot.classList.remove("is-hover");
+
+        if (slot.classList.contains("is-complete")) {
+          return;
+        }
+
+        const draggingTerm = document.querySelector(".page-101-term-chip.is-dragging");
+        if (!draggingTerm) {
+          return;
+        }
+
+        if (draggingTerm.dataset.matchId !== slot.dataset.matchId) {
+          flashWrong(slot);
+          return;
+        }
+
+        lockMatch(slot, dropzone, draggingTerm);
+      });
+
+      dropzone?.addEventListener("click", () => {
+        if (!selectedTerm || slot.classList.contains("is-complete")) {
+          return;
+        }
+
+        if (selectedTerm.dataset.matchId !== slot.dataset.matchId) {
+          flashWrong(slot);
+          return;
+        }
+
+        lockMatch(slot, dropzone, selectedTerm);
+      });
+
+      definitionsRoot.appendChild(slot);
+    });
+
+    updateMatchStatus();
+  }
+
+  resetButton?.addEventListener("click", buildMatchGame);
+  buildMatchGame();
+
   const shell = document.querySelector("[data-terminal-shell]");
   if (!shell) {
     return;
