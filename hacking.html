@@ -293,6 +293,84 @@ Password: password123</code></pre>
               </div>
             </details>
           </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>Opacity</h3>
+            <img class="hacking-feature-image" src="assets/opacity.png" alt="Opacity room graphic" />
+            <a class="btn" href="https://www.notion.so/Opacity-327ca0ef4e7a80e39a61c9abe1359374?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Opacity - Write-Up</h4>
+                <h5>Initial Enumeration</h5>
+                <p>I started with a full Nmap scan to identify exposed services and gather version details.</p>
+                <pre><code>nmap -sV -sC -A -p- 10.65.173.123</code></pre>
+                <p>The scan revealed the following ports and services:</p>
+                <pre><code>22/tcp    SSH   OpenSSH 8.2
+80/tcp    HTTP  Apache 2.4.41
+139/tcp   SMB   Samba
+445/tcp   SMB   Samba</code></pre>
+                <p>Two early findings stood out. The web app exposed a <code>login.php</code> page, and the session cookie was missing the <code>HttpOnly</code> flag, which could matter if an XSS path became available. SMB signing was enabled but not required, which suggested weaker hardening and possible relay-style opportunities in other scenarios.</p>
+
+                <h5>Web Enumeration</h5>
+                <p>I began with common quick checks against the login page. Default credentials such as <code>admin:admin</code> and <code>admin:password</code> failed, and a basic SQL injection test also went nowhere.</p>
+                <pre><code>' OR 1=1--</code></pre>
+                <p>I also attempted directory and subdomain enumeration, but at first nothing useful appeared. That turned out to be a mistake in process rather than a dead end: I had not enumerated thoroughly enough, and that gap delayed the actual path forward.</p>
+
+                <h5>SMB Enumeration</h5>
+                <p>Next I moved to SMB to see whether shares, users, or policy weaknesses could provide credentials or context.</p>
+                <pre><code>smbclient -L //&lt;IP&gt; -N
+enum4linux -a &lt;IP&gt;</code></pre>
+                <p>The shares exposed were limited:</p>
+                <pre><code>print$
+IPC$</code></pre>
+                <p><code>print$</code> was just printer-driver related and not useful, while <code>IPC$</code> only confirmed standard inter-process communication access. SMB did allow null sessions, and the password policy was weak with no complexity requirement and no minimum length, but there were still no direct credentials or sensitive files available from this angle.</p>
+
+                <h5>Burp Suite Analysis</h5>
+                <p>I inspected requests in Burp Suite and found encoded parameters along with the <code>PHPSESSID</code> cookie. I tried decoding, modifying, and re-encoding the parameters to see whether the application trusted client-side state in a dangerous way, but that line of testing did not produce a foothold.</p>
+
+                <h5>Breakthrough: Hidden Directory</h5>
+                <p>The key breakthrough came after revisiting enumeration more carefully. A hidden directory led to a file upload feature labeled <code>5 Minute File Upload</code>, presented as a personal cloud storage page. Missing that directory during the first pass was the main reason progress stalled.</p>
+
+                <h5>Exploitation</h5>
+                <p>Once the upload page was found, the path to code execution became straightforward. I uploaded a PHP reverse shell and executed it through the web application, which returned shell access on the target.</p>
+
+                <h5>Shell Stabilization</h5>
+                <p>After landing the initial shell, I upgraded it into a fully interactive TTY to make enumeration and escalation easier.</p>
+                <pre><code>python3 -c 'import pty; pty.spawn("/bin/bash")'
+export TERM=xterm</code></pre>
+                <p>Then I backgrounded the shell and fixed terminal handling:</p>
+                <pre><code>Ctrl + Z
+stty raw -echo; fg</code></pre>
+                <p>This makes post-exploitation work far more reliable.</p>
+
+                <h5>Post-Exploitation Enumeration</h5>
+                <p>With a stable shell, I started searching for files owned by higher-value users.</p>
+                <pre><code>find / -user sysadmin 2&gt;/dev/null</code></pre>
+                <p>That led to a KeePass database file with the <code>.kdbx</code> extension, which was a strong indicator that stored credentials might be recoverable offline.</p>
+
+                <h5>Credential Extraction</h5>
+                <p>I extracted the KeePass hash and cracked it with John using <code>rockyou.txt</code>.</p>
+                <pre><code>john --wordlist=/usr/share/wordlists/rockyou.txt opacity.txt</code></pre>
+                <p>The recovered password was:</p>
+                <pre><code>Cl0udP4ss40p4city#8700</code></pre>
+
+                <h5>Privilege Escalation Enumeration</h5>
+                <p>To identify scheduled or automated tasks worth hijacking, I ran <code>pspy</code>. This exposed a cron job running every minute and executing a script from <code>/lib</code>.</p>
+
+                <h5>Root Exploit</h5>
+                <p>The escalation path was to modify the script being executed by the cron job and inject a PHP reverse shell payload. Once the job ran, it executed the modified code and returned a root shell.</p>
+                <p>One operational note: the reverse shell required allowing the listener port through UFW on the target environment.</p>
+
+                <h5>Final Outcome</h5>
+                <p>The full chain was: missed directory corrected through better enumeration, file upload to RCE, post-exploitation discovery of a KeePass database, password cracking, cron-job hijacking, and root access.</p>
+
+                <h5>Key Lessons</h5>
+                <p>This room reinforced a few important habits: enumeration is everything, SMB often provides valuable context even when it does not immediately hand over credentials, file upload features are high-value attack surfaces, and <code>.kdbx</code> files plus cron jobs are both worth checking early during post-exploitation. Running <code>pspy</code> is especially useful because it exposes automated tasks you can potentially abuse for escalation.</p>
+              </div>
+            </details>
+          </article>
         </div>
         <div class="hacking-feature-grid stack-top" id="featured-writeups-extra"></div>
       </div>
