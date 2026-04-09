@@ -33,8 +33,8 @@
           <section class="page-101-scoreboard" data-scoreboard>
             <article class="page-101-score-card">
               <p class="eyebrow">terminal lab</p>
-              <h3 data-score-terminal>0/10</h3>
-              <p>Commands and flags completed.</p>
+              <h3 data-score-terminal>0/15</h3>
+              <p>Objectives and flags completed.</p>
             </article>
             <article class="page-101-score-card">
               <p class="eyebrow">quizzes</p>
@@ -64,11 +64,11 @@
       <div class="container">
         <article class="card page-101-card">
           <p class="eyebrow">command line exercises</p>
-          <h2>Receiving files and traveling through directories</h2>
-          <p class="lede">This lab gives you a fake terminal with dummy directories, flags, and simple questions. Work through it in order and use the <code>?</code> button in the top-right corner when you need a hint.</p>
+          <h2>Starter Terminal: mini CTF</h2>
+          <p class="lede">This lab now plays like a small beginner CTF. You are dropped into a fake shell, given an objective, and asked to explore the filesystem, inspect clues, and use commands like <code>ls</code>, <code>cd</code>, <code>cat</code>, and <code>find</code> to recover the flags.</p>
           <div class="page-101-section-score">
             <p class="page-101-section-score-label">Section score</p>
-            <p class="page-101-section-score-value" data-score-terminal-detail>0/10 complete</p>
+            <p class="page-101-section-score-value" data-score-terminal-detail>0/15 complete</p>
           </div>
           <div class="page-101-lab">
             <section class="terminal-shell" data-terminal-shell>
@@ -90,19 +90,31 @@
             </section>
 
             <aside class="page-101-sidecar">
+              <section class="page-101-module page-101-objective">
+                <p class="eyebrow">Objective</p>
+                <h3>Operation: Starter Terminal</h3>
+                <p>A training server was left behind by a sloppy operator. Your job is to move through the directories, read the right files, and recover three training flags without guessing.</p>
+                <p>Use the terminal like a real beginner recon workflow: confirm where you are, list what exists, follow the clue trail, and <code>cat</code> the files that matter.</p>
+              </section>
+
               <section class="page-101-module">
-                <h3>Walkthrough</h3>
+                <h3>Mission objectives</h3>
                 <ol class="page-101-task-list" data-terminal-tasks>
                   <li>Use <code>pwd</code> to see where you are.</li>
                   <li>Use <code>ls</code> to see what is available.</li>
+                  <li>Use <code>whoami</code> to identify the current user.</li>
                   <li>Move into the <code>missions</code> directory.</li>
-                  <li>Read <code>welcome.txt</code>.</li>
-                  <li>Find the first flag in <code>first-flag.txt</code>.</li>
-                  <li>Question: what command takes you back one directory? Use it now.</li>
+                  <li>Read <code>briefing.txt</code>.</li>
+                  <li>List the files in <code>missions</code> with <code>ls</code>.</li>
+                  <li>Open <code>first-flag.txt</code> and recover the first flag.</li>
+                  <li>Use <code>cd ..</code> to move back one directory.</li>
+                  <li>Search for <code>incoming.flag</code> with <code>find</code>.</li>
                   <li>Move into <code>Downloads</code>.</li>
-                  <li>Open <code>incoming.flag</code> and collect the second flag.</li>
+                  <li>Open <code>incoming.flag</code> and recover the second flag.</li>
                   <li>Use <code>ls -la</code> to reveal hidden files.</li>
-                  <li>Read <code>.secret</code> to collect the final flag.</li>
+                  <li>Read <code>.secret</code> and recover the final flag.</li>
+                  <li>Move into <code>vault</code>.</li>
+                  <li>Read <code>flag-report.txt</code> to close the mission.</li>
                 </ol>
               </section>
 
@@ -116,14 +128,17 @@
               <section class="page-101-module">
                 <h3>Useful commands</h3>
                 <pre><code>pwd
+whoami
 ls
 ls -la
 cd missions
 cd ..
-cat welcome.txt
-cat first-flag.txt
+find . -name incoming.flag
+cat briefing.txt
 cat incoming.flag
 cat .secret
+cat first-flag.txt
+cat flag-report.txt
 help
 clear</code></pre>
               </section>

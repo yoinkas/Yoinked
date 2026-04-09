@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return copy;
   }
 
-  function updateTerminalScore(current = 0, total = 10) {
+  function updateTerminalScore(current = 0, total = 15) {
     if (terminalScore) {
       terminalScore.textContent = `${current}/${total}`;
     }
@@ -356,15 +356,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const fileSystem = {
     home: {
       student: {
-        "readme.txt": "Welcome to 101. Use the terminal to explore the fake filesystem.",
+        "readme.txt": "Welcome to 101. Use the terminal to explore the fake filesystem and recover the training flags.",
         missions: {
-          "welcome.txt": "Mission briefing: learn pwd, ls, cd, and cat before you move on.",
+          "briefing.txt": "Mission briefing: a careless operator scattered flags across the system. Read files, follow clues, and do not skip basic recon.",
+          "clue.log": "Clue: the first flag is sitting in plain sight. The second one is somewhere in Downloads. The last one is hidden, so your usual ls output will not be enough.",
           "first-flag.txt": "FLAG{dir_hunter_101}",
         },
         Downloads: {
           "packet-copy.pcap": "Dummy capture file for practice.",
+          "notes.txt": "Reminder: incoming.flag matters. Hidden files matter too.",
           "incoming.flag": "FLAG{download_received}",
           ".secret": "FLAG{hidden_file_found}",
+        },
+        vault: {
+          "flag-report.txt": "Mission complete. You recovered every flag and practiced pwd, ls, cd, cat, and find like a proper beginner operator.",
         },
       },
     },
@@ -382,14 +387,24 @@ document.addEventListener("DOMContentLoaded", () => {
       complete: (ctx) => ctx.command === "ls" && ctx.cwd === "/home/student",
     },
     {
+      label: "Use whoami to identify the current user.",
+      hint: "There is a command that prints the logged-in username.",
+      complete: (ctx) => ctx.command === "whoami" && ctx.cwd === "/home/student",
+    },
+    {
       label: "Move into the missions directory.",
       hint: "Use cd followed by the directory name you want to enter.",
       complete: (ctx) => ctx.command === "cd missions" && ctx.cwd === "/home/student/missions",
     },
     {
-      label: "Read welcome.txt.",
-      hint: "Use cat to print the file contents.",
-      complete: (ctx) => ctx.command === "cat welcome.txt",
+      label: "Read briefing.txt.",
+      hint: "Use cat to print the mission file.",
+      complete: (ctx) => ctx.command === "cat briefing.txt",
+    },
+    {
+      label: "List the files in missions with ls.",
+      hint: "There is more than one file in this directory. Check the full list.",
+      complete: (ctx) => ctx.command === "ls" && ctx.cwd === "/home/student/missions",
     },
     {
       label: "Find the first flag in first-flag.txt.",
@@ -397,9 +412,14 @@ document.addEventListener("DOMContentLoaded", () => {
       complete: (ctx) => ctx.command === "cat first-flag.txt",
     },
     {
-      label: "Question: what command takes you back one directory? Use it now.",
+      label: "Use cd .. to move back one directory.",
       hint: "Two dots mean one level up.",
       complete: (ctx) => ctx.command === "cd .." && ctx.cwd === "/home/student",
+    },
+    {
+      label: "Search for incoming.flag with find.",
+      hint: "Use find from your current location and search by exact file name.",
+      complete: (ctx) => ctx.command === "find . -name incoming.flag" && ctx.cwd === "/home/student",
     },
     {
       label: "Move into Downloads.",
@@ -420,6 +440,16 @@ document.addEventListener("DOMContentLoaded", () => {
       label: "Read .secret to collect the final flag.",
       hint: "Now that you can see hidden files, open the hidden one.",
       complete: (ctx) => ctx.command === "cat .secret",
+    },
+    {
+      label: "Move into vault.",
+      hint: "Leave Downloads and enter the final directory waiting in your home folder.",
+      complete: (ctx) => ctx.command === "cd ../vault" && ctx.cwd === "/home/student/vault",
+    },
+    {
+      label: "Read flag-report.txt to close the mission.",
+      hint: "There is one final text file in vault.",
+      complete: (ctx) => ctx.command === "cat flag-report.txt",
     },
   ];
 
@@ -594,6 +624,41 @@ document.addEventListener("DOMContentLoaded", () => {
     revealFlag(value);
   }
 
+  function walkFind(node, currentPath, matcher, results) {
+    Object.entries(node).forEach(([name, value]) => {
+      const nextPath = `${currentPath}/${name}`;
+      if (matcher(name)) {
+        results.push(nextPath);
+      }
+
+      if (isDirectory(value)) {
+        walkFind(value, nextPath, matcher, results);
+      }
+    });
+  }
+
+  function handleFind(args) {
+    const searchRoot = args[0];
+    const flag = args[1];
+    const pattern = args[2];
+
+    if (!searchRoot || flag !== "-name" || !pattern) {
+      printLine("find usage: find <path> -name <filename>", "error");
+      return;
+    }
+
+    const rootPath = resolvePath(searchRoot);
+    const rootNode = getNode(rootPath);
+    if (!isDirectory(rootNode)) {
+      printLine(`find: ${searchRoot}: no such directory`, "error");
+      return;
+    }
+
+    const results = [];
+    walkFind(rootNode, pathString(rootPath), (name) => name === pattern, results);
+    printLine(results.length ? results.join("\n") : "find: no matches");
+  }
+
   function showHint() {
     const nextTask = tasks.find((_, index) => !completedTasks.has(index));
     if (!nextTask) {
@@ -616,7 +681,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     switch (command) {
       case "help":
-        printLine("Available commands: pwd, ls, ls -la, cd, cat, clear, help");
+        printLine("Available commands: pwd, whoami, ls, ls -la, cd, cat, find, clear, help");
+        break;
+      case "whoami":
+        printLine("student");
         break;
       case "pwd":
         printLine(pathString());
@@ -629,6 +697,9 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "cat":
         handleCat(args);
+        break;
+      case "find":
+        handleFind(args);
         break;
       case "clear":
         output.innerHTML = "";
@@ -650,9 +721,9 @@ document.addEventListener("DOMContentLoaded", () => {
     runCommand(commandText);
   });
 
-  printLine("Welcome to the 101 terminal lab.", "success");
-  printLine("Your mission is to explore this dummy filesystem, collect the flags, and answer the walkthrough question.");
-  printLine("Type help if you want the list of available commands.");
+  printLine("Welcome to the 101 starter terminal.", "success");
+  printLine("Objective: recover three training flags from the fake filesystem and finish the report in vault.");
+  printLine("Use basic recon first. Type help if you want the list of available commands.");
 
   updatePrompt();
   renderTasks();
