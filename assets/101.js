@@ -734,6 +734,121 @@ document.addEventListener("DOMContentLoaded", () => {
     printLine(`Hint: ${nextTask.hint}`, "warning");
   }
 
+  function handleNikto(commandText) {
+    if (!commandText.includes("http")) {
+      printLine("nikto usage: nikto -h http://target", "error");
+      return;
+    }
+
+    printLine("- Nikto vFake/2.1.6");
+    printLine("+ Target Host: training.local");
+    printLine("+ Server: Apache/2.4.54");
+    printLine("+ /admin: Admin panel discovered");
+    printLine("+ /search.php?q=: Input reflected in response body");
+    printLine("+ Missing security headers: X-Frame-Options, Content-Security-Policy");
+    printLine("+ /login.php?id=1 appears to return SQL errors when given malformed input", "warning");
+  }
+
+  function handleGobuster(commandText) {
+    if (!commandText.includes("http")) {
+      printLine("gobuster usage: gobuster dir -u http://target -w wordlist.txt", "error");
+      return;
+    }
+
+    printLine("==============================================================");
+    printLine("/admin               (Status: 301)");
+    printLine("/search.php          (Status: 200)");
+    printLine("/uploads             (Status: 403)");
+    printLine("/assets              (Status: 301)");
+    printLine("/backup.zip          (Status: 200)", "warning");
+  }
+
+  function handleFfuf(commandText) {
+    if (!commandText.includes("FUZZ")) {
+      printLine("ffuf usage: ffuf -u http://target/FUZZ -w wordlist.txt", "error");
+      return;
+    }
+
+    printLine(":: Method           : GET");
+    printLine(":: URL              : http://training.local/FUZZ");
+    printLine("admin               [Status: 301, Size: 312]");
+    printLine("backup.zip          [Status: 200, Size: 9241]", "warning");
+    printLine("search.php          [Status: 200, Size: 1842]");
+  }
+
+  function handleSqlmap(commandText) {
+    if (!commandText.includes("-u")) {
+      printLine("sqlmap usage: sqlmap -u \"http://target/item.php?id=1\" --batch", "error");
+      return;
+    }
+
+    printLine("[INFO] testing connection to the target URL");
+    printLine("[INFO] testing if the parameter 'id' is dynamic");
+    printLine("[INFO] heuristic (basic) test shows that GET parameter 'id' might be injectable", "warning");
+    printLine("[INFO] testing for SQL injection on GET parameter 'id'");
+    printLine("[INFO] GET parameter 'id' appears to be 'UNION query' injectable", "success");
+    printLine("[INFO] backend DBMS: SQLite");
+  }
+
+  function handleSqliCheck(commandText) {
+    const lower = commandText.toLowerCase();
+    const indicators = [
+      "' or '1'='1",
+      "\" or \"1\"=\"1",
+      "union select",
+      "sleep(",
+      "order by",
+      "'--",
+      "'#",
+      "information_schema",
+    ];
+
+    if (indicators.some((indicator) => lower.includes(indicator))) {
+      printLine("SQLi checker: suspicious SQL injection pattern detected.", "warning");
+      printLine("This payload looks like authentication bypass, UNION-based enumeration, or error/time-based probing.");
+      return;
+    }
+
+    printLine("SQLi checker: no obvious SQL injection markers found in that input.");
+  }
+
+  function handleXssCheck(commandText) {
+    const lower = commandText.toLowerCase();
+    const indicators = [
+      "<script",
+      "onerror=",
+      "onload=",
+      "svg/onload",
+      "javascript:",
+      "<img",
+      "<iframe",
+    ];
+
+    if (indicators.some((indicator) => lower.includes(indicator))) {
+      printLine("XSS checker: likely cross-site scripting payload detected.", "warning");
+      printLine("This input contains scriptable HTML or event-handler patterns commonly used for reflected or stored XSS.");
+      return;
+    }
+
+    printLine("XSS checker: no obvious XSS markers found in that input.");
+  }
+
+  function handlePayloadNotes(commandText) {
+    const lower = commandText.toLowerCase();
+
+    if (lower.includes("<script") || lower.includes("onerror=") || lower.includes("javascript:")) {
+      printLine("Training note: that looks like an XSS payload. Test safely against a legal lab target only.", "warning");
+      return true;
+    }
+
+    if (lower.includes("union select") || lower.includes("' or 1=1") || lower.includes("' or '1'='1") || lower.includes("information_schema")) {
+      printLine("Training note: that looks like an SQL injection payload. Watch how the application responds to quotes, errors, and changed row counts.", "warning");
+      return true;
+    }
+
+    return false;
+  }
+
   function runCommand(commandText) {
     const trimmed = commandText.trim();
     printLine(`${prompt.textContent} ${trimmed}`, "command");
@@ -746,7 +861,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     switch (command) {
       case "help":
-        printLine("Available commands: pwd, whoami, ls, ls -la, cd, cat, find, clear, help");
+        printLine("Available commands: pwd, whoami, ls, ls -la, cd, cat, find, nikto, gobuster, ffuf, sqlmap, sqli-check, xss-check, clear, help");
         break;
       case "whoami":
         printLine("student");
@@ -766,11 +881,31 @@ document.addEventListener("DOMContentLoaded", () => {
       case "find":
         handleFind(args);
         break;
+      case "nikto":
+        handleNikto(trimmed);
+        break;
+      case "gobuster":
+        handleGobuster(trimmed);
+        break;
+      case "ffuf":
+        handleFfuf(trimmed);
+        break;
+      case "sqlmap":
+        handleSqlmap(trimmed);
+        break;
+      case "sqli-check":
+        handleSqliCheck(trimmed);
+        break;
+      case "xss-check":
+        handleXssCheck(trimmed);
+        break;
       case "clear":
         output.innerHTML = "";
         break;
       default:
-        printLine(`${command}: command not found`, "error");
+        if (!handlePayloadNotes(trimmed)) {
+          printLine(`${command}: command not found`, "error");
+        }
         break;
     }
 

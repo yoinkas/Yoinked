@@ -139,6 +139,12 @@ cat incoming.flag
 cat .secret
 cat first-flag.txt
 cat flag-report.txt
+nikto -h http://training.local
+gobuster dir -u http://training.local -w wordlist.txt
+ffuf -u http://training.local/FUZZ -w wordlist.txt
+sqlmap -u "http://training.local/item.php?id=1" --batch
+sqli-check ' OR '1'='1
+xss-check &lt;script&gt;alert(1)&lt;/script&gt;
 help
 clear</code></pre>
               </section>
