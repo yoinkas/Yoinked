@@ -1319,7 +1319,7 @@ body.page-101 .cyber-video {
 
 .page-101-lab {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(380px, 1.08fr);
   gap: 22px;
   margin-top: 22px;
   align-items: start;
@@ -1449,6 +1449,7 @@ body.page-101 .cyber-video {
 .page-101-sidecar {
   display: grid;
   gap: 18px;
+  min-width: 0;
 }
 
 .page-101-module,
