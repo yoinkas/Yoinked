@@ -357,22 +357,52 @@ document.addEventListener("DOMContentLoaded", () => {
     home: {
       student: {
         "readme.txt": "Welcome to 101. Use the terminal to explore the fake filesystem and recover the training flags.",
+        "todo.md": "Review notes, stop leaving flags in obvious places, and maybe stop naming files incoming.flag.",
+        "session.log": "Last login: Tue Apr 08 19:52:11 2026 from training-console",
         missions: {
           "briefing.txt": "Mission briefing: a careless operator scattered flags across the system. Read files, follow clues, and do not skip basic recon.",
           "clue.log": "Clue: the first flag is sitting in plain sight. The second one is somewhere in Downloads. The last one is hidden, so your usual ls output will not be enough.",
+          "operator-note.txt": "If you can read files and move around directories, you can solve this whole room.",
+          "archive.tar": "Pretend archive data. Nothing useful inside.",
           "first-flag.txt": "FLAG{dir_hunter_101}",
         },
         Downloads: {
           "packet-copy.pcap": "Dummy capture file for practice.",
           "notes.txt": "Reminder: incoming.flag matters. Hidden files matter too.",
+          "wallpaper.jpg": "Corrupted image preview. Still not the file you need.",
+          "payload.bin": "Random bytes. Safe in this fake terminal.",
           "incoming.flag": "FLAG{download_received}",
           ".secret": "FLAG{hidden_file_found}",
         },
         vault: {
           "flag-report.txt": "Mission complete. You recovered every flag and practiced pwd, ls, cd, cat, and find like a proper beginner operator.",
+          "audit.txt": "Audit status: training scenario complete.",
         },
       },
     },
+  };
+
+  const fileDetails = {
+    "/home/student": { permissions: "drwxr-xr-x", links: 5, owner: "student", group: "student", size: 4096, stamp: "Apr 08 19:45" },
+    "/home/student/readme.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 78, stamp: "Apr 08 19:40" },
+    "/home/student/todo.md": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 92, stamp: "Apr 08 19:41" },
+    "/home/student/session.log": { permissions: "-rw-------", links: 1, owner: "student", group: "student", size: 61, stamp: "Apr 08 19:52" },
+    "/home/student/missions": { permissions: "drwxr-xr-x", links: 2, owner: "student", group: "student", size: 4096, stamp: "Apr 08 19:43" },
+    "/home/student/missions/briefing.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 118, stamp: "Apr 08 19:43" },
+    "/home/student/missions/clue.log": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 135, stamp: "Apr 08 19:43" },
+    "/home/student/missions/operator-note.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 90, stamp: "Apr 08 19:42" },
+    "/home/student/missions/archive.tar": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 2048, stamp: "Apr 08 19:44" },
+    "/home/student/missions/first-flag.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 21, stamp: "Apr 08 19:44" },
+    "/home/student/Downloads": { permissions: "drwxr-x---", links: 2, owner: "student", group: "student", size: 4096, stamp: "Apr 08 19:47" },
+    "/home/student/Downloads/packet-copy.pcap": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 40960, stamp: "Apr 08 19:46" },
+    "/home/student/Downloads/notes.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 56, stamp: "Apr 08 19:47" },
+    "/home/student/Downloads/wallpaper.jpg": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 183424, stamp: "Apr 08 19:46" },
+    "/home/student/Downloads/payload.bin": { permissions: "-rwxr-xr-x", links: 1, owner: "student", group: "student", size: 8192, stamp: "Apr 08 19:47" },
+    "/home/student/Downloads/incoming.flag": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 24, stamp: "Apr 08 19:47" },
+    "/home/student/Downloads/.secret": { permissions: "-rw-------", links: 1, owner: "student", group: "student", size: 24, stamp: "Apr 08 19:48" },
+    "/home/student/vault": { permissions: "drwx------", links: 2, owner: "student", group: "student", size: 4096, stamp: "Apr 08 19:49" },
+    "/home/student/vault/flag-report.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 108, stamp: "Apr 08 19:49" },
+    "/home/student/vault/audit.txt": { permissions: "-rw-r--r--", links: 1, owner: "student", group: "student", size: 38, stamp: "Apr 08 19:49" },
   };
 
   const tasks = [
@@ -474,6 +504,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function isDirectory(node) {
     return node && typeof node === "object";
+  }
+
+  function getEntryDetails(parts) {
+    const fullPath = pathString(parts);
+    return fileDetails[fullPath] ?? {
+      permissions: isDirectory(getNode(parts)) ? "drwxr-xr-x" : "-rw-r--r--",
+      links: 1,
+      owner: "student",
+      group: "student",
+      size: isDirectory(getNode(parts)) ? 4096 : 64,
+      stamp: "Apr 08 19:50",
+    };
+  }
+
+  function formatLsEntry(name, parts) {
+    const details = getEntryDetails(parts);
+    return `${details.permissions} ${String(details.links).padStart(2, " ")} ${details.owner} ${details.group} ${String(details.size).padStart(6, " ")} ${details.stamp} ${name}`;
   }
 
   function printLine(text, type = "") {
@@ -579,9 +626,27 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const showLong = args.includes("-l") || args.includes("-la") || args.includes("-al");
     const showHidden = args.includes("-la") || args.includes("-al");
     const entries = Object.keys(node).filter((name) => showHidden || !name.startsWith("."));
-    printLine(entries.length ? entries.join("    ") : "(empty)");
+
+    if (showLong) {
+      const lines = [];
+      if (showHidden) {
+        lines.push(formatLsEntry(".", cwd));
+        lines.push(formatLsEntry("..", cwd.slice(0, -1).length ? cwd.slice(0, -1) : cwd));
+      }
+
+      entries.forEach((name) => {
+        lines.push(formatLsEntry(name, [...cwd, name]));
+      });
+
+      printLine(lines.length ? lines.join("\n") : "(empty)");
+      return;
+    }
+
+    const lines = entries.map((name) => formatLsEntry(name, [...cwd, name]));
+    printLine(lines.length ? lines.join("\n") : "(empty)");
   }
 
   function handleCd(args) {
