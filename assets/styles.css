@@ -1465,6 +1465,17 @@ body.page-101 .cyber-video {
   margin-bottom: 10px;
 }
 
+.page-101-module pre {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+}
+
+.page-101-module pre code {
+  white-space: pre;
+}
+
 .page-101-task-list {
   display: grid;
   gap: 10px;
