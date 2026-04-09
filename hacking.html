@@ -371,6 +371,111 @@ stty raw -echo; fg</code></pre>
               </div>
             </details>
           </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>Lian_Yu</h3>
+            <img class="hacking-feature-image" src="assets/lian-yu.jpeg" alt="Lian Yu island graphic" />
+            <a class="btn" href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Lian_Yu Walkthrough Report</h4>
+                <p>Web enumeration, credential discovery, FTP access, and file manipulation through a disguised <code>.png</code> workflow.</p>
+
+                <h5>Objective</h5>
+                <p>Gain access to the target system by performing enumeration, discovering hidden content, extracting credentials, and analyzing downloaded files.</p>
+
+                <h5>Step 1: Initial Enumeration</h5>
+                <p>I started with a standard Nmap scan to identify exposed services and gather version details.</p>
+                <pre><code>nmap -sC -sV &lt;target-ip&gt;</code></pre>
+                <p>The results showed an FTP service with anonymous login disabled and an Apache web server. Since FTP did not provide an initial foothold, the attack surface shifted to the web application.</p>
+                <p>The key lesson here is simple: when one service fails, pivot immediately instead of forcing a dead path.</p>
+
+                <h5>Step 2: Web Exploration</h5>
+                <p>I opened the target website in a browser and reviewed the page source. There were no obvious credentials, comments, or hidden links, so I moved to deeper enumeration.</p>
+
+                <h5>Step 3: Directory Brute Forcing</h5>
+                <p>I used Gobuster to look for hidden directories and files.</p>
+                <pre><code>gobuster dir -u http://&lt;target-ip&gt; \
+-w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt \
+-x html,php,jpg</code></pre>
+                <p>This revealed a hidden directory:</p>
+                <pre><code>/island</code></pre>
+                <p>Gobuster brute-forces directories and file names against the target using a supplied wordlist, making it useful when manual browsing turns up nothing.</p>
+
+                <h5>Step 4: Hidden Content Discovery</h5>
+                <p>Inside the discovered path, I used <code>CTRL + A</code> to highlight all page content. That exposed text hidden with CSS by matching the foreground color to the background.</p>
+                <p>This revealed another path:</p>
+                <pre><code>/island/2100</code></pre>
+                <p>This is a common CTF trick, but it also mirrors real-world cases where developers hide content poorly instead of actually restricting access.</p>
+
+                <h5>Step 5: Deeper Directory Enumeration</h5>
+                <p>I continued enumeration against the deeper directory with a different wordlist and a custom extension.</p>
+                <pre><code>gobuster dir -u http://&lt;target-ip&gt;/island/2100 \
+-w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
+-t 48 \
+-x .ticket</code></pre>
+                <p>This uncovered files that contained encoded data.</p>
+
+                <h5>Step 6: Credential Extraction</h5>
+                <p>The discovered content exposed the username <code>vigilante</code> and an encoded password string. After identifying the encoding as Base58 and decoding it, the password became:</p>
+                <pre><code>!#th3h00d</code></pre>
+                <p>Credentials are often hidden, transformed, or lightly obfuscated rather than stored in plain text, so recognizing common encodings matters.</p>
+
+                <h5>Step 7: FTP Access</h5>
+                <p>With valid credentials recovered, I returned to FTP and logged in successfully.</p>
+                <pre><code>ftp &lt;target-ip&gt;</code></pre>
+                <p>Credentials used:</p>
+                <pre><code>Username: vigilante
+Password: !#th3h00d</code></pre>
+
+                <h5>Step 8: File Retrieval</h5>
+                <p>After authentication, I listed available files and downloaded the relevant content for local analysis.</p>
+                <pre><code>ls
+get Leave_me_alone.png
+get Queen's_Gambit.png
+get aa.jpg</code></pre>
+                <p>This pulled multiple files from the server, including one that appeared malformed.</p>
+
+                <h5>Step 9: File Analysis and Header Fix</h5>
+                <p>The file <code>aa.jpg</code> did not open correctly, which suggested either an incorrect header or a misleading extension.</p>
+
+                <h5>Inspect File Type</h5>
+                <p>First I verified the real file type:</p>
+                <pre><code>file aa.jpg</code></pre>
+                <p>This helps confirm whether the extension matches the actual file signature.</p>
+
+                <h5>Open in a Hex Editor</h5>
+                <p>I then opened the file in a hex editor to inspect the first bytes directly.</p>
+                <pre><code>hexedit aa.jpg</code></pre>
+
+                <h5>Analyze the Header</h5>
+                <p>At the top of the file, the header bytes were invalid for the claimed format. That indicated the file was either corrupted or intentionally disguised.</p>
+
+                <h5>Fix the Header to PNG</h5>
+                <p>I replaced the opening bytes with the correct PNG magic bytes:</p>
+                <pre><code>89 50 4E 47 0D 0A 1A 0A</code></pre>
+                <p>Then I saved the file and renamed it accordingly:</p>
+                <pre><code>mv aa.jpg aa.png</code></pre>
+                <p>After that, the file opened correctly as a PNG and the previously hidden or inaccessible data became visible.</p>
+
+                <h5>Why This Works</h5>
+                <p>Files are identified by their magic bytes, not just their extensions. A file named <code>.jpg</code> can still be a PNG if its header matches the PNG signature. This is a useful technique in forensics, malware analysis, and challenge environments where files are intentionally disguised.</p>
+
+                <h5>Key Takeaways</h5>
+                <p>This challenge reinforced several habits: Nmap is only the first step, Gobuster often reveals the actual path forward, hidden content can sometimes be exposed with simple checks like page source review or text highlighting, credentials may be encoded rather than plaintext, and hex editing is a practical skill for recovering disguised or corrupted files.</p>
+
+                <h5>Pro Tips</h5>
+                <p>Always verify file types instead of trusting extensions alone.</p>
+                <pre><code>file filename</code></pre>
+                <p>If a file will not open, check the header, verify the extension, and inspect it in a hex editor. When brute-forcing web content, use multiple extensions when appropriate, and always look for hidden text or weak client-side hiding tricks.</p>
+
+                <h5>Conclusion</h5>
+                <p>This walkthrough follows a clean attack chain: enumerate, discover, decode, access, and analyze. The file-header repair step is what turns it from a basic enumeration challenge into a useful lesson in data recovery and content inspection.</p>
+              </div>
+            </details>
+          </article>
         </div>
         <div class="hacking-feature-grid stack-top" id="featured-writeups-extra"></div>
       </div>
