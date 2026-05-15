@@ -127,6 +127,119 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).format(date);
   }
 
+  function formatRelativeVisitorTime(value) {
+    if (!value) {
+      return "unknown";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "unknown";
+    }
+
+    const diffMs = Date.now() - date.getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+
+    if (diffMs < minute) {
+      return "just now";
+    }
+
+    if (diffMs < hour) {
+      return `${Math.max(1, Math.floor(diffMs / minute))}m ago`;
+    }
+
+    if (diffMs < day) {
+      return `${Math.max(1, Math.floor(diffMs / hour))}h ago`;
+    }
+
+    return `${Math.max(1, Math.floor(diffMs / day))}d ago`;
+  }
+
+  function summarizeUserAgent(userAgent) {
+    const value = String(userAgent || "").trim();
+    if (!value) {
+      return "Unknown device";
+    }
+
+    const lower = value.toLowerCase();
+    const browser = lower.includes("edg/")
+      ? "Edge"
+      : lower.includes("chrome/") && !lower.includes("edg/")
+        ? "Chrome"
+        : lower.includes("firefox/")
+          ? "Firefox"
+          : lower.includes("safari/") && !lower.includes("chrome/")
+            ? "Safari"
+            : lower.includes("opr/") || lower.includes("opera/")
+              ? "Opera"
+              : "Other browser";
+
+    const platform = lower.includes("windows")
+      ? "Windows"
+      : lower.includes("iphone") || lower.includes("ipad")
+        ? "iPhone/iPad"
+        : lower.includes("android")
+          ? "Android"
+          : lower.includes("mac os x") || lower.includes("macintosh")
+            ? "macOS"
+            : lower.includes("linux")
+              ? "Linux"
+              : "Unknown OS";
+
+    return `${browser} on ${platform}`;
+  }
+
+  function buildVisitorGroups(visitors) {
+    const groups = new Map();
+
+    visitors.forEach((visitor) => {
+      const ip = String(visitor.ip || "unknown").trim() || "unknown";
+      const existing = groups.get(ip);
+
+      if (existing) {
+        existing.visits.push(visitor);
+        return;
+      }
+
+      groups.set(ip, {
+        ip,
+        visits: [visitor],
+      });
+    });
+
+    return Array.from(groups.values()).map((group) => {
+      const visits = [...group.visits].sort((left, right) => {
+        return new Date(right.timestamp || 0).getTime() - new Date(left.timestamp || 0).getTime();
+      });
+      const latestVisit = visits[0] || {};
+      const oldestVisit = visits[visits.length - 1] || {};
+      const pageCounts = new Map();
+
+      visits.forEach((visit) => {
+        const page = String(visit.page || "Unknown page").trim() || "Unknown page";
+        pageCounts.set(page, (pageCounts.get(page) || 0) + 1);
+      });
+
+      const topPages = Array.from(pageCounts.entries())
+        .sort((left, right) => right[1] - left[1])
+        .slice(0, 3);
+
+      return {
+        ip: group.ip,
+        visits,
+        totalVisits: visits.length,
+        latestVisit,
+        oldestVisit,
+        topPages,
+        deviceLabel: summarizeUserAgent(latestVisit.userAgent),
+      };
+    }).sort((left, right) => {
+      return new Date(right.latestVisit.timestamp || 0).getTime() - new Date(left.latestVisit.timestamp || 0).getTime();
+    });
+  }
+
   function renderVisitorLog(visitors, storage) {
     if (!visitors.length) {
       visitorLogEl.innerHTML = `
@@ -138,20 +251,77 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    visitorLogEl.innerHTML = visitors.map((visitor) => `
-      <article class="admin-post-card">
-        <div>
-          <p class="meta">${escapeHtml(formatVisitorTime(visitor.timestamp))}</p>
-          <h3>${escapeHtml(visitor.page || "Unknown page")}</h3>
-          <p><strong>IP:</strong> ${escapeHtml(visitor.ip || "unknown")}</p>
-          <p><strong>User-Agent:</strong> ${escapeHtml(visitor.userAgent || "unknown")}</p>
-          <p><strong>Referer:</strong> ${escapeHtml(visitor.referer || "direct")}</p>
-          <p><strong>Host:</strong> ${escapeHtml(visitor.host || "unknown")}</p>
-          <p><strong>Viewport:</strong> ${escapeHtml(visitor.viewport || "unknown")}</p>
-          <p><strong>Language:</strong> ${escapeHtml(visitor.language || "unknown")}</p>
-        </div>
-      </article>
-    `).join("");
+    const groups = buildVisitorGroups(visitors);
+    const repeatVisitors = groups.filter((group) => group.totalVisits > 1).length;
+    const uniqueVisitors = groups.length;
+
+    visitorLogEl.innerHTML = `
+      <section class="visitor-summary-grid">
+        <article class="admin-post-card visitor-summary-card">
+          <p class="meta">Unique IPs</p>
+          <h3>${escapeHtml(String(uniqueVisitors))}</h3>
+          <p class="muted">Distinct visitor sources in the current log.</p>
+        </article>
+        <article class="admin-post-card visitor-summary-card">
+          <p class="meta">Recurring Visitors</p>
+          <h3>${escapeHtml(String(repeatVisitors))}</h3>
+          <p class="muted">IPs seen more than once.</p>
+        </article>
+        <article class="admin-post-card visitor-summary-card">
+          <p class="meta">Tracked Visits</p>
+          <h3>${escapeHtml(String(visitors.length))}</h3>
+          <p class="muted">${storage === "logs-only" ? "Only current server log storage is available." : "Loaded from Redis visitor history."}</p>
+        </article>
+      </section>
+      <section class="visitor-group-list">
+        ${groups.map((group) => `
+          <article class="admin-post-card visitor-group-card">
+            <div class="visitor-group-head">
+              <div>
+                <p class="meta">${group.totalVisits > 1 ? "Recurring visitor" : "Single visit"}</p>
+                <h3>${escapeHtml(group.ip)}</h3>
+                <p class="muted">${escapeHtml(group.deviceLabel)}</p>
+              </div>
+              <div class="visitor-group-badges">
+                <span class="tag">${escapeHtml(`${group.totalVisits} visit${group.totalVisits === 1 ? "" : "s"}`)}</span>
+                <span class="tag">${escapeHtml(formatRelativeVisitorTime(group.latestVisit.timestamp))}</span>
+              </div>
+            </div>
+            <div class="visitor-group-meta">
+              <p><strong>Last seen:</strong> ${escapeHtml(formatVisitorTime(group.latestVisit.timestamp))}</p>
+              <p><strong>First seen:</strong> ${escapeHtml(formatVisitorTime(group.oldestVisit.timestamp))}</p>
+              <p><strong>Latest page:</strong> ${escapeHtml(group.latestVisit.page || "Unknown page")}</p>
+              <p><strong>Host:</strong> ${escapeHtml(group.latestVisit.host || "unknown")}</p>
+              <p><strong>Viewport:</strong> ${escapeHtml(group.latestVisit.viewport || "unknown")}</p>
+              <p><strong>Language:</strong> ${escapeHtml(group.latestVisit.language || "unknown")}</p>
+            </div>
+            <div class="visitor-top-pages">
+              <p class="meta">Most visited pages</p>
+              <div class="tag-list">
+                ${group.topPages.map(([page, count]) => `<span class="tag">${escapeHtml(`${page} x${count}`)}</span>`).join("")}
+              </div>
+            </div>
+            <details class="visitor-events">
+              <summary class="btn ghost">Recent activity</summary>
+              <div class="visitor-events-list">
+                ${group.visits.slice(0, 8).map((visit) => `
+                  <article class="visitor-event-row">
+                    <div>
+                      <p class="meta">${escapeHtml(formatVisitorTime(visit.timestamp))}</p>
+                      <h4>${escapeHtml(visit.page || "Unknown page")}</h4>
+                    </div>
+                    <div class="visitor-event-meta">
+                      <p><strong>Referer:</strong> ${escapeHtml(visit.referer || "direct")}</p>
+                      <p><strong>User-Agent:</strong> ${escapeHtml(visit.userAgent || "unknown")}</p>
+                    </div>
+                  </article>
+                `).join("")}
+              </div>
+            </details>
+          </article>
+        `).join("")}
+      </section>
+    `;
   }
 
   async function loadVisitorLog() {
@@ -170,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderVisitorLog(Array.isArray(payload.visitors) ? payload.visitors : [], payload.storage);
       setVisitorStatus(payload.storage === "logs-only"
         ? "Visitor tracking is active, but Redis is not configured. Only server logs are persistent."
-        : "Visitor log loaded.");
+        : `Visitor log loaded. ${Array.isArray(payload.visitors) ? payload.visitors.length : 0} visits processed.`);
     } catch (error) {
       visitorLogEl.innerHTML = `
         <article class="card">
