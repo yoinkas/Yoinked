@@ -1192,6 +1192,24 @@ body.page-101 a:hover {
   text-shadow: 0 0 14px rgba(156, 212, 255, 0.42);
 }
 
+.page-101-skip-videos {
+  position: fixed;
+  top: 86px;
+  left: 18px;
+  z-index: 20;
+  padding: 10px 14px;
+  border: 1px solid rgba(156, 212, 255, 0.4);
+  border-radius: 999px;
+  color: #eef4ff;
+  background: rgba(5, 8, 22, 0.9);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.38);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(12px);
+}
+
 .page-101-card {
   background:
     linear-gradient(180deg, rgba(14, 18, 43, 0.96), rgba(8, 11, 28, 0.94)),
@@ -1221,6 +1239,37 @@ body.page-101 .cyber-video {
 
 .page-101-feature-video {
   padding: 34px 0 50px;
+  scroll-margin-top: 90px;
+}
+
+.page-101-video-heading {
+  width: min(820px, 90%);
+  margin: 0 auto 18px;
+  text-align: center;
+}
+
+.page-101-video-heading h2 {
+  margin: 4px 0 0;
+}
+
+.page-101-video-track {
+  display: grid;
+}
+
+.page-101-video-slide {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(28px) scale(0.98);
+  transition: opacity 320ms ease, transform 320ms ease;
+  pointer-events: none;
+}
+
+.page-101-video-slide.is-active {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
 }
 
 .page-101-feature-video-frame {
@@ -1241,6 +1290,47 @@ body.page-101 .cyber-video {
   max-height: 70vh;
   border-radius: 12px;
   background: #02040d;
+}
+
+.page-101-video-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.page-101-video-controls .btn {
+  min-width: 112px;
+}
+
+.page-101-video-controls .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.page-101-video-count {
+  min-width: 64px;
+  color: #9cd4ff;
+  text-align: center;
+  font-family: "Share Tech Mono", monospace;
+}
+
+@media (max-width: 720px) {
+  .page-101-skip-videos {
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .page-101-video-controls {
+    gap: 10px;
+  }
+
+  .page-101-video-controls .btn {
+    min-width: 96px;
+    padding-inline: 12px;
+  }
 }
 
 .page-101-scoreboard {

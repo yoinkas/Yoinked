@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
 </head>
 <body class="page-101">
+  <a class="page-101-skip-videos" href="#tutorial-videos">Skip to videos</a>
+
   <header class="site-header">
     <div class="container">
       <a class="logo" href="index.html">Yoinked by Yoinkas</a>
@@ -60,13 +62,28 @@
       </div>
     </section>
 
-    <section class="page-101-feature-video" aria-label="Featured video">
+    <section class="page-101-feature-video" id="tutorial-videos" aria-labelledby="tutorial-videos-title">
       <div class="container">
-        <div class="page-101-feature-video-frame">
-          <video controls playsinline preload="metadata">
-            <source src="assets/LS2.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+        <div class="page-101-video-heading">
+          <p class="eyebrow">Tutorial videos</p>
+          <h2 id="tutorial-videos-title">Video tutorials</h2>
+        </div>
+        <div class="page-101-video-slider" data-video-slider tabindex="0">
+          <div class="page-101-video-track">
+            <article class="page-101-video-slide is-active" data-video-slide>
+              <div class="page-101-feature-video-frame">
+                <video controls playsinline preload="metadata">
+                  <source src="assets/LS2.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </article>
+          </div>
+          <div class="page-101-video-controls">
+            <button class="btn ghost" type="button" data-video-previous aria-label="Previous tutorial video">Previous</button>
+            <p class="page-101-video-count" aria-live="polite" data-video-count>1 / 1</p>
+            <button class="btn ghost" type="button" data-video-next aria-label="Next tutorial video">Next</button>
+          </div>
         </div>
       </div>
     </section>

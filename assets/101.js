@@ -11,7 +11,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const definitionsRoot = document.querySelector("[data-match-definitions]");
   const matchStatus = document.querySelector("[data-match-status]");
   const resetButton = document.querySelector("[data-match-reset]");
+  const videoSlider = document.querySelector("[data-video-slider]");
+  const videoSlides = [...document.querySelectorAll("[data-video-slide]")];
+  const previousVideoButton = document.querySelector("[data-video-previous]");
+  const nextVideoButton = document.querySelector("[data-video-next]");
+  const videoCount = document.querySelector("[data-video-count]");
   let selectedTerm = null;
+  let activeVideoIndex = 0;
+
+  function showVideoSlide(index) {
+    if (!videoSlides.length) return;
+
+    activeVideoIndex = (index + videoSlides.length) % videoSlides.length;
+    videoSlides.forEach((slide, slideIndex) => {
+      const isActive = slideIndex === activeVideoIndex;
+      slide.classList.toggle("is-active", isActive);
+      slide.setAttribute("aria-hidden", String(!isActive));
+
+      if (!isActive) {
+        slide.querySelector("video")?.pause();
+      }
+    });
+
+    if (videoCount) {
+      videoCount.textContent = `${activeVideoIndex + 1} / ${videoSlides.length}`;
+    }
+
+    const hasMultipleVideos = videoSlides.length > 1;
+    if (previousVideoButton) previousVideoButton.disabled = !hasMultipleVideos;
+    if (nextVideoButton) nextVideoButton.disabled = !hasMultipleVideos;
+  }
+
+  previousVideoButton?.addEventListener("click", () => showVideoSlide(activeVideoIndex - 1));
+  nextVideoButton?.addEventListener("click", () => showVideoSlide(activeVideoIndex + 1));
+  videoSlider?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") showVideoSlide(activeVideoIndex - 1);
+    if (event.key === "ArrowRight") showVideoSlide(activeVideoIndex + 1);
+  });
+
+  showVideoSlide(0);
   const quizQuestions = [
     {
       id: "quiz-1",
