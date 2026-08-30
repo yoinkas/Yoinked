@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio | Yoinked by Yoinkas</title>
+  <meta name="description" content="Locked portfolio blueprint for Yoinked by Yoinkas." />
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body class="page-portfolio">
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="../index.html">Yoinked by Yoinkas</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../cybersecurity.html">CyberSecurity</a>
+        <a href="../hacking.html">Hacking</a>
+        <a href="../101.html">101</a>
+        <a class="nav-current" href="./">Portfolio</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="portfolio-lock-hero" aria-labelledby="portfolio-title">
+      <div class="container portfolio-lock-grid">
+        <article class="portfolio-lock-panel">
+          <p class="eyebrow">Access Layer</p>
+          <h1 id="portfolio-title">Portfolio is locked.</h1>
+          <p class="lede">This is the blueprint page for the future portfolio. The 64-bit access ping has not been activated yet, so nobody can enter from the public site.</p>
+
+          <form class="portfolio-lock-form" aria-label="Portfolio access form">
+            <label for="portfolio-ping">64-bit ping</label>
+            <div class="portfolio-lock-row">
+              <input id="portfolio-ping" name="ping" type="text" inputmode="text" placeholder="0000000000000000" maxlength="16" disabled />
+              <button class="btn" type="button" disabled>Locked</button>
+            </div>
+            <p class="portfolio-lock-status">Access disabled until the real server-side gate is added.</p>
+          </form>
+        </article>
+
+        <aside class="portfolio-blueprint-card" aria-label="Portfolio blueprint">
+          <div class="portfolio-code-window">
+            <span>const portfolio = {</span>
+            <span>  route: "/portfolio",</span>
+            <span>  status: "locked",</span>
+            <span>  auth: "pending_64_bit_ping"</span>
+            <span>};</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section portfolio-preview-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Blueprint</h2>
+          <p>These blocks are placeholders you can swap with your real name, projects, skills, and contact info later.</p>
+        </div>
+        <div class="portfolio-blueprint-grid">
+          <article class="card">
+            <p class="eyebrow">Profile</p>
+            <h3>Developer Identity</h3>
+            <p>Future intro, title, location, and quick summary.</p>
+          </article>
+          <article class="card">
+            <p class="eyebrow">Builds</p>
+            <h3>Project Showcase</h3>
+            <p>Future featured work, live links, repo links, and notes.</p>
+          </article>
+          <article class="card">
+            <p class="eyebrow">Stack</p>
+            <h3>Skills Matrix</h3>
+            <p>Future tools, languages, labs, certs, and experience.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Yoinked by Yoinkas | Locked portfolio blueprint</p>
+      <p class="muted">Updated <span id="year"></span></p>
+    </div>
+  </footer>
+
+  <script src="../assets/main.js"></script>
+</body>
+</html>
