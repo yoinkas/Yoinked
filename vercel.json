@@ -9,12 +9,26 @@
       "source": "/admin/",
       "destination": "/admin",
       "permanent": true
+    },
+    {
+      "source": "/portfolio/",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/index.html",
+      "destination": "/portfolio",
+      "permanent": true
     }
   ],
   "rewrites": [
     {
       "source": "/admin",
       "destination": "/api/admin"
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/api/portfolio"
     }
   ],
   "headers": [
