@@ -1,85 +1,202 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfolio | Yoinked by Yoinkas</title>
-  <meta name="description" content="Portfolio blueprint for Yoinked by Yoinkas." />
-  <link rel="stylesheet" href="/assets/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Professional Portfolio | Yoinked by Yoinkas</title>
+  <meta name="description" content="Unlocked developer portfolio." />
+  <link rel="stylesheet" href="/assets/portfolio.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="page-portfolio">
-  <header class="site-header">
-    <div class="container">
-      <a class="logo" href="/index.html">Yoinked by Yoinkas</a>
-      <nav class="nav">
-        <a href="/index.html">Home</a>
-        <a href="/cybersecurity.html">CyberSecurity</a>
-        <a href="/hacking.html">Hacking</a>
-        <a href="/101.html">101</a>
-        <a class="nav-current" href="/portfolio">Portfolio</a>
-        <a href="/index.html#about">About</a>
-      </nav>
+<body class="portfolio-body" data-theme="dark" data-lang="en" data-dir="ltr">
+  <div class="loader-screen" id="loader">
+    <div class="loader-content">
+      <div class="loader-code-text">
+        <div class="loader-code-line" data-line="1">const portfolio = {</div>
+        <div class="loader-code-line" data-line="2">  access: 'granted',</div>
+        <div class="loader-code-line" data-line="3">  status: 'initializing...'</div>
+        <div class="loader-code-line" data-line="4">};</div>
+      </div>
+      <div class="loader-spinner"></div>
+      <div class="loader-progress-wrapper"><div class="loader-progress-bar"></div></div>
+      <div class="loader-percentage" id="loaderPercent">0%</div>
     </div>
+  </div>
+
+  <header class="portfolio-header" id="header">
+    <nav class="portfolio-nav">
+      <a class="brand-logo" href="/index.html" aria-label="Back to Yoinked home">
+        <span>&lt;</span><strong>Dev</strong><span>/&gt;</span>
+      </a>
+      <div class="nav-menu" id="navMenu">
+        <a href="#home" class="nav-link active" data-section="home"><i class="fas fa-home"></i><span data-text-en="Home" data-text-ar="الرئيسية">Home</span></a>
+        <a href="#about" class="nav-link" data-section="about"><i class="fas fa-user"></i><span data-text-en="About" data-text-ar="عني">About</span></a>
+        <a href="#skills" class="nav-link" data-section="skills"><i class="fas fa-code"></i><span data-text-en="Skills" data-text-ar="المهارات">Skills</span></a>
+        <a href="#experience" class="nav-link" data-section="experience"><i class="fas fa-briefcase"></i><span data-text-en="Experience" data-text-ar="الخبرة">Experience</span></a>
+        <a href="#projects" class="nav-link" data-section="projects"><i class="fas fa-rocket"></i><span data-text-en="Projects" data-text-ar="المشاريع">Projects</span></a>
+        <a href="#contact" class="nav-link" data-section="contact"><i class="fas fa-envelope"></i><span data-text-en="Contact" data-text-ar="التواصل">Contact</span></a>
+      </div>
+      <div class="nav-controls">
+        <button class="icon-button" id="langToggle" type="button" title="Toggle Language"><i class="fas fa-language"></i><span class="lang-text">AR</span></button>
+        <button class="icon-button" id="themeToggle" type="button" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        <button class="menu-toggle" id="menuToggle" type="button" title="Toggle Menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
   </header>
 
-  <main>
-    <section class="portfolio-lock-hero" aria-labelledby="portfolio-title">
-      <div class="container portfolio-lock-grid">
-        <article class="portfolio-lock-panel">
-          <p class="eyebrow">Unlocked Blueprint</p>
-          <h1 id="portfolio-title">Portfolio access granted.</h1>
-          <p class="lede">This is the placeholder page for your future portfolio. Swap these blocks with your real name, skills, projects, and contact info when you are ready.</p>
-        </article>
-
-        <aside class="portfolio-blueprint-card" aria-label="Portfolio blueprint">
-          <div class="portfolio-code-window">
-            <span>const portfolio = {</span>
-            <span>  route: "/portfolio",</span>
-            <span>  status: "unlocked",</span>
-            <span>  next: "customize_content"</span>
-            <span>};</span>
+  <main class="portfolio-main">
+    <section id="home" class="hero-section">
+      <div class="hero-background">
+        <div class="code-grid-bg"></div>
+        <div class="floating-particles" id="particles"></div>
+      </div>
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-greeting">
+            <span data-text-en="Hello, I'm" data-text-ar="مرحبا أنا">Hello, I'm</span>
+            <span class="greeting-cursor">|</span>
           </div>
-        </aside>
+          <h1 class="hero-name" id="heroName">
+            <span class="name-prefix">const</span>
+            <span class="name-operator">=</span>
+            <span class="name-value">Developer</span>
+            <span class="name-suffix">;</span>
+          </h1>
+          <div class="hero-title">
+            <span class="title-prefix">//</span>
+            <span data-text-en="Full Stack Developer & UI/UX Designer" data-text-ar="مطور Full Stack & مصمم UI/UX">Full Stack Developer & UI/UX Designer</span>
+          </div>
+          <p class="hero-description" data-text-en="Passionate developer creating exceptional digital experiences with modern technologies." data-text-ar="مطور شغوف بإنشاء تجارب رقمية استثنائية باستخدام التقنيات الحديثة.">Passionate developer creating exceptional digital experiences with modern technologies.</p>
+          <div class="hero-buttons">
+            <a href="#contact" class="portfolio-btn portfolio-btn-primary"><span data-text-en="Get In Touch" data-text-ar="تواصل معي">Get In Touch</span><i class="fas fa-arrow-right"></i></a>
+            <a href="#projects" class="portfolio-btn portfolio-btn-secondary"><span data-text-en="View Projects" data-text-ar="عرض المشاريع">View Projects</span><i class="fas fa-code"></i></a>
+          </div>
+          <div class="hero-social">
+            <a href="#" class="social-icon" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" class="social-icon" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-icon" title="CodePen"><i class="fab fa-codepen"></i></a>
+            <a href="#" class="social-icon" title="Email"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+        <div class="hero-image-wrapper">
+          <div class="hero-image-container">
+            <div class="profile-image-glow"></div>
+            <div class="profile-image-frame">
+              <div class="profile-image" id="profileImage"><div class="profile-placeholder"><i class="fas fa-code"></i></div></div>
+            </div>
+            <div class="floating-badge badge-1"><i class="fab fa-react"></i><div><strong>React</strong><span>Redux, Router, Hooks</span></div></div>
+            <div class="floating-badge badge-2"><i class="fab fa-node-js"></i><div><strong>Node.js</strong><span>Express, Socket.io, MongoDB</span></div></div>
+            <div class="floating-badge badge-3"><i class="fab fa-js"></i><div><strong>JavaScript</strong><span>ES6+, TypeScript, jQuery</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-indicator"><div class="scroll-mouse"><div class="scroll-wheel"></div></div><span data-text-en="Scroll Down" data-text-ar="انتقل للأسفل">Scroll Down</span></div>
+    </section>
+
+    <section id="about" class="portfolio-section">
+      <div class="section-container">
+        <div class="section-header"><span class="section-number">01</span><h2><span>&lt;</span><strong data-text-en="About Me" data-text-ar="عني">About Me</strong><span>/&gt;</span></h2><div class="section-line"></div></div>
+        <div class="about-content">
+          <div>
+            <p class="about-text" data-text-en="I'm a passionate Full Stack Developer with over 5 years of experience in building modern web applications and mobile solutions. I specialize in JavaScript technologies, React, Node.js, and creating beautiful user interfaces." data-text-ar="أنا مطور Full Stack شغوف مع أكثر من 5 سنوات من الخبرة في بناء تطبيقات الويب الحديثة والحلول الجوالة. أتخصص في تقنيات JavaScript React Node.js وإنشاء واجهات مستخدم جميلة.">I'm a passionate Full Stack Developer with over 5 years of experience in building modern web applications and mobile solutions. I specialize in JavaScript technologies, React, Node.js, and creating beautiful user interfaces.</p>
+            <div class="about-stats">
+              <div class="stat-item"><div class="stat-number" data-count="50">0</div><div data-text-en="Projects" data-text-ar="مشروع">Projects</div></div>
+              <div class="stat-item"><div class="stat-number" data-count="5">0</div><div data-text-en="Years Experience" data-text-ar="سنوات خبرة">Years Experience</div></div>
+              <div class="stat-item"><div class="stat-number" data-count="30">0</div><div data-text-en="Happy Clients" data-text-ar="عميل سعيد">Happy Clients</div></div>
+            </div>
+          </div>
+          <div class="code-block">
+            <div><span class="code-keyword">const</span> <span class="code-variable">developer</span> <span class="code-operator">=</span> <span class="code-brace">{</span></div>
+            <div class="indent"><span class="code-property">name</span>: <span class="code-string">'Developer'</span>,</div>
+            <div class="indent"><span class="code-property">skills</span>: [<span class="code-string">'React'</span>, <span class="code-string">'Node.js'</span>, <span class="code-string">'TypeScript'</span>],</div>
+            <div class="indent"><span class="code-property">passion</span>: <span class="code-string">'Coding'</span></div>
+            <div><span class="code-brace">};</span></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section portfolio-preview-section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Blueprint</h2>
-          <p>These blocks are placeholders you can replace with your real portfolio details.</p>
+    <section id="skills" class="portfolio-section">
+      <div class="section-container">
+        <div class="section-header"><span class="section-number">02</span><h2><span>&lt;</span><strong data-text-en="Skills" data-text-ar="المهارات">Skills</strong><span>/&gt;</span></h2><div class="section-line"></div></div>
+        <div class="skills-grid">
+          <article class="skill-category"><h3>Frontend</h3><div class="skill-items">
+            <div class="skill-item" data-percent="95"><div><span>React</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="85"><div><span>Vue.js</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="90"><div><span>TypeScript</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="88"><div><span>Next.js</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+          </div></article>
+          <article class="skill-category"><h3>Backend</h3><div class="skill-items">
+            <div class="skill-item" data-percent="92"><div><span>Node.js</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="90"><div><span>Express</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="85"><div><span>MongoDB</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="80"><div><span>PostgreSQL</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+          </div></article>
+          <article class="skill-category"><h3>Tools & Others</h3><div class="skill-items">
+            <div class="skill-item" data-percent="95"><div><span>Git</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="75"><div><span>Docker</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="70"><div><span>AWS</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+            <div class="skill-item" data-percent="88"><div><span>Figma</span><span class="skill-percent">0%</span></div><div class="skill-bar"><div class="skill-progress"></div></div></div>
+          </div></article>
         </div>
-        <div class="portfolio-blueprint-grid">
-          <article class="card">
-            <p class="eyebrow">Profile</p>
-            <h3>Developer Identity</h3>
-            <p>Future intro, title, location, and quick summary.</p>
-          </article>
-          <article class="card">
-            <p class="eyebrow">Builds</p>
-            <h3>Project Showcase</h3>
-            <p>Future featured work, live links, repo links, and notes.</p>
-          </article>
-          <article class="card">
-            <p class="eyebrow">Stack</p>
-            <h3>Skills Matrix</h3>
-            <p>Future tools, languages, labs, certs, and experience.</p>
-          </article>
+      </div>
+    </section>
+
+    <section id="experience" class="portfolio-section">
+      <div class="section-container">
+        <div class="section-header"><span class="section-number">03</span><h2><span>&lt;</span><strong data-text-en="Experience" data-text-ar="الخبرة">Experience</strong><span>/&gt;</span></h2><div class="section-line"></div></div>
+        <div class="timeline">
+          <article class="timeline-item"><div class="timeline-marker"></div><div class="timeline-content"><div class="timeline-header"><span>2022 - Present</span><b>Current</b></div><h3>Senior Full Stack Developer</h3><p class="timeline-company"><i class="fas fa-building"></i> Tech Company Inc.</p><p>Leading a team of developers in building complex web applications using React and Node.js. Developing advanced user interfaces and optimizing performance.</p><div class="tag-row"><span>React</span><span>Node.js</span><span>TypeScript</span><span>MongoDB</span><span>Docker</span></div></div></article>
+          <article class="timeline-item"><div class="timeline-marker"></div><div class="timeline-content"><div class="timeline-header"><span>2020 - 2022</span></div><h3>Frontend Developer</h3><p class="timeline-company"><i class="fas fa-building"></i> Digital Solutions</p><p>Developed interactive user interfaces using React and Vue.js. Improved user experience, accessibility, and performance.</p><div class="tag-row"><span>React</span><span>Vue.js</span><span>JavaScript</span><span>SASS</span></div></div></article>
+          <article class="timeline-item"><div class="timeline-marker"></div><div class="timeline-content"><div class="timeline-header"><span>2018 - 2020</span></div><h3>Junior Developer</h3><p class="timeline-company"><i class="fas fa-building"></i> Creative Studio</p><p>Developed websites using HTML, CSS, and JavaScript while learning modern web development practices.</p><div class="tag-row"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Bootstrap</span></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="portfolio-section">
+      <div class="section-container">
+        <div class="section-header"><span class="section-number">04</span><h2><span>&lt;</span><strong data-text-en="Projects" data-text-ar="المشاريع">Projects</strong><span>/&gt;</span></h2><div class="section-line"></div></div>
+        <div class="projects-grid">
+          <article class="project-card"><div class="project-image"><i class="fas fa-shopping-cart"></i></div><div><h3>E-Commerce Platform</h3><p>A complete e-commerce platform with payment integration and advanced inventory management.</p><div class="tag-row"><span>React</span><span>Node.js</span><span>MongoDB</span></div></div></article>
+          <article class="project-card"><div class="project-image"><i class="fas fa-tasks"></i></div><div><h3>Task Management App</h3><p>A web application for task management with real-time synchronization and modern design.</p><div class="tag-row"><span>React</span><span>Firebase</span><span>TypeScript</span></div></div></article>
+          <article class="project-card"><div class="project-image"><i class="fas fa-blog"></i></div><div><h3>Blog Platform</h3><p>A modern blog platform with CMS features and a clean UI design.</p><div class="tag-row"><span>Next.js</span><span>Prisma</span><span>PostgreSQL</span></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="portfolio-section">
+      <div class="section-container">
+        <div class="section-header"><span class="section-number">05</span><h2><span>&lt;</span><strong data-text-en="Contact" data-text-ar="التواصل">Contact</strong><span>/&gt;</span></h2><div class="section-line"></div></div>
+        <div class="contact-content">
+          <div class="contact-info">
+            <div class="contact-item"><i class="fas fa-envelope"></i><div><h4>Email</h4><a href="mailto:developer@example.com">developer@example.com</a></div></div>
+            <div class="contact-item"><i class="fas fa-phone"></i><div><h4>Phone</h4><a href="tel:+966501234567">+966 50 123 4567</a></div></div>
+            <div class="contact-item"><i class="fas fa-map-marker-alt"></i><div><h4>Location</h4><span>Riyadh, Saudi Arabia</span></div></div>
+          </div>
+          <form class="contact-form" id="contactForm">
+            <input name="name" placeholder="Name" data-placeholder-en="Name" data-placeholder-ar="الاسم" required />
+            <input name="email" type="email" placeholder="Email" data-placeholder-en="Email" data-placeholder-ar="البريد الإلكتروني" required />
+            <input name="subject" placeholder="Subject" data-placeholder-en="Subject" data-placeholder-ar="الموضوع" required />
+            <textarea name="message" rows="5" placeholder="Message" data-placeholder-en="Message" data-placeholder-ar="الرسالة" required></textarea>
+            <button class="portfolio-btn portfolio-btn-primary" type="submit"><span data-text-en="Send Message" data-text-ar="إرسال الرسالة">Send Message</span><i class="fas fa-paper-plane"></i></button>
+          </form>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>Yoinked by Yoinkas | Locked portfolio blueprint</p>
-      <p class="muted">Updated <span id="year"></span></p>
+  <footer class="portfolio-footer">
+    <div class="section-container">
+      <p><span>2026 Developer Portfolio</span><span class="footer-divider"></span><span>Built with passion and code</span></p>
+      <p>by <a href="https://www.linkedin.com/in/mohammad-abu-sakour-kn" target="_blank" rel="noopener noreferrer"><i class="fas fa-code"></i> Kan3an</a></p>
     </div>
   </footer>
 
-  <script src="/assets/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script src="/assets/portfolio.js"></script>
 </body>
 </html>
