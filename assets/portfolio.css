@@ -408,6 +408,15 @@ textarea {
   transition: var(--transition);
 }
 
+.lab-icon span {
+  display: block;
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .hero-image-wrapper {
   display: flex;
   justify-content: center;
