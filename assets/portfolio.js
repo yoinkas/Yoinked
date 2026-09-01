@@ -4,6 +4,64 @@ const AppState = {
   isMenuOpen: false,
 };
 
+const supportedLanguages = ["en", "es", "fr", "ar"];
+
+const languageLabels = {
+  en: "EN",
+  es: "ES",
+  fr: "FR",
+  ar: "AR",
+};
+
+const translations = {
+  es: {
+    "Home": "Inicio",
+    "About": "Sobre mi",
+    "Skills": "Habilidades",
+    "Experience": "Experiencia",
+    "Projects": "Proyectos",
+    "Contact": "Contacto",
+    "Hello, I'm": "Hola, soy",
+    "Full Stack Developer & UI/UX Designer": "Desarrollador Full Stack y disenador UI/UX",
+    "Passionate developer creating exceptional digital experiences with modern technologies.": "Desarrollador apasionado que crea experiencias digitales con tecnologias modernas.",
+    "Get In Touch": "Contactame",
+    "View Projects": "Ver proyectos",
+    "Scroll Down": "Desplazarse",
+    "About Me": "Sobre mi",
+    "I'm a passionate Full Stack Developer with over 5 years of experience in building modern web applications and mobile solutions. I specialize in JavaScript technologies, React, Node.js, and creating beautiful user interfaces.": "Soy un desarrollador Full Stack enfocado en aplicaciones web modernas, interfaces responsivas, rutas autenticadas, APIs serverless e integraciones reales.",
+    "Years Experience": "Anos de experiencia",
+    "Happy Clients": "Clientes satisfechos",
+    "Send Message": "Enviar mensaje",
+    "Name": "Nombre",
+    "Email": "Correo",
+    "Subject": "Asunto",
+    "Message": "Mensaje",
+  },
+  fr: {
+    "Home": "Accueil",
+    "About": "A propos",
+    "Skills": "Competences",
+    "Experience": "Experience",
+    "Projects": "Projets",
+    "Contact": "Contact",
+    "Hello, I'm": "Bonjour, je suis",
+    "Full Stack Developer & UI/UX Designer": "Developpeur Full Stack et designer UI/UX",
+    "Passionate developer creating exceptional digital experiences with modern technologies.": "Developpeur passionne qui cree des experiences numeriques avec des technologies modernes.",
+    "Get In Touch": "Me contacter",
+    "View Projects": "Voir les projets",
+    "Scroll Down": "Defiler",
+    "About Me": "A propos de moi",
+    "I'm a passionate Full Stack Developer with over 5 years of experience in building modern web applications and mobile solutions. I specialize in JavaScript technologies, React, Node.js, and creating beautiful user interfaces.": "Je suis un developpeur Full Stack concentre sur les applications web modernes, les interfaces responsives, les routes authentifiees, les APIs serverless et les integrations reelles.",
+    "Years Experience": "Annees d'experience",
+    "Happy Clients": "Clients satisfaits",
+    "Send Message": "Envoyer",
+    "Name": "Nom",
+    "Email": "Email",
+    "Subject": "Sujet",
+    "Message": "Message",
+  },
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   loadPreferences();
   initLanguage();
@@ -17,7 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadPreferences() {
-  AppState.currentLang = localStorage.getItem("portfolio-lang") || "en";
+  const savedLang = localStorage.getItem("portfolio-lang") || "en";
+  AppState.currentLang = supportedLanguages.includes(savedLang) ? savedLang : "en";
   AppState.currentTheme = localStorage.getItem("portfolio-theme") || "dark";
 }
 
@@ -28,29 +87,44 @@ function initLanguage() {
 }
 
 function toggleLanguage() {
-  setLanguage(AppState.currentLang === "en" ? "ar" : "en");
+  const currentIndex = supportedLanguages.indexOf(AppState.currentLang);
+  const nextLang = supportedLanguages[(currentIndex + 1) % supportedLanguages.length];
+  setLanguage(nextLang);
   localStorage.setItem("portfolio-lang", AppState.currentLang);
 }
 
-function setLanguage(lang) {
-  AppState.currentLang = lang;
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-  document.body.dataset.lang = lang;
-  document.body.dataset.dir = lang === "ar" ? "rtl" : "ltr";
+function translateValue(lang, englishValue, fallbackValue) {
+  if (lang === "en") return englishValue || fallbackValue;
+  return translations[lang]?.[englishValue] || fallbackValue || englishValue;
+}
 
-  document.querySelectorAll("[data-text-en], [data-text-ar]").forEach((element) => {
-    const value = element.getAttribute(`data-text-${lang}`);
+function setLanguage(lang) {
+  const activeLang = supportedLanguages.includes(lang) ? lang : "en";
+  AppState.currentLang = activeLang;
+  document.documentElement.lang = activeLang;
+  document.documentElement.dir = activeLang === "ar" ? "rtl" : "ltr";
+  document.body.dataset.lang = activeLang;
+  document.body.dataset.dir = activeLang === "ar" ? "rtl" : "ltr";
+
+  document.querySelectorAll("[data-text-en]").forEach((element) => {
+    const englishValue = element.getAttribute("data-text-en");
+    const fallbackValue = element.getAttribute(`data-text-${activeLang}`);
+    const value = translateValue(activeLang, englishValue, fallbackValue);
     if (value) element.textContent = value;
   });
 
-  document.querySelectorAll("[data-placeholder-en], [data-placeholder-ar]").forEach((element) => {
-    const value = element.getAttribute(`data-placeholder-${lang}`);
+  document.querySelectorAll("[data-placeholder-en]").forEach((element) => {
+    const englishValue = element.getAttribute("data-placeholder-en");
+    const fallbackValue = element.getAttribute(`data-placeholder-${activeLang}`);
+    const value = translateValue(activeLang, englishValue, fallbackValue);
     if (value) element.placeholder = value;
   });
 
+  const nextIndex = (supportedLanguages.indexOf(activeLang) + 1) % supportedLanguages.length;
   const langText = document.querySelector(".lang-text");
-  if (langText) langText.textContent = lang === "en" ? "AR" : "EN";
+  if (langText) langText.textContent = languageLabels[supportedLanguages[nextIndex]];
+  const langToggle = document.getElementById("langToggle");
+  if (langToggle) langToggle.title = `Switch to ${languageLabels[supportedLanguages[nextIndex]]}`;
 }
 
 function initTheme() {
@@ -116,7 +190,13 @@ function initFormHandlers() {
   if (!contactForm) return;
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    alert(AppState.currentLang === "ar" ? "تم إرسال الرسالة بنجاح!" : "Message sent successfully!");
+    const messages = {
+      en: "Message sent successfully!",
+      es: "Mensaje enviado correctamente!",
+      fr: "Message envoye avec succes!",
+      ar: "تم إرسال الرسالة بنجاح!",
+    };
+    alert(messages[AppState.currentLang] || messages.en);
     contactForm.reset();
   });
 }
