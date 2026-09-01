@@ -986,6 +986,191 @@ body.page-hacking a:hover {
   margin-top: 10px;
 }
 
+.boxes-section {
+  padding-top: 64px;
+}
+
+.boxes-container {
+  max-width: 920px;
+}
+
+.boxes-head {
+  margin-bottom: 24px;
+}
+
+.boxes-head h1 {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: 0;
+}
+
+.box-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.box-filter {
+  min-height: 36px;
+  border: 1px solid rgba(255, 95, 46, 0.28);
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.76);
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  padding: 8px 12px;
+}
+
+.box-filter:hover,
+.box-filter.active {
+  background: rgba(255, 95, 46, 0.16);
+  color: var(--accent);
+}
+
+.box-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 95, 46, 0.18);
+  border-radius: 8px;
+  background: rgba(8, 8, 8, 0.86);
+  padding: 10px 12px;
+}
+
+.box-search span {
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+.box-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+}
+
+.directory-card {
+  overflow-x: auto;
+  border: 1px solid rgba(255, 95, 46, 0.18);
+  border-radius: 8px;
+  background: rgba(238, 238, 238, 0.96);
+  color: #333;
+  box-shadow: var(--shadow);
+}
+
+.directory-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.directory-table thead {
+  display: none;
+}
+
+.directory-table td,
+.directory-table th {
+  padding: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  vertical-align: middle;
+}
+
+.directory-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.directory-table td:first-child {
+  width: 34px;
+  padding-left: 8px;
+}
+
+.directory-table td:nth-child(2) {
+  width: 32%;
+}
+
+.directory-table td:nth-child(2) a {
+  position: relative;
+  display: block;
+  padding: 10px 34px 10px 10px;
+  border-radius: 4px;
+  color: #15e;
+}
+
+.directory-table td:nth-child(2) a:visited {
+  color: #818;
+}
+
+.directory-table td:nth-child(2) a:hover {
+  background: #cdf;
+  color: #038;
+  text-shadow: none;
+}
+
+.directory-table td:nth-child(2) a::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 15px;
+  width: 9px;
+  height: 9px;
+  border-color: #08f;
+  border-style: solid;
+  border-width: 3px 3px 0 0;
+  transform: rotate(45deg);
+}
+
+.directory-table td:nth-child(3),
+.directory-table td:nth-child(4),
+.directory-size {
+  padding: 10px;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.directory-size {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dir-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.folder-icon {
+  background:
+    linear-gradient(#08f, #08f) 7px 8px / 17px 12px no-repeat,
+    linear-gradient(#08f, #08f) 2px 11px / 22px 11px no-repeat;
+  border-radius: 3px;
+}
+
+.parent-icon {
+  position: relative;
+}
+
+.parent-icon::before {
+  content: "";
+  position: absolute;
+  inset: 5px 2px;
+  border: solid #aaa;
+  border-width: 0 0 5px 5px;
+  transform: rotate(45deg);
+}
+
+.directory-empty {
+  margin: 0;
+  padding: 18px;
+  color: #777;
+}
+
 .hacking-note-card {
   min-height: 100%;
 }

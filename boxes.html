@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Boxes | Yoinked by Yoinkas</title>
+  <meta name="description" content="Directory listing of completed cybersecurity boxes and writeups." />
+  <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body class="page-hacking page-boxes">
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="index.html">Yoinked by Yoinkas</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="cybersecurity.html">CyberSecurity</a>
+        <a href="hacking.html">Hacking</a>
+        <a href="101.html">101</a>
+        <a href="portfolio/">Portfolio</a>
+        <a href="index.html#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section boxes-section">
+      <div class="container boxes-container">
+        <div class="boxes-head">
+          <p class="eyebrow">Directory Listing</p>
+          <h1>/all-boxes/</h1>
+          <p>Completed rooms, machines, and writeups organized like a directory so each entry can point wherever it needs to go next.</p>
+        </div>
+
+        <div class="box-filters" aria-label="Filter boxes">
+          <button class="box-filter active" type="button" data-filter="all">All</button>
+          <button class="box-filter" type="button" data-filter="tryhackme">TryHackMe</button>
+          <button class="box-filter" type="button" data-filter="hackthebox">Hack The Box</button>
+          <button class="box-filter" type="button" data-filter="rce">RCE</button>
+          <button class="box-filter" type="button" data-filter="command-execution">Command Execution</button>
+          <button class="box-filter" type="button" data-filter="xss">XSS</button>
+          <button class="box-filter" type="button" data-filter="command-injection">Command Injection</button>
+          <button class="box-filter" type="button" data-filter="file-upload">File Upload</button>
+          <button class="box-filter" type="button" data-filter="brute-force">Brute Force</button>
+          <button class="box-filter" type="button" data-filter="active-directory">Active Directory</button>
+        </div>
+
+        <label class="box-search">
+          <span>grep</span>
+          <input id="boxSearch" type="search" placeholder="filter by name, platform, exploit, or notes" autocomplete="off" />
+        </label>
+
+        <div class="directory-card">
+          <table class="directory-table">
+            <thead>
+              <tr>
+                <th aria-label="Icon"></th>
+                <th>Name</th>
+                <th>Platform</th>
+                <th>Exploit / Path</th>
+                <th class="directory-size">Status</th>
+              </tr>
+            </thead>
+            <tbody id="boxTableBody">
+              <tr class="parent-row" data-tags="all parent">
+                <td><a class="dir-icon parent-icon" href="hacking.html" aria-label="Parent directory"></a></td>
+                <td><a href="hacking.html">Parent Directory</a></td>
+                <td>-</td>
+                <td>-</td>
+                <td class="directory-size">-</td>
+              </tr>
+              <tr data-tags="tryhackme rce java-deserialization jboss privilege-escalation linux">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open Tony the Tiger writeup"></a></td>
+                <td><a href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer">Tony the Tiger/</a></td>
+                <td>TryHackMe</td>
+                <td>Java deserialization, JBoss RCE, sudo find</td>
+                <td class="directory-size">done</td>
+              </tr>
+              <tr data-tags="tryhackme rce command-execution file-upload reverse-shell privilege-escalation linux">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/Gallery-324ca0ef4e7a80c1944fc624197091ef?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open Gallery writeup"></a></td>
+                <td><a href="https://www.notion.so/Gallery-324ca0ef4e7a80c1944fc624197091ef?source=copy_link" target="_blank" rel="noreferrer">Gallery/</a></td>
+                <td>TryHackMe</td>
+                <td>Unauthenticated RCE, web shell, reverse shell</td>
+                <td class="directory-size">done</td>
+              </tr>
+              <tr data-tags="tryhackme pcap wireshark ftp brute-force hydra reverse-shell privilege-escalation forensics">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/h4cked-322ca0ef4e7a80bdbed5f284e46e6bd3?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open h4cked writeup"></a></td>
+                <td><a href="https://www.notion.so/h4cked-322ca0ef4e7a80bdbed5f284e46e6bd3?source=copy_link" target="_blank" rel="noreferrer">h4cked/</a></td>
+                <td>TryHackMe</td>
+                <td>PCAP analysis, FTP brute force, PHP reverse shell</td>
+                <td class="directory-size">done</td>
+              </tr>
+              <tr data-tags="tryhackme rce file-upload smb keepass cron privilege-escalation linux">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/Opacity-327ca0ef4e7a80e39a61c9abe1359374?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open Opacity writeup"></a></td>
+                <td><a href="https://www.notion.so/Opacity-327ca0ef4e7a80e39a61c9abe1359374?source=copy_link" target="_blank" rel="noreferrer">Opacity/</a></td>
+                <td>TryHackMe</td>
+                <td>Hidden upload path, KeePass cracking, cron hijack</td>
+                <td class="directory-size">done</td>
+              </tr>
+              <tr data-tags="tryhackme command-execution python reverse-shell privilege-escalation linux">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/Pyrat-231ca0ef4e7a8020ac4ad24f9f6bbb8c?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open Pyrat writeup"></a></td>
+                <td><a href="https://www.notion.so/Pyrat-231ca0ef4e7a8020ac4ad24f9f6bbb8c?source=copy_link" target="_blank" rel="noreferrer">Pyrat/</a></td>
+                <td>TryHackMe</td>
+                <td>Python service command execution, reverse shell</td>
+                <td class="directory-size">done</td>
+              </tr>
+              <tr data-tags="tryhackme web-enumeration ftp credentials base58 file-recovery forensics">
+                <td><a class="dir-icon folder-icon" href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer" aria-label="Open Lian_Yu writeup"></a></td>
+                <td><a href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer">Lian_Yu/</a></td>
+                <td>TryHackMe</td>
+                <td>Gobuster, credential discovery, Base58, file header repair</td>
+                <td class="directory-size">done</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="directory-empty" id="boxEmpty" hidden>No boxes match that filter.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Yoinked by Yoinkas | Box directory</p>
+      <p class="muted">Updated <span id="year"></span></p>
+    </div>
+  </footer>
+
+  <script>
+    const filters = document.querySelectorAll(".box-filter");
+    const search = document.getElementById("boxSearch");
+    const rows = Array.from(document.querySelectorAll("#boxTableBody tr")).filter((row) => !row.classList.contains("parent-row"));
+    const empty = document.getElementById("boxEmpty");
+    let activeFilter = "all";
+
+    function applyBoxFilters() {
+      const query = search.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        const tags = row.dataset.tags || "";
+        const text = row.textContent.toLowerCase();
+        const matchesFilter = activeFilter === "all" || tags.includes(activeFilter);
+        const matchesSearch = !query || text.includes(query) || tags.includes(query);
+        const visible = matchesFilter && matchesSearch;
+        row.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+
+      empty.hidden = visibleCount !== 0;
+    }
+
+    filters.forEach((button) => {
+      button.addEventListener("click", () => {
+        filters.forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        activeFilter = button.dataset.filter || "all";
+        applyBoxFilters();
+      });
+    });
+
+    search.addEventListener("input", applyBoxFilters);
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
