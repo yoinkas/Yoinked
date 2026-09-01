@@ -764,7 +764,10 @@ textarea {
 }
 
 .project-card {
+  display: block;
   overflow: hidden;
+  color: inherit;
+  text-decoration: none;
   transition: var(--transition);
 }
 
