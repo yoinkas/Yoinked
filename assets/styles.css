@@ -987,39 +987,49 @@ body.page-hacking a:hover {
 }
 
 .boxes-section {
-  min-height: calc(100vh - 86px);
-  padding: 36px clamp(12px, 2vw, 28px) 64px;
+  min-height: calc(100vh - 78px);
+  padding: 0;
 }
 
 .boxes-container {
   width: 100%;
   max-width: none;
+  padding: 0;
 }
 
 .boxes-head {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   max-width: 1100px;
+}
+
+.boxes-head .eyebrow {
+  color: #555;
 }
 
 .boxes-head h1 {
   font-family: var(--mono);
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2rem, 5vw, 3.6rem);
   letter-spacing: 0;
+  color: #111;
+}
+
+.boxes-head p {
+  color: #555;
 }
 
 .box-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .box-filter {
   min-height: 36px;
-  border: 1px solid rgba(255, 95, 46, 0.28);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 6px;
-  background: rgba(10, 10, 10, 0.76);
-  color: var(--ink-soft);
+  background: #f7f7f7;
+  color: #333;
   cursor: pointer;
   font-family: var(--mono);
   font-size: 0.82rem;
@@ -1029,23 +1039,22 @@ body.page-hacking a:hover {
 
 .box-filter:hover,
 .box-filter.active {
-  background: rgba(255, 95, 46, 0.16);
-  color: var(--accent);
+  background: #cdf;
+  color: #038;
 }
 
 .box-search {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 95, 46, 0.18);
-  border-radius: 8px;
-  background: rgba(8, 8, 8, 0.86);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #fff;
   padding: 10px 12px;
 }
 
 .box-search span {
-  color: var(--accent);
+  color: #038;
   font-family: var(--mono);
 }
 
@@ -1054,19 +1063,28 @@ body.page-hacking a:hover {
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--ink);
+  color: #333;
   font: inherit;
 }
 
 .directory-card {
+  display: flex;
+  flex-direction: column;
   overflow-x: auto;
-  border: 1px solid rgba(255, 95, 46, 0.18);
+  border: 0;
   border-radius: 0;
   background: rgba(238, 238, 238, 0.96);
   color: #333;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
-  min-height: 62vh;
+  box-shadow: none;
+  min-height: calc(100vh - 78px);
   width: 100%;
+}
+
+.directory-toolbar {
+  flex: 0 0 auto;
+  padding: clamp(20px, 3vw, 42px) clamp(14px, 3vw, 48px) 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: #eee;
 }
 
 .directory-table {
@@ -1074,6 +1092,7 @@ body.page-hacking a:hover {
   min-width: 980px;
   border-collapse: collapse;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  flex: 1 1 auto;
 }
 
 .directory-table thead {

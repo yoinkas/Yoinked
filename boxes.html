@@ -28,31 +28,33 @@
   <main>
     <section class="section boxes-section">
       <div class="container boxes-container">
-        <div class="boxes-head">
-          <p class="eyebrow">Directory Listing</p>
-          <h1>/all-boxes/</h1>
-          <p>Completed rooms, machines, and writeups organized like a directory so each entry can point wherever it needs to go next.</p>
-        </div>
-
-        <div class="box-filters" aria-label="Filter boxes">
-          <button class="box-filter active" type="button" data-filter="all">All</button>
-          <button class="box-filter" type="button" data-filter="tryhackme">TryHackMe</button>
-          <button class="box-filter" type="button" data-filter="hackthebox">Hack The Box</button>
-          <button class="box-filter" type="button" data-filter="rce">RCE</button>
-          <button class="box-filter" type="button" data-filter="command-execution">Command Execution</button>
-          <button class="box-filter" type="button" data-filter="xss">XSS</button>
-          <button class="box-filter" type="button" data-filter="command-injection">Command Injection</button>
-          <button class="box-filter" type="button" data-filter="file-upload">File Upload</button>
-          <button class="box-filter" type="button" data-filter="brute-force">Brute Force</button>
-          <button class="box-filter" type="button" data-filter="active-directory">Active Directory</button>
-        </div>
-
-        <label class="box-search">
-          <span>grep</span>
-          <input id="boxSearch" type="search" placeholder="filter by name, platform, exploit, or notes" autocomplete="off" />
-        </label>
-
         <div class="directory-card">
+          <div class="directory-toolbar">
+            <div class="boxes-head">
+              <p class="eyebrow">Directory Listing</p>
+              <h1>/all-boxes/</h1>
+              <p>Completed rooms, machines, and writeups organized like a directory so each entry can point wherever it needs to go next.</p>
+            </div>
+
+            <div class="box-filters" aria-label="Filter boxes">
+              <button class="box-filter active" type="button" data-filter="all">All</button>
+              <button class="box-filter" type="button" data-filter="tryhackme">TryHackMe</button>
+              <button class="box-filter" type="button" data-filter="hackthebox">Hack The Box</button>
+              <button class="box-filter" type="button" data-filter="rce">RCE</button>
+              <button class="box-filter" type="button" data-filter="command-execution">Command Execution</button>
+              <button class="box-filter" type="button" data-filter="xss">XSS</button>
+              <button class="box-filter" type="button" data-filter="command-injection">Command Injection</button>
+              <button class="box-filter" type="button" data-filter="file-upload">File Upload</button>
+              <button class="box-filter" type="button" data-filter="brute-force">Brute Force</button>
+              <button class="box-filter" type="button" data-filter="active-directory">Active Directory</button>
+            </div>
+
+            <label class="box-search">
+              <span>grep</span>
+              <input id="boxSearch" type="search" placeholder="filter by name, platform, exploit, or notes" autocomplete="off" />
+            </label>
+          </div>
+
           <table class="directory-table">
             <thead>
               <tr>
