@@ -55,10 +55,13 @@
             <a class="btn ghost" href="#quizzes">quizzes</a>
             <a class="btn ghost" href="#matching-game">matching game</a>
           </div>
-          <video class="cyber-video" autoplay muted loop playsinline preload="auto">
-            <source src="assets/101-intro.mp4" type="video/mp4" />
-            <source src="assets/101-intro.mov" type="video/quicktime" />
-          </video>
+          <div class="video-return-shell">
+            <a class="video-close-button" href="hacking.html" data-video-return aria-label="Close video and return to hacking">X</a>
+            <video class="cyber-video" autoplay muted loop playsinline preload="auto">
+              <source src="assets/101-intro.mp4" type="video/mp4" />
+              <source src="assets/101-intro.mov" type="video/quicktime" />
+            </video>
+          </div>
         </article>
       </div>
     </section>
@@ -73,6 +76,7 @@
           <div class="page-101-video-track">
             <article class="page-101-video-slide is-active" data-video-slide>
               <div class="page-101-feature-video-frame">
+                <a class="video-close-button" href="hacking.html" data-video-return aria-label="Close video and return to hacking">X</a>
                 <video controls playsinline preload="metadata">
                   <source src="assets/LS2.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
@@ -255,5 +259,6 @@ clear</code></pre>
   <script src="assets/content.js"></script>
   <script src="assets/main.js"></script>
   <script src="assets/101.js"></script>
+  <script src="assets/video-return.js"></script>
 </body>
 </html>
