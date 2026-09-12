@@ -2451,6 +2451,16 @@ body.page-portfolio {
   margin: 0 auto;
 }
 
+.video-page-heading {
+  width: min(1120px, 100%);
+  margin: 0 auto 18px;
+}
+
+.video-page-heading h1 {
+  margin-top: 4px;
+  font-size: clamp(2rem, 5vw, 4rem);
+}
+
 .video-page-player {
   width: 100%;
   max-height: 82vh;
