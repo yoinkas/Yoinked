@@ -83,6 +83,7 @@ function renderMenu(label, items) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  let visitorMap = null;
   const api = window.BoxLadderContent;
   const homepageResetButton = document.getElementById("homepage-reset");
   const homepageAddSectionButton = document.getElementById("homepage-add-section");
@@ -93,6 +94,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const visitorStatusEl = document.getElementById("visitor-status");
   const visitorRefreshButton = document.getElementById("visitor-refresh");
   const visitorLogEl = document.getElementById("visitor-log");
+  const visitorMapEl = document.getElementById("visitor-map");
   const logoutButton = document.getElementById("logout-button");
 
   if (!api || !homepageResetButton || !homepageAddSectionButton || !homepageRestoreSectionsButton || !featuredWriteupAddButton || !homepageStatusEl || !homepagePreviewEl || !visitorStatusEl || !visitorRefreshButton || !visitorLogEl) {
@@ -324,6 +326,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  function renderVisitorMap(visitors) {
+    if (!visitorMapEl || !window.L) {
+      return;
+    }
+    if (visitorMap) {
+      visitorMap.remove();
+    }
+    visitorMap = window.L.map(visitorMapEl, { scrollWheelZoom: false }).setView([20, 0], 2);
+    const map = visitorMap;
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    const points = visitors.filter((visitor) => {
+      const location = visitor.location || {};
+      return Number.isFinite(location.latitude) && Number.isFinite(location.longitude);
+    });
+    const bounds = [];
+    points.forEach((visitor) => {
+      const location = visitor.location;
+      const coordinates = [location.latitude, location.longitude];
+      bounds.push(coordinates);
+      const place = [location.city, location.region, location.country].filter(Boolean).join(", ") || "Approximate location";
+      window.L.marker(coordinates).addTo(map).bindPopup(`<strong>${escapeHtml(place)}</strong><br>${escapeHtml(visitor.page || "Unknown page")}<br>${escapeHtml(formatVisitorTime(visitor.timestamp))}`);
+    });
+    if (bounds.length) {
+      map.fitBounds(bounds, { padding: [28, 28], maxZoom: 9 });
+    }
+    window.setTimeout(() => map.invalidateSize(), 0);
+  }
+
   async function loadVisitorLog() {
     setVisitorStatus("Loading visitor log...");
     try {
@@ -338,9 +371,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       renderVisitorLog(Array.isArray(payload.visitors) ? payload.visitors : [], payload.storage);
+      renderVisitorMap(Array.isArray(payload.visitors) ? payload.visitors : []);
       setVisitorStatus(payload.storage === "logs-only"
         ? "Visitor tracking is active, but Redis is not configured. Only server logs are persistent."
-        : `Visitor log loaded. ${Array.isArray(payload.visitors) ? payload.visitors.length : 0} visits processed.`);
+        : `Visitor log loaded. ${Array.isArray(payload.visitors) ? payload.visitors.length : 0} visits processed. Your IP (${payload.adminIp || "unknown"}) is excluded.`);
     } catch (error) {
       visitorLogEl.innerHTML = `
         <article class="card">

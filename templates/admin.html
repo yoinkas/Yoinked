@@ -7,6 +7,7 @@
   <title>Homepage Admin | Yoinked by Yoinkas</title>
   <meta name="description" content="Protected homepage editor for Yoinked by Yoinkas." />
   <link rel="stylesheet" href="/assets/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
@@ -45,6 +46,7 @@
           <p class="inline-note" id="visitor-status">Loading visitor log...</p>
           <button type="button" class="btn ghost" id="visitor-refresh">Refresh visitors</button>
         </div>
+        <div id="visitor-map" class="visitor-map" aria-label="Map of visitor locations"></div>
         <div id="visitor-log" class="admin-canvas"></div>
       </div>
     </section>
@@ -59,6 +61,7 @@
 
   <script src="/assets/content.js"></script>
   <script src="/assets/main.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="/assets/admin-inline.js"></script>
 </body>
 </html>

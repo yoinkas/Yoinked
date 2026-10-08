@@ -8,6 +8,7 @@ const {
   verifyPin,
   verifySessionToken,
 } = require("../lib/portfolio-auth");
+const { isRedisConfigured, PORTFOLIO_RESPONSES_KEY, pushListItem } = require("../lib/redis");
 
 const portfolioTemplatePath = path.join(process.cwd(), "templates", "portfolio.html");
 
@@ -70,6 +71,20 @@ function renderLockedPage(error = "") {
             </div>
             <p class="portfolio-lock-status" id="portfolioLockStatus">${error}</p>
           </form>
+
+          <div class="portfolio-questionnaire" id="portfolioQuestionnaire" hidden>
+            <div class="portfolio-questionnaire-card" role="dialog" aria-modal="true" aria-labelledby="portfolio-question-title">
+              <p class="eyebrow">One quick question</p>
+              <h2 id="portfolio-question-title">What company are you with?</h2>
+              <form id="portfolioQuestionForm">
+                <input id="portfolioCompany" name="company" type="text" maxlength="120" autocomplete="organization" placeholder="Company name" />
+                <div class="portfolio-question-actions">
+                  <button class="btn" type="submit">Continue</button>
+                  <button class="btn ghost" type="button" id="portfolioAnonymous">Stay anonymous</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </article>
 
         <aside class="portfolio-blueprint-card" aria-label="Portfolio blueprint">
@@ -88,6 +103,24 @@ function renderLockedPage(error = "") {
   <script>
     const form = document.getElementById("portfolioLockForm");
     const statusEl = document.getElementById("portfolioLockStatus");
+    const questionnaire = document.getElementById("portfolioQuestionnaire");
+    const questionForm = document.getElementById("portfolioQuestionForm");
+    const anonymousButton = document.getElementById("portfolioAnonymous");
+
+    async function finishQuestionnaire(company, anonymous) {
+      await fetch("/portfolio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "questionnaire", company, anonymous }),
+      }).catch(() => null);
+      window.location.reload();
+    }
+
+    questionForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      finishQuestionnaire(questionForm.company.value.trim(), false);
+    });
+    anonymousButton.addEventListener("click", () => finishQuestionnaire("", true));
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       statusEl.textContent = "Checking ping...";
@@ -100,7 +133,8 @@ function renderLockedPage(error = "") {
       }).catch(() => null);
 
       if (result && result.ok) {
-        window.location.reload();
+        questionnaire.hidden = false;
+        document.getElementById("portfolioCompany").focus();
         return;
       }
 
@@ -116,7 +150,31 @@ module.exports = async function handler(request, response) {
   const token = cookies[PORTFOLIO_COOKIE_NAME];
 
   if (request.method === "POST") {
-    const body = typeof request.body === "string" ? JSON.parse(request.body || "{}") : request.body || {};
+    let body = {};
+    try {
+      body = typeof request.body === "string" ? JSON.parse(request.body || "{}") : request.body || {};
+    } catch (error) {
+      sendJson(response, { error: "Invalid request." }, 400);
+      return;
+    }
+
+    if (body.action === "questionnaire") {
+      if (!verifySessionToken(token)) {
+        sendJson(response, { error: "Unauthorized." }, 401);
+        return;
+      }
+      const company = String(body.company || "").trim().slice(0, 120);
+      const anonymous = Boolean(body.anonymous) || !company;
+      if (isRedisConfigured()) {
+        await pushListItem(PORTFOLIO_RESPONSES_KEY, {
+          timestamp: new Date().toISOString(),
+          company: anonymous ? "" : company,
+          anonymous,
+        }, 200).catch((error) => console.error("Portfolio response storage failed:", error));
+      }
+      sendJson(response, { ok: true });
+      return;
+    }
     if (!verifyPin(body.pin)) {
       sendJson(response, { error: "Access denied." }, 401);
       return;

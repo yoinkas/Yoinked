@@ -2451,6 +2451,60 @@ body.page-portfolio {
   margin: 0 auto;
 }
 
+.visitor-map {
+  min-height: 380px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(93, 255, 139, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #071009;
+}
+
+.visitor-map .leaflet-popup-content-wrapper,
+.visitor-map .leaflet-popup-tip {
+  color: #dfffe7;
+  background: #071009;
+}
+
+.portfolio-questionnaire[hidden] {
+  display: none;
+}
+
+.portfolio-questionnaire {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(6px);
+}
+
+.portfolio-questionnaire-card {
+  width: min(440px, 100%);
+  padding: 26px;
+  border: 1px solid rgba(93, 255, 139, 0.28);
+  border-radius: 18px;
+  background: #071009;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.portfolio-questionnaire-card form,
+.portfolio-question-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.portfolio-questionnaire-card form {
+  flex-direction: column;
+}
+
+.portfolio-questionnaire-card input {
+  width: 100%;
+}
+
 .video-page-heading {
   width: min(1120px, 100%);
   margin: 0 auto 18px;
