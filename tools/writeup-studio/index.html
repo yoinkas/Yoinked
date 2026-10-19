@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writeup Studio | Yoinked</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo"><i class="fa-solid fa-pen-nib"></i><span>Writeup Studio</span></div>
+      <input type="text" id="note-title" placeholder="Untitled" maxlength="200" autocomplete="off">
+    </div>
+    <div class="topbar-center">
+      <span class="status saved" id="save-status">Saved</span>
+      <span class="word-count" id="word-count">0 words</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn" id="export-html-btn" title="Export standalone HTML"><i class="fa-solid fa-globe"></i><span>HTML</span></button>
+      <button class="btn" id="export-md-btn" title="Export Markdown"><i class="fa-brands fa-markdown"></i><span>MD</span></button>
+      <button class="btn" id="import-btn" title="Import HTML or Markdown file"><i class="fa-solid fa-file-import"></i><span>Import</span></button>
+      <button class="btn yoinked-action" id="btn-save-disk" type="button" title="Save this writeup into the Yoinked project"><i class="fa-solid fa-folder-plus"></i><span>Add to Yoinked</span></button>
+      <button class="btn primary" id="new-note-btn" title="New writeup"><i class="fa-solid fa-plus"></i><span>New</span></button>
+      
+      <!-- Tools Dropdown -->
+      <div id="custom-tools-container" style="position: relative; display: inline-block; vertical-align: middle; margin-left: 10px;">
+          <button id="custom-tools-btn" class="btn" style="background: #4f46e5; color: white;">Ã¢Å¡â„¢Ã¯Â¸Â Tools</button>
+          <div id="custom-tools-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); min-width: 180px; margin-top: 5px; z-index: 9999;">
+              <a href="#" id="btn-pdf" style="display: block; padding: 10px 15px; text-decoration: none; color: #eee; font-size: 14px; border-bottom: 1px solid #333;">Ã°Å¸â€œâ€ž Save as PDF</a>
+              <a href="#" id="btn-json" style="display: block; padding: 10px 15px; text-decoration: none; color: #eee; font-size: 14px; border-bottom: 1px solid #333;">Ã°Å¸â€œÂ¦ Export as JSON</a>
+              <a href="#" id="btn-clear" style="display: block; padding: 10px 15px; text-decoration: none; color: #ff5555; font-size: 14px;">Ã°Å¸â€”â€˜Ã¯Â¸Â Clear Local Storage</a>
+          </div>
+      </div>
+      <input type="file" id="import-file" class="file-hidden" accept=".html,.htm,.md,.markdown,.txt">
+    </div>
+  </header>
+  <div class="body-row">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-head"><span class="side-title">Writeups</span><span class="side-count" id="side-count">0</span></div>
+      <div class="side-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="side-search" placeholder="Search boxes..." autocomplete="off"></div>
+      <div class="notes-list" id="notes-list"></div>
+    </aside>
+    <main class="editor-wrap" id="editor-wrap"><div id="editor"></div></main>
+  </div>
+  <footer class="bottombar">
+    <div class="bottombar-left"><span id="save-text">Browser changes saved</span><span class="project-path" id="project-path">Checking project storage...</span></div>
+    <div class="bottombar-right"><span id="block-count">0 blocks</span><span class="dot"></span><span id="chars-count">0 chars</span><span class="dot"></span><span class="hint">Type <b>/</b> for commands</span></div>
+  </footer>
+</div>
+<div class="slash-menu" id="slash-menu" style="display:none"></div>
+<div class="format-toolbar" id="format-toolbar" style="display:none">
+  <button data-action="bold" title="Bold (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
+  <button data-action="italic" title="Italic (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
+  <button data-action="underline" title="Underline (Ctrl+U)"><i class="fa-solid fa-underline"></i></button>
+  <button data-action="strike" title="Strikethrough"><i class="fa-solid fa-strikethrough"></i></button>
+  <button data-action="code" title="Inline code"><i class="fa-solid fa-code"></i></button>
+  <span class="fmt-sep"></span>
+  <button data-action="link" title="Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
+  <button data-action="textcolor" title="Text color"><i class="fa-solid fa-palette"></i></button>
+  <button data-action="highlight" title="Highlight color"><i class="fa-solid fa-highlighter"></i></button>
+  <span class="fmt-sep"></span>
+  <button data-action="h1" title="Heading 1">H1</button>
+  <button data-action="h2" title="Heading 2">H2</button>
+  <button data-action="clear" title="Clear formatting"><i class="fa-solid fa-eraser"></i></button>
+</div>
+<div class="color-pop" id="color-pop" style="display:none">
+  <div class="color-label">Text</div><div class="color-grid" id="text-color-grid"></div>
+  <div class="color-label">Highlight</div><div class="color-grid" id="bg-color-grid"></div>
+</div>
+<div class="modal-back" id="new-modal" style="display:none">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="New writeup">
+    <div class="modal-head"><div><h2>New writeup</h2><p>Fill out the box info to start.</p></div><button class="modal-x" id="new-modal-x" title="Cancel"><i class="fa-solid fa-xmark"></i></button></div>
+    <label class="m-field">Box name<input id="m-name" placeholder="e.g. Editorial" autocomplete="off"></label>
+    <div class="m-field">Cover photo <span class="m-opt">(optional)</span>
+      <div class="m-upload-row"><button class="btn" id="m-cover-btn" type="button"><i class="fa-solid fa-upload"></i><span>Upload</span></button><span class="m-file-name" id="m-file-name">No file chosen</span><button class="btn m-rm" id="m-cover-rm" type="button" style="display:none">Remove</button></div>
+      <input type="file" id="m-cover-file" class="file-hidden" accept="image/*">
+      <span class="m-preview" id="m-preview" style="display:none"><img id="m-preview-img" alt="Cover preview"></span>
+    </div>
+    <div class="m-grid">
+      <label class="m-field">Platform<select id="m-platform"><option>HTB</option><option>THM</option><option>VulnHub</option><option>PG</option><option>Other</option></select></label>
+      <label class="m-field">Difficulty<select id="m-diff"><option>Very Easy</option><option selected>Easy</option><option>Medium</option><option>Hard</option><option>Insane</option></select></label>
+      <label class="m-field">OS<select id="m-os"><option>Linux</option><option>Windows</option><option>Other</option></select></label>
+    </div>
+    <div class="m-err" id="m-err" style="display:none">Box name is required.</div>
+    <div class="m-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn primary" id="m-create"><i class="fa-solid fa-plus"></i><span>Create</span></button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="storage.js"></script>
+<script src="ollama.js"></script>
+<script src="ai.js"></script>
+<script src="app.js"></script>
+<script src="slashclick.js"></script>
+<script src="editfix.js"></script>
+<script src="mediaupload.js"></script>
+<script src="codeblocks.js"></script>
+<script src="project-sync.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('custom-tools-btn');
+    const dropdown = document.getElementById('custom-tools-dropdown');
+    
+    btn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
+    document.addEventListener('click', () => { dropdown.style.display = 'none'; });
+
+    document.getElementById('btn-pdf').addEventListener('click', async () => {
+        const { jsPDF } = window.jspdf;
+        alert('Generating PDF... This might take a moment.');
+        try {
+            const canvas = await html2canvas(document.body, { scale: 2 });
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('writeup.pdf');
+        } catch (e) { alert('Error generating PDF: ' + e.message); }
+    });
+
+    document.getElementById('btn-json').addEventListener('click', () => {
+        const data = localStorage.getItem('writeup_notes_v4') || '{}';
+        const blob = new Blob([data], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'writeup_backup.json'; a.click(); URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btn-clear').addEventListener('click', () => {
+        if(confirm("WARNING: This will delete all your notes from this browser. Are you sure?")) { localStorage.clear(); location.reload(); }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const importBtn = document.getElementById('import-btn');
+    let importFile = document.getElementById('import-file');
+    const editor = document.getElementById('editor');
+    const titleInput = document.getElementById('note-title');
+
+    if (importBtn && importFile) {
+        // Clone to remove app.js's broken listener
+        const newImportFile = importFile.cloneNode(true);
+        importFile.parentNode.replaceChild(newImportFile, importFile);
+
+        importBtn.addEventListener('click', () => { newImportFile.click(); });
+
+        newImportFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const fileContent = event.target.result;
+
+                if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(fileContent, 'text/html');
+
+                    const docTitle = doc.querySelector('title');
+                    if (titleInput) {
+                        titleInput.value = docTitle ? docTitle.innerText : file.name.replace(/\.[^/.]+$/, "");
+                        titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    // 1. Strip massive base64 video/images to prevent freezing
+                    let bodyHTML = doc.body.innerHTML;
+                    bodyHTML = bodyHTML.replace(/<video[^>]*>.*?<\/video>/gs, '<p style="color: #ff5555; font-weight: bold; padding: 10px; border: 1px solid #ff5555; border-radius: 5px; text-align:center;">[Video removed during import because it was too large]</p>');
+                    bodyHTML = bodyHTML.replace(/<img[^>]+src="data:image\/[^"]+"[^>]*>/g, '<p style="color: #ff5555; font-weight: bold; text-align:center;">[Image removed during import because it was too large]</p>');
+
+                    // 2. Parse cleaned HTML
+                    const cleanedDoc = new DOMParser().parseFromString(bodyHTML, 'text/html');
+
+                    // 3. Translate standard <pre> tags into app-specific code blocks
+                    const preBlocks = cleanedDoc.querySelectorAll('pre');
+                    preBlocks.forEach((pre, i) => {
+                        let code = pre.querySelector('code');
+                        let lang = 'bash';
+                        if (code && code.className) {
+                            let match = code.className.match(/language-(\w+)/);
+                            if (match) lang = match[1];
+                        }
+                        
+                        let contentText = pre.textContent || '';
+                        contentText = contentText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                        let block = cleanedDoc.createElement('div');
+                        block.className = 'block';
+                        block.setAttribute('data-type', 'code');
+                        block.setAttribute('data-id', 'code-' + Date.now() + '-' + i);
+                        
+                        // This exact structure allows codeblocks.js to attach themes automatically
+                        block.innerHTML = `
+                            <div class="code-head">
+                                <div class="term-dots"><span></span><span></span><span></span></div>
+                                <div class="term-title">Terminal</div>
+                                <span class="code-lang">${lang}</span>
+                                <button class="code-copy" contenteditable="false"><i class="fa-solid fa-copy"></i></button>
+                            </div>
+                            <div class="block-content" contenteditable="true"><pre style="margin:0; padding:0; background:transparent; color:inherit; font-family:inherit; font-size:inherit; white-space:pre-wrap;">${contentText}</pre></div>
+                        `;
+                        
+                        pre.replaceWith(block);
+                    });
+
+                    // 4. Inject into editor
+                    if (editor) {
+                        editor.innerHTML = cleanedDoc.body.innerHTML;
+                        
+                        // Trigger input event so app.js saves it
+                        editor.dispatchEvent(new Event('input', { bubbles: true }));
+                        
+                        // Trigger a paste event just in case app.js parses pastes
+                        try {
+                            const pasteEvent = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() });
+                            editor.dispatchEvent(pasteEvent);
+                        } catch (err) {}
+                    }
+                } else if (file.name.match(/\.(md|txt|markdown)$/i)) {
+                    if (titleInput) {
+                        titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+                        titleInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    if (editor) {
+                        editor.innerText = fileContent;
+                        editor.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                }
+            };
+            reader.readAsText(file);
+            newImportFile.value = ''; 
+        });
+    }
+});
+</script>
+
+<!-- Retained for reference only: the old implicit autosync caused stale merges. -->
+<script type="text/plain">
+(function() {
+    const originalSetItem = Storage.prototype.setItem;
+    
+    // Intercept setItem to prevent QuotaExceededError from breaking app.js
+    Storage.prototype.setItem = function(key, value) {
+        if (key === 'writeup_notes_v4') {
+            try {
+                originalSetItem.call(this, key, value);
+            } catch (e) {
+                console.warn("LocalStorage full. Save will only go to backend.");
+            }
+            
+            // Sync the most recently updated note to the backend
+            try {
+                const notes = JSON.parse(value);
+                if (Array.isArray(notes) && notes.length > 0) {
+                    // Sort by updatedAt to find the one we just saved
+                    notes.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+                    const latest = notes[0];
+                    
+                    const formData = new FormData();
+                    formData.append('writeup', JSON.stringify(latest));
+                    
+                    fetch('/api/save', { method: 'POST', body: formData })
+                        .then(r => r.json())
+                        .then(d => {
+                            if(d.success) console.log('âœ… Synced to backend disk!');
+                        })
+                        .catch(err => console.error('Backend sync failed', err));
+                }
+            } catch (e) {
+                console.error("Failed to parse for backend sync", e);
+            }
+        } else {
+            originalSetItem.call(this, key, value);
+        }
+    };
+
+    // On load, fetch from backend and merge into UI
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(async () => {
+            try {
+                const res = await fetch('/api/writeups');
+                if (!res.ok) return;
+                const backendNotes = await res.json();
+                
+                if (Array.isArray(backendNotes) && backendNotes.length > 0) {
+                    let updated = false;
+                    const currentNotesStr = localStorage.getItem('writeup_notes_v4') || '[]';
+                    let currentNotes = JSON.parse(currentNotesStr);
+                    
+                    backendNotes.forEach(bNote => {
+                        if (!currentNotes.find(n => n.id === bNote.id)) {
+                            currentNotes.push(bNote);
+                            updated = true;
+                        }
+                    });
+
+                    if (updated) {
+                        console.log("Merged backend notes into local storage.");
+                        // Bypass interceptor so we don't re-upload everything
+                        originalSetItem.call(localStorage, 'writeup_notes_v4', JSON.stringify(currentNotes));
+                        
+                        // If the app's notes array is global, update it and re-render
+                        if (typeof notes !== 'undefined' && Array.isArray(notes)) {
+                             notes.length = 0;
+                             currentNotes.forEach(n => notes.push(n));
+                             if (typeof renderNotes === 'function') renderNotes();
+                        } else {
+                            location.reload(); // Fallback
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load backend notes", e);
+            }
+        }, 1500); // Wait 1.5s for app.js to finish booting
+    });
+})();
+</script>
+</body>
+</html>
