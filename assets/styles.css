@@ -1206,25 +1206,87 @@ body.page-hacking a:hover {
 
 .hacking-feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   justify-content: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .hacking-feature-card {
   width: 100%;
   display: grid;
-  gap: 16px;
+  gap: 10px;
+  align-content: start;
+  padding: 15px;
+  border-radius: 14px;
+  grid-template-rows: auto minmax(2.7rem, auto) 130px auto auto;
+}
+
+.hacking-feature-card h3 {
+  font-size: 1.08rem;
+  margin: 0;
+  min-height: 2.7rem;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+
+.hacking-feature-card > p:not(.eyebrow) {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.hacking-feature-card > .btn {
+  justify-self: start;
+  padding: 8px 12px;
 }
 
 .hacking-feature-image {
   width: 100%;
-  max-height: 220px;
+  height: 130px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 95, 46, 0.16);
   margin: 0;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+  position: relative;
+  z-index: 0;
+  margin-top: 0;
+}
+
+.box-browser {
+  margin-bottom: 22px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(7, 17, 10, 0.78);
+}
+
+.box-browser-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.box-browser-heading h2,
+.box-browser-heading p { margin: 0; }
+.box-browser-heading > p { color: var(--muted); font-size: 0.86rem; }
+.box-filter-selects { display: grid; grid-template-columns: minmax(160px, 1.15fr) repeat(3, minmax(140px, 1fr)) auto; gap: 12px; align-items: end; }
+.box-filter-selects label { display: grid; gap: 6px; color: var(--muted); font-size: 0.76rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.box-filter-selects select,
+.box-filter-selects input { width: 100%; min-height: 42px; padding: 8px 34px 8px 10px; color: var(--text); background: #090d0a; border: 1px solid var(--border); border-radius: 9px; font: inherit; text-transform: none; letter-spacing: 0; }
+.box-filter-selects input { padding-right: 10px; }
+.box-rotation-note { margin: 12px 0 0; color: var(--muted); font-size: .78rem; }
+.box-filter-empty { margin: 18px 0 0; color: var(--muted); }
+.hacking-feature-card[hidden] { display: none; }
+
+@media (max-width: 760px) {
+  .box-filter-selects { grid-template-columns: 1fr; }
+  .box-browser-heading { align-items: start; flex-direction: column; gap: 6px; }
+  .hacking-feature-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
 }
 
 .hacking-notes {
@@ -2629,11 +2691,4 @@ body.page-portfolio {
   .portfolio-lock-row {
     grid-template-columns: 1fr;
   }
-}
-
-/* --- VisBug Layout Changes --- */
-body.page-hacking img {
-  width: 333px;
-  height: 314.297px;
-  transform: translate(-15px, -23px);
 }

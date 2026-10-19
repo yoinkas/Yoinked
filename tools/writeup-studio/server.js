@@ -129,6 +129,8 @@ app.post('/api/save', upload.array('media'), (request, response) => {
   }
 });
 app.use((error, _request, response, _next) => {
-  console.error(error); response.status(error.code === 'LIMIT_FILE_SIZE' ? 413 : 500).json({ success: false, message: error.message || 'Unexpected server error.' });
+  const status = error.code === 'LIMIT_FILE_SIZE' ? 413 : (Number(error.status) || 500);
+  if (status >= 500) console.error(error);
+  response.status(status).json({ success: false, message: status === 404 ? 'Not found.' : (error.message || 'Unexpected server error.') });
 });
 app.listen(PORT, '127.0.0.1', () => { console.log(`Writeup Studio: http://127.0.0.1:${PORT}`); console.log(`Drafts: ${DRAFT_ROOT}`); });
