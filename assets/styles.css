@@ -2630,3 +2630,10 @@ body.page-portfolio {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- VisBug Layout Changes --- */
+body.page-hacking img {
+  width: 333px;
+  height: 314.297px;
+  transform: translate(-15px, -23px);
+}
