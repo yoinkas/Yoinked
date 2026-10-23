@@ -7,6 +7,13 @@
   var toolsButton = document.getElementById('custom-tools-btn');
   if (toolsButton) toolsButton.innerHTML = '<i class="fa-solid fa-ellipsis"></i><span>More</span>';
   function newestLocalNote() {
+    /* prefer the writeup that is actually open — falling back to the newest */
+    try {
+      if (window.WriteUp && window.WriteUp.getCurrent) {
+        var current = window.WriteUp.getCurrent();
+        if (current && Array.isArray(current.blocks)) return current;
+      }
+    } catch (_error) { /* fall through to the localStorage lookup */ }
     try {
       var notes = JSON.parse(localStorage.getItem('writeup_notes_v4') || '[]');
       if (!Array.isArray(notes) || !notes.length) return null;
@@ -27,7 +34,26 @@
     finally { syncing = false; if (button) button.removeAttribute('aria-busy'); }
   }
   if (button) button.addEventListener('click', saveToProject);
+  window.WriteUpProject = { save: saveToProject };
+
+  /* Pull writeups that are already on disk into the editor.
+     Pushes stay explicit (the "Add to Yoinked" button) so we never clobber
+     a project draft with a stale browser copy. */
+  function pullProjectWriteups() {
+    if (!window.WriteUp || !window.WriteUp.mergeNotes) return;
+    fetch('/api/writeups').then(function (response) { return response.ok ? response.json() : []; })
+      .then(function (list) {
+        if (!Array.isArray(list) || !list.length) return;
+        var added = window.WriteUp.mergeNotes(list);
+        if (added) console.log('[project-sync] pulled ' + added + ' writeup(s) from the project');
+      })
+      .catch(function () { /* offline / no server — the editor still works */ });
+  }
+
   fetch('/api/config').then(function (response) { return response.ok ? response.json() : Promise.reject(); })
     .then(function (config) { show('Drafts: ' + config.draftRoot); })
     .catch(function () { show('Browser-only mode. Run npm run serve to save into Yoinked.', true); });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pullProjectWriteups);
+  else pullProjectWriteups();
 })();

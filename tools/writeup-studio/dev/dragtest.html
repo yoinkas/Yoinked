@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>drag & drop selftest</title>
+<style>body{font:13px/1.6 monospace;background:#0d1117;color:#c9d1d9;padding:16px}
+pre{white-space:pre-wrap}iframe{width:1200px;height:760px;border:1px solid #30363d;margin-top:12px}
+.ok{color:#3fb950}.bad{color:#f85149}</style></head>
+<body>
+<pre id="out">running…</pre>
+<iframe id="f" src="/index.html"></iframe>
+<script>
+var log = [], fails = 0;
+function say(k, v, pass) {
+  if (!pass) fails++;
+  var line = (pass ? 'PASS ' : 'FAIL ') + k + ' :: ' + JSON.stringify(v);
+  log.push(line);
+  document.getElementById('out').innerHTML = log.map(function (l) {
+    return '<span class="' + (l.indexOf('PASS') === 0 ? 'ok' : 'bad') + '">' + l + '</span>';
+  }).join('\n');
+}
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  function q(s) { return d.querySelector(s); }
+  function qa(s) { return Array.prototype.slice.call(d.querySelectorAll(s)); }
+  function T(ms, fn) { return new Promise(function (r) { setTimeout(function () { Promise.resolve(fn()).then(r, r); }, ms); }); }
+  function mouse(el, type, x, y) {
+    var ev = new w.MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 });
+    (type === 'mousemove' ? w.document : el).dispatchEvent(ev);
+  }
+
+  (async function () {
+    await T(700, function () {
+      var W = w.WriteUp, n = W.getCurrent();
+      n.blocks = [];
+      for (var i = 1; i <= 60; i++) n.blocks.push({ id: 'd' + i, type: 'text', html: 'Block ' + i });
+      W.persist(); W.render();
+    });
+
+    await T(500, function () {
+      var W = w.WriteUp;
+      var wrap = q('#editor-wrap');
+      var blocks = qa('#editor > .block');
+      say('60 blocks rendered', blocks.length, blocks.length === 60);
+
+      // start dragging block 1 using its grip handle
+      var grip = blocks[0].querySelector('.drag-handle');
+      var r0 = grip.getBoundingClientRect();
+      var startX = r0.left + 5, startY = r0.top + 5;
+      mouse(grip, 'mousedown', startX, startY);
+
+      var before = W.getCurrent().blocks.map(function (b) { return b.id; });
+      say('drag started', !!q('.block.dragging'), !!q('.block.dragging'));
+      say('body drag class', d.body.classList.contains('dragging-block'), d.body.classList.contains('dragging-block'));
+
+      // move into the MIDDLE of the editor -> must NOT auto scroll
+      var wr = wrap.getBoundingClientRect();
+      var midY = wr.top + wr.height / 2;
+      var scrollBefore = wrap.scrollTop;
+      mouse(d.body, 'mousemove', startX, midY);
+      say('drop marker appears in the middle', qa('.block.drop-above,.block.drop-below').length, qa('.block.drop-above,.block.drop-below').length > 0);
+
+      return T(700, function () {
+        say('no auto-scroll in the middle band', { scrollTop: wrap.scrollTop, was: scrollBefore }, Math.abs(wrap.scrollTop - scrollBefore) < 1);
+      });
+    });
+
+    await T(300, function () {
+      var W = w.WriteUp;
+      var wrap = q('#editor-wrap');
+      var wr = wrap.getBoundingClientRect();
+      var startX = 300;
+      // move to the BOTTOM band -> must auto scroll DOWN
+      var before = wrap.scrollTop;
+      mouse(d.body, 'mousemove', startX, wr.bottom - 12);
+      setTimeout(function () {
+        say('auto-scrolls down at the bottom edge', { was: before, now: wrap.scrollTop }, wrap.scrollTop > before + 5);
+        // now move to the TOP band -> must auto scroll UP
+        var before2 = wrap.scrollTop;
+        mouse(d.body, 'mousemove', startX, wr.top + 6);
+        setTimeout(function () {
+          say('auto-scrolls up at the top edge', { was: before2, now: wrap.scrollTop }, wrap.scrollTop < before2 - 5);
+          // back to the middle -> scrolling stops again
+          var before3 = wrap.scrollTop;
+          mouse(d.body, 'mousemove', startX, wr.top + wr.height / 2);
+          setTimeout(function () {
+            say('scrolling stops again in the middle', { was: before3, now: wrap.scrollTop }, Math.abs(wrap.scrollTop - before3) < 2);
+            // drop it
+            mouse(d.body, 'mouseup', startX, wr.top + wr.height / 2);
+            setTimeout(function () {
+              var after = W.getCurrent().blocks.map(function (b) { return b.id; });
+              say('drag finished, order changed', { first: after[0], last: after[after.length - 1] }, after[0] !== 'd1');
+              say('no blocks lost', after.length, after.length === 60);
+              say('drag class cleared', d.body.className, !d.body.classList.contains('dragging-block'));
+              say('dragging block gone', qa('.block.dragging').length, qa('.block.dragging').length === 0);
+              say('DONE', fails, fails === 0);
+            }, 400);
+          }, 600);
+        }, 700);
+      }, 700);
+    });
+  })();
+});
+</script>
+</body></html>

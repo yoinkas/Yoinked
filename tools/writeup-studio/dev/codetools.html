@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>code block tools</title>
+<style>body{margin:0;background:#0b0d12}iframe{width:1180px;height:760px;border:0;display:block}</style></head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  setTimeout(function () {
+    var W = w.WriteUp, n = W.getCurrent();
+    n.blocks = [
+      { id: 'v-h', type: 'h2', html: 'Exploitation' },
+      { id: 'v-c', type: 'code', lang: 'bash', theme: 'code', src: 'nmap -sC -sV -p- 10.65.177.141\n\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9p1\n80/tcp   open  http    nginx 1.18.0' },
+      { id: 'v-t', type: 'text', html: 'The SSH service is running on the default port.' }
+    ];
+    W.persist(); W.render();
+    setTimeout(function () {
+      var c = d.querySelector('.block[data-type=code] .block-content');
+      if (c) { c.focus(); }
+    }, 250);
+  }, 600);
+});
+</script>
+</body></html>

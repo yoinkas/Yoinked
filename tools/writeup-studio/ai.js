@@ -1,4 +1,4 @@
-/* ai.js â€” Ollama-powered tagging for WriteUp. */
+/* ai.js — Ollama-powered tagging for WriteUp. */
 (function () {
   'use strict';
 
@@ -117,12 +117,12 @@
       '<span class="ai-progress" id="ai-progress" style="display:none"></span>' +
       '<button type="button" class="btn ai-btn" id="ai-menu-btn" title="AI tools"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI</span><span class="ai-dot" id="ai-dot"></span></button>' +
       '<div class="ai-menu" id="ai-menu" style="display:none">' +
-      '<div class="ai-menu-status" id="ai-menu-status">Checking Ollamaâ€¦</div><div class="ai-menu-sep"></div>' +
+      '<div class="ai-menu-status" id="ai-menu-status">Checking Ollama…</div><div class="ai-menu-sep"></div>' +
       '<button type="button" class="ai-menu-item" data-act="one"><i class="fa-solid fa-tag"></i> Analyze this note</button>' +
       '<button type="button" class="ai-menu-item" data-act="all"><i class="fa-solid fa-list-check"></i> Analyze all notes</button>' +
       '<button type="button" class="ai-menu-item" data-act="clear"><i class="fa-solid fa-eraser"></i> Clear tags on this note</button>' +
       '<div class="ai-menu-sep"></div>' +
-      '<button type="button" class="ai-menu-item" data-act="settings"><i class="fa-solid fa-gear"></i> Settingsâ€¦</button>' +
+      '<button type="button" class="ai-menu-item" data-act="settings"><i class="fa-solid fa-gear"></i> Settings…</button>' +
       '</div>';
     var nb = document.getElementById('new-note-btn');
     if (nb && nb.parentNode === right) right.insertBefore(w, nb); else right.appendChild(w);
@@ -145,16 +145,16 @@
 
   function refreshDot() {
     var d = document.getElementById('ai-dot'); if (!d) return;
-    d.className = 'ai-dot'; d.title = 'Checkingâ€¦';
+    d.className = 'ai-dot'; d.title = 'Checking…';
     window.Ollama.ping().then(function (ok) {
       d.classList.add(ok ? 'on' : 'off'); d.title = ok ? 'Ollama connected' : 'Ollama offline';
     });
   }
   function refreshStatus() {
     var s = document.getElementById('ai-menu-status'); if (!s) return;
-    s.textContent = 'Checking Ollamaâ€¦';
+    s.textContent = 'Checking Ollama…';
     window.Ollama.ping().then(function (ok) {
-      s.textContent = ok ? ('Connected Â· ' + window.Ollama.config.model) : 'Ollama offline at ' + window.Ollama.config.base;
+      s.textContent = ok ? ('Connected · ' + window.Ollama.config.model) : 'Ollama offline at ' + window.Ollama.config.base;
       var d = document.getElementById('ai-dot'); if (d) { d.classList.remove('on','off'); d.classList.add(ok ? 'on' : 'off'); }
     });
   }
@@ -168,7 +168,7 @@
 
   function analyzeCurrent(force) {
     var c = window.WriteUp.getCurrent(); if (!c) return;
-    setBusy(true, 'Analyzingâ€¦');
+    setBusy(true, 'Analyzing…');
     analyzeNote(c, !!force)
       .then(function () { window.WriteUp.persist(); window.WriteUp.renderNotes(); renderSidebar(); toast('Tagged ' + ((c.ai.tags.all || []).length) + ' terms'); })
       .catch(function (e) { toast('AI: ' + e.message); })
@@ -185,7 +185,7 @@
     (function step() {
       if (i >= notes.length) { window.WriteUp.persist(); window.WriteUp.renderNotes(); renderSidebar(); setBusy(false); toast('Done: ' + ok + ' tagged' + (fail ? ', ' + fail + ' failed' : '')); return; }
       var n = notes[i++];
-      setBusy(true, i + '/' + notes.length + 'â€¦');
+      setBusy(true, i + '/' + notes.length + '…');
       analyzeNote(n).then(function () { ok++; }).catch(function (e) { fail++; console.warn(n.title, e); }).then(function () { window.WriteUp.persist(); window.WriteUp.renderNotes(); renderSidebar(); setTimeout(step, 40); });
     })();
   }
@@ -211,7 +211,7 @@
     var keys = Object.keys(idx).sort(function (a, b) { return (idx[b].count - idx[a].count) || a.localeCompare(b); });
     var cEl = document.getElementById('ai-tags-count'); if (cEl) cEl.textContent = keys.length;
     var clEl = document.getElementById('ai-tags-clear'); if (clEl) clEl.style.display = window.__tagFilter ? 'inline-block' : 'none';
-    if (!keys.length) { list.innerHTML = '<div class="ai-tags-empty">No tags yet. Use AI â†’ Analyze all notes.</div>'; return; }
+    if (!keys.length) { list.innerHTML = '<div class="ai-tags-empty">No tags yet. Use AI → Analyze all notes.</div>'; return; }
     var html = '';
     for (var i = 0; i < keys.length; i++) html += '<div class="ai-tag-row' + (window.__tagFilter === keys[i] ? ' on' : '') + '" data-tag="' + esc(keys[i]) + '"><span class="ai-tag-name">' + esc(keys[i]) + '</span><span class="ai-tag-n">' + idx[keys[i]].count + '</span></div>';
     list.innerHTML = html;
@@ -223,14 +223,14 @@
     var back = document.createElement('div'); back.className = 'modal-back'; back.id = 'ai-settings'; back.style.display = 'flex';
     back.innerHTML = '<div class="modal"><div class="modal-head"><div><h2>AI settings</h2><p>Connect to your local Ollama instance</p></div><button type="button" class="modal-x" id="ai-set-x"><i class="fa-solid fa-xmark"></i></button></div>' +
       '<label class="m-field">Ollama base URL<input id="ai-base" autocomplete="off"></label>' +
-      '<label class="m-field">Model<select id="ai-model"><option>(loadingâ€¦)</option></select></label>' +
+      '<label class="m-field">Model<select id="ai-model"><option>(loading…)</option></select></label>' +
       '<div class="m-err" id="ai-set-err" style="display:none"></div>' +
       '<div class="m-actions"><button type="button" class="btn" id="ai-test">Test</button><button type="button" class="btn" id="ai-set-cancel">Cancel</button><button type="button" class="btn primary" id="ai-set-save">Save</button></div></div>';
     document.body.appendChild(back);
     document.getElementById('ai-base').value = c.base;
     function err(m) { var e = document.getElementById('ai-set-err'); if (!e) return; if (!m) { e.style.display = 'none'; return; } e.style.display = 'block'; e.textContent = m; }
     function load() {
-      var s = document.getElementById('ai-model'); s.innerHTML = '<option>(loadingâ€¦)</option>';
+      var s = document.getElementById('ai-model'); s.innerHTML = '<option>(loading…)</option>';
       window.Ollama.listModels().then(function (list) {
         s.innerHTML = '';
         if (!list.length) { s.innerHTML = '<option>(no models)</option>'; return; }
@@ -257,6 +257,8 @@
     if (!window.Ollama || !window.WriteUp) { setTimeout(init, 200); return; }
     buildTopbar(); buildSidebar(); renderSidebar();
     window.WriteUp.getNotes().forEach(function (n) { if (n.ai && n.ai.tags) {} });
+    /* make sure the configured model is actually installed */
+    window.Ollama.ensureModel().then(function () { refreshDot(); refreshStatus(); });
     setInterval(refreshDot, 30000);
   }
 

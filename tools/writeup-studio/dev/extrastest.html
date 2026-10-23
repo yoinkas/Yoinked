@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>extras selftest</title>
+<style>body{font:13px/1.6 monospace;background:#0d1117;color:#c9d1d9;padding:16px}
+pre{white-space:pre-wrap}iframe{width:1200px;height:800px;border:1px solid #30363d;margin-top:12px}
+.ok{color:#3fb950}.bad{color:#f85149}</style></head>
+<body>
+<pre id="out">running…</pre>
+<iframe id="f" src="/index.html"></iframe>
+<script>
+var log = [], fails = 0;
+function say(k, v, pass) {
+  if (!pass) fails++;
+  var line = (pass ? 'PASS ' : 'FAIL ') + k + ' :: ' + JSON.stringify(v);
+  log.push(line);
+  document.getElementById('out').innerHTML = log.map(function (l) {
+    return '<span class="' + (l.indexOf('PASS') === 0 ? 'ok' : 'bad') + '">' + l + '</span>';
+  }).join('\n');
+}
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  function q(s) { return d.querySelector(s); }
+  function qa(s) { return Array.prototype.slice.call(d.querySelectorAll(s)); }
+  function T(ms, fn) { return new Promise(function (r) { setTimeout(function () { Promise.resolve(fn()).then(r, r); }, ms); }); }
+  w.addEventListener('error', function (e) { say('JS ERROR: ' + e.message, e.filename + ':' + e.lineno, false); });
+
+  (async function () {
+    await T(700, function () {
+      var W = w.WriteUp, n = W.getCurrent();
+      n.blocks = [
+        { id: 'x1', type: 'text', html: 'Target is 10.10.10.5 and CVE-2021-44228 with hash 5f4dcc3b5aa765d61d8327deb882cf99 and flag HTB{secret_flag}' },
+        { id: 'x2', type: 'code', lang: 'bash', theme: 'code', src: 'id\nwhoami' },
+        { id: 'x3', type: 'todo', html: 'do the thing', checked: false },
+        { id: 'x4', type: 'todo', html: 'other thing', checked: true },
+        { id: 'x5', type: 'checklist' },
+        { id: 'x6', type: 'timer', startedAt: Date.now() - 65000, elapsed: 0, running: true },
+        { id: 'x7', type: 'mermaid', src: 'graph TD; A-->B;' }
+      ];
+      n.tags = ['htb', 'linux'];
+      W.persist(); W.render();
+    });
+
+    await T(1200, function () {
+      var W = w.WriteUp;
+      /* 1 command palette */
+      say('command palette opens', (function () { w.WriteUpExtras.openPalette(); return q('#cmd-palette').style.display === 'flex'; })(), q('#cmd-palette').style.display === 'flex');
+      say('palette lists actions', qa('.cmd-row-item').length > 5, qa('.cmd-row-item').length > 5);
+      q('#cmd-input').value = 'export';
+      q('#cmd-input').dispatchEvent(new w.Event('input', { bubbles: true }));
+      say('palette filters', qa('.cmd-row-item').length >= 1, qa('.cmd-row-item').length >= 1);
+      w.WriteUpExtras.openPalette();
+      q('#cmd-palette').style.display = 'none';
+
+      /* 4 user tags */
+      say('tag bar rendered', qa('.tag-chip').length, qa('.tag-chip').length >= 1);
+      say('card shows tag chips', qa('.note-tag-btn').length, qa('.note-tag-btn').length >= 1);
+
+      /* 5 checklist */
+      say('checklist rendered', qa('.checklist-block .cl-list li').length, qa('.checklist-block .cl-list li').length === 2);
+      say('checklist progress', (q('.cl-count') || {}).textContent, (q('.cl-count') || {}).textContent === '1 / 2');
+
+      /* 6 timer */
+      say('timer rendered', !!q('.timer-block .tm-time'), !!q('.timer-block .tm-time'));
+      say('timer counting', /0[01]:/.test((q('.tm-time') || {}).textContent || ''), /0[01]:/.test((q('.tm-time') || {}).textContent || ''));
+
+      /* 7 mermaid */
+      say('mermaid block rendered', !!q('.mermaid-block .mermaid-src'), !!q('.mermaid-block .mermaid-src'));
+
+      /* 8 line numbers */
+      var cb = q('.block[data-type=code]');
+      say('line number button present', !!cb.querySelector('.code-lines-btn'), !!cb.querySelector('.code-lines-btn'));
+      cb.querySelector('.code-lines-btn').click();
+      say('line numbers shown', qa('.code-numbers span').length, qa('.code-numbers span').length === 2);
+
+      /* 9 snippets */
+      say('snippets available', (w.WriteUpExtras.snippets() || []).length >= 1, (w.WriteUpExtras.snippets() || []).length >= 1);
+      say('snippet expands', w.WriteUpExtras.expand(';nmap 10.0.0.1'), /nmap -sC -sV -p-/.test(w.WriteUpExtras.expand(';nmap 10.0.0.1') || ''));
+
+      /* 10 lightbox */
+      w.WriteUpExtras.openLightbox('https://x.test/i.png');
+      say('lightbox opens', q('#lightbox').style.display === 'flex', q('#lightbox').style.display === 'flex');
+      w.WriteUpExtras.openLightbox('https://x.test/i.png');
+      q('#lightbox').style.display = 'none';
+    });
+
+    await T(600, function () {
+      /* 5 token highlighting (applied on blur) */
+      var txt = q('.block[data-type=text] .block-content');
+      say('tokens highlighted', qa('.block[data-type=text] span[data-tok]').length, qa('.block[data-type=text] span[data-tok]').length >= 3);
+      say('cve token', !!q('.tok-cve'), !!q('.tok-cve'));
+      say('ip token', !!q('.tok-ip'), !!q('.tok-ip'));
+      say('flag token', !!q('.tok-flag'), !!q('.tok-flag'));
+      say('hash token', !!q('.tok-hash'), !!q('.tok-hash'));
+      say('DONE', fails, fails === 0);
+    });
+  })();
+});
+</script>
+</body></html>

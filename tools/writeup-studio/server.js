@@ -122,8 +122,24 @@ app.post('/api/save', upload.array('media'), (request, response) => {
       filename: file.filename, originalName: path.basename(file.originalname), mimetype: file.mimetype, path: `/draft-media/${file.filename}`,
     }));
     const jsonPath = path.join(DATA_DIR, `${slug}.json`); const previewPath = path.join(PREVIEW_DIR, `${slug}.html`);
-    atomicWrite(jsonPath, `${JSON.stringify(note, null, 2)}\n`); atomicWrite(previewPath, renderPreview(note, slug));
-    response.json({ success: true, slug, jsonPath: path.relative(PROJECT_ROOT, jsonPath), previewPath: path.relative(PROJECT_ROOT, previewPath), previewUrl: `/drafts/writeups/previews/${slug}.html` });
+    /* Never silently clobber a different writeup that happens to share a slug.
+       If the slug is taken by another note id, keep both by suffixing the filename. */
+    let targetSlug = slug;
+    if (fs.existsSync(jsonPath)) {
+      try {
+        const existing = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+        if (String(existing.id || '') !== String(note.id || '')) {
+          let n = 2;
+          while (fs.existsSync(path.join(DATA_DIR, `${slug}-${n}.json`))) n += 1;
+          targetSlug = `${slug}-${n}`;
+        }
+      } catch (_error) { /* unreadable file -> fall through and overwrite it */ }
+    }
+    const finalJson = path.join(DATA_DIR, `${targetSlug}.json`);
+    const finalPreview = path.join(PREVIEW_DIR, `${targetSlug}.html`);
+    note.projectSlug = targetSlug;
+    atomicWrite(finalJson, `${JSON.stringify(note, null, 2)}\n`); atomicWrite(finalPreview, renderPreview(note, targetSlug));
+    response.json({ success: true, slug: targetSlug, jsonPath: path.relative(PROJECT_ROOT, finalJson), previewPath: path.relative(PROJECT_ROOT, finalPreview), previewUrl: `/drafts/writeups/previews/${targetSlug}.html` });
   } catch (error) {
     console.error(error); response.status(error instanceof SyntaxError ? 400 : 500).json({ success: false, message: 'Could not save this writeup.' });
   }

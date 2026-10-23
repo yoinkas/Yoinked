@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>seed</title></head><body>
+<script>
+localStorage.setItem('writeup_notes_active','n1');
+if (localStorage.getItem('writeup_notes_v4')) {
+  if (!sessionStorage.getItem('writeup_seed_ok')) {
+    document.title = 'Writeup Studio - seed';
+    document.body.innerHTML = '<div style="font:14px/1.6 system-ui;padding:40px;max-width:560px">'
+      + '<h2>Replace the demo writeups?</h2>'
+      + '<p>This page overwrites the writeups stored in this browser. Your current notes will be lost.</p>'
+      + '<button id="go" style="padding:9px 16px;border-radius:8px;border:0;background:#6c7bff;color:#fff;font-weight:700;cursor:pointer">Replace them</button> '
+      + '<button id="no" style="padding:9px 16px;border-radius:8px;background:#1d212b;color:#c9d1d9;border:1px solid #30363d;font-weight:700;cursor:pointer">Keep mine</button></div>';
+    document.getElementById('go').onclick = function () { sessionStorage.setItem('writeup_seed_ok','1'); location.reload(); };
+    document.getElementById('no').onclick = function () { location.href = '/index.html'; };
+    throw new Error('seed paused');
+  }
+}
+localStorage.setItem('writeup_notes_v4', JSON.stringify([
+  {id:'n1',title:'Editorial',createdAt:Date.now()-86400000*4,updatedAt:Date.now()-3600000*2,pinned:true,blocks:[
+    {id:'b1',type:'box',html:'',box:{name:'Editorial',platform:'HTB',difficulty:'Easy',os:'Linux',cover:''}},
+    {id:'b2',type:'text',html:'Welcome back. This machine is a <b>content management system</b> with exposed Git. I will walk through the full kill chain.'},
+    {id:'b3',type:'h2',html:'Reconnaissance'},
+    {id:'b4',type:'text',html:'Start with a port scan to find what is listening.'},
+    {id:'b5',type:'code',lang:'bash',theme:'code',src:'nmap -sC -sV -oN nmap.txt -p- 10.10.10.5\n\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9p1\n80/tcp   open  http    nginx 1.18.0'},
+    {id:'b6',type:'h3',html:'Enumerating the web server'},
+    {id:'b7',type:'bullet',html:'Directory fuzzing revealed <code>/.git</code> exposed.'},
+    {id:'b8',type:'bullet',html:'Recovered the full source with <code>git-dumper</code>.'},
+    {id:'b9',type:'callout',html:'The leaked <code>.git</code> directory let me pull the application source and find an exposed API key.',variant:'warning'},
+    {id:'b10',type:'todo',html:'Try the recovered credentials',checked:true},
+    {id:'b11',type:'todo',html:'Escalate via the sudoers file',checked:false},
+    {id:'b12',type:'divider'},
+    {id:'b13',type:'h2',html:'Initial Access'},
+    {id:'b14',type:'text',html:'The API key belonged to a staging service with database access.'}
+  ]},
+  {id:'n5',title:'Block showcase',createdAt:Date.now()-86400000*1,updatedAt:Date.now()-600000,blocks:[
+    {id:'c1',type:'h2',html:'Tables'},
+    {id:'c2',type:'table',header:true,rows:[['Port','State','Service','Version'],['22','open','ssh','OpenSSH 8.9'],['80','open','http','nginx 1.18'],['443','open','https','Apache 2.4']]},
+    {id:'c3',type:'h2',html:'Toggle list'},
+    {id:'c4',type:'toggle',html:'Full nmap output',open:false,children:[
+      {id:'c4a',type:'code',lang:'bash',theme:'code',src:'nmap -sC -sV -p- 10.10.10.5'},
+      {id:'c4b',type:'text',html:'Swapped to /bin/bash for a nicer shell.'}
+    ]},
+    {id:'c5',type:'h2',html:'Table of contents'},
+    {id:'c6',type:'toc'},
+    {id:'c7',type:'h2',html:'Breadcrumb, button, file, audio'},
+    {id:'c8',type:'breadcrumb'},
+    {id:'c9',type:'button',label:'Read the box page',url:'https://app.hackthebox.com'},
+    {id:'c10',type:'file',name:'rockyou.txt',url:'https://example.com/rockyou.txt'},
+    {id:'c11',type:'audio',src:'https://example.com/note.mp3'},
+    {id:'c12',type:'h2',html:'Equation'},
+    {id:'c13',type:'equation',latex:'2^{n} \\equiv 1 \\pmod m'},
+    {id:'c14',type:'h2',html:'Link to page'},
+    {id:'c15',type:'page'}
+  ]},
+  {id:'n2',title:'Jupiter',createdAt:Date.now()-86400000*9,updatedAt:Date.now()-86400000*1,blocks:[
+    {id:'d1',type:'box',html:'',box:{name:'Jupiter',platform:'THM',difficulty:'Medium',os:'Linux',cover:''}},
+    {id:'d2',type:'text',html:'Python pickle deserialization in the notes endpoint.'}
+  ]},
+  {id:'n3',title:'Airplane',createdAt:Date.now()-86400000*20,updatedAt:Date.now()-86400000*6,blocks:[
+    {id:'e1',type:'box',html:'',box:{name:'Airplane',platform:'PG',difficulty:'Very Easy',os:'Windows',cover:''}},
+    {id:'e2',type:'text',html:'Chained CVE-2023-44487 with a log poisoning payload.'}
+  ]},
+  {id:'n4',title:'Jackpot',createdAt:Date.now()-86400000*30,updatedAt:Date.now()-86400000*15,blocks:[
+    {id:'f1',type:'box',html:'',box:{name:'Jackpot',platform:'VulnHub',difficulty:'Hard',os:'Linux',cover:''}},
+    {id:'f2',type:'text',html:'Race condition on the payment webhook.'}
+  ]}
+]));
+/* demo tip blocks */
+(function(){
+  var notes=JSON.parse(localStorage.getItem('writeup_notes_v4')||'[]');
+  var note=notes.filter(function(n){return n.title==='Block showcase';})[0];
+  if(!note)return;
+  var blocks=note.blocks||[];
+  var insertAt=blocks.filter(function(b){return b.type==='h2';}).length;
+  blocks.splice(insertAt,0,
+    {id:'tip-demo-1',type:'tip',html:'Convert the port scan to a table',body:'Paste the nmap output into a table block so the open ports are easy to scan. Keep the raw output in a code block underneath for reference.'},
+    {id:'tip-demo-2',type:'tip',html:'Check robots.txt first',body:'Before fuzzing, read robots.txt — on many boxes it names a hidden directory that gives away the whole attack path.'}
+  );
+  note.blocks=blocks;
+  localStorage.setItem('writeup_notes_v4',JSON.stringify(notes));
+})();
+var q = new URLSearchParams(location.search);
+if (q.get('theme')) localStorage.setItem('writeup_theme', q.get('theme'));
+if (q.get('width')) localStorage.setItem('writeup_width', q.get('width'));
+if (q.get('sort')) localStorage.setItem('writeup_sort', q.get('sort'));
+location.replace('/index.html' + location.hash);</script>
+</body></html>

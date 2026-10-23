@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>prod audit</title>
+<style>body{font:13px/1.6 monospace;background:#0d1117;color:#c9d1d9;padding:14px}
+pre{white-space:pre-wrap}iframe{width:1200px;height:700px;border:1px solid #30363d}</style></head>
+<body><pre id="out">…</pre><iframe id="f" src="/index.html"></iframe>
+<script>
+var out = [];
+function say(k, v) { out.push(k + ' :: ' + JSON.stringify(v)); document.getElementById('out').textContent = out.join('\n'); }
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  setTimeout(function () {
+    var W = w.WriteUp, n = W.getCurrent();
+    n.blocks = [{ id: 'a1', type: 'text', html: 'target 10.10.10.5 and CVE-2021-44228' }];
+    W.persist(); W.render();
+
+    /* count how often the editor mutates over 1.5s of idle time */
+    var ed = d.getElementById('editor');
+    var mutations = 0;
+    var mo = new w.MutationObserver(function (list) { mutations += list.length; });
+    mo.observe(ed, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-type', 'data-id'] });
+
+    setTimeout(function () {
+      mo.disconnect();
+      say('editor mutations while idle (1.5s)', mutations);
+      say('token spans present', ed.querySelectorAll('span[data-tok]').length);
+      var c = ed.querySelector('.block-content');
+      say('html has token markup', /data-tok/.test(c.innerHTML));
+    }, 1500);
+  }, 800);
+});
+</script></body></html>

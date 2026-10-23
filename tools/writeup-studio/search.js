@@ -1,4 +1,4 @@
-/* search.js â€” Ctrl+K command palette: searches titles, box names, content, and AI tags. */
+/* search.js — Ctrl+K command palette: searches titles, box names, content, and AI tags. */
 (function () {
   'use strict';
 
@@ -176,10 +176,11 @@
     if (right && !document.getElementById('search-btn')) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'btn';
+      btn.className = 'btn icon-btn';
       btn.id = 'search-btn';
       btn.title = 'Search (Ctrl+K)';
-      btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i><span>Search</span>';
+      btn.setAttribute('aria-label', 'Search');
+      btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i>';
       right.insertBefore(btn, right.firstChild);
       btn.addEventListener('click', open);
     }
@@ -187,6 +188,7 @@
       if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault(); open();
       }
+      if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') close();
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(init, 500); });

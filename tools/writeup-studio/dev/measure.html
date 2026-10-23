@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>measure</title>
+<style>body{font:13px monospace;background:#111;color:#eee;padding:10px}iframe{width:430px;height:700px;border:1px solid #444}</style>
+</head><body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">measuring…</pre>
+<script>
+if (!localStorage.getItem('writeup_notes_v4')) {
+  localStorage.setItem('writeup_notes_v4', JSON.stringify([{id:'n1',title:'Editorial',createdAt:Date.now(),updatedAt:Date.now(),blocks:[
+    {id:'b1',type:'box',html:'',box:{name:'Editorial',platform:'HTB',difficulty:'Easy',os:'Linux',cover:''}},
+    {id:'b2',type:'text',html:'Welcome back. This machine is a content management system with exposed Git.'},
+    {id:'b3',type:'h2',html:'Reconnaissance'}
+  ]}]));
+  localStorage.setItem('writeup_notes_active','n1');
+}
+document.getElementById('f').addEventListener('load', function(){
+  setTimeout(function(){
+    var d = this.contentDocument, win = this.contentWindow;
+    function w(sel){var e=d.querySelector(sel);return e?Math.round(e.getBoundingClientRect().width):null;}
+    function r(sel){var e=d.querySelector(sel);if(!e)return null;var b=e.getBoundingClientRect();return {l:Math.round(b.left),r:Math.round(b.right),w:Math.round(b.width)};}
+    document.getElementById('out').textContent = JSON.stringify({
+      vw: win.innerWidth,
+      doc: d.documentElement.scrollWidth,
+      app: r('.app'), topbar: r('.topbar'), left: r('.topbar-left'), right: r('.topbar-right'),
+      title: r('.title-field'), meta: r('.title-meta'), input: r('#note-title'),
+      editor: r('#editor'), wrap: r('.editor-wrap'),
+      rightKids: Array.prototype.map.call(d.querySelectorAll('.topbar-right > *'), function(e){return e.className+':'+Math.round(e.getBoundingClientRect().width);})
+    }, null, 1);
+  }.bind(this), 900);
+});
+</script>
+</body></html>

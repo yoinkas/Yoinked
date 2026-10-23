@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>persistence check</title>
+<style>body{font:13px/1.6 monospace;background:#0d1117;color:#c9d1d9;padding:14px}
+pre{white-space:pre-wrap}iframe{width:1200px;height:700px;border:1px solid #30363d}</style></head>
+<body><pre id="out">…</pre><iframe id="f" src="/index.html"></iframe>
+<script>
+var out = [];
+function say(k, v) { out.push(k + ' :: ' + JSON.stringify(v)); document.getElementById('out').textContent = out.join('\n'); }
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  setTimeout(function () {
+    var W = w.WriteUp;
+    say('WriteUp.ready exists', typeof W.ready === 'function');
+    Promise.resolve(W.ready()).then(function () {
+      var n = W.getCurrent();
+      say('notes loaded', (n || []).length);
+      /* write a marker note and confirm it lands in IndexedDB */
+      n.title = 'IDB persistence probe';
+      W.persist();
+      setTimeout(function () {
+        var req = w.indexedDB.open('writeup_db');
+        req.onsuccess = function () {
+          var db = req.result;
+          var tx = db.transaction(['notes'], 'readonly');
+          var all = tx.objectStore('notes').getAll();
+          all.onsuccess = function () {
+            var rows = all.result || [];
+            var titles = rows.map(function (r) { return r.title; });
+            say('rows in IndexedDB', rows.length);
+            say('probe note present in IDB', titles.indexOf('IDB persistence probe') >= 0, titles);
+            say('localStorage mirror', (JSON.parse(w.localStorage.getItem('writeup_notes_v4') || '[]') || []).length);
+            /* clean up the probe */
+            W.getNotes().forEach(function (x) { if (x.title === 'IDB persistence probe') x.title = 'Untitled'; });
+            W.persist();
+          };
+        };
+      }, 700);
+    });
+  }, 900);
+});
+</script></body></html>

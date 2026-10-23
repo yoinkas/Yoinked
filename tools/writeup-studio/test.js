@@ -25,7 +25,7 @@ catch(e){ errors.push('EVAL: '+e.message); }
 
 // App defers init to DOMContentLoaded when readyState==='loading' (correct browser
 // behavior). jsdom fires DOMContentLoaded itself under outside-only, so we just
-// wait for it ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â with a one-shot guard in case it double-fires.
+// wait for it · with a one-shot guard in case it double-fires.
 var didInit=false;
 function afterReady(fn){
   var run=function(){ if(didInit)return; didInit=true; setTimeout(fn,0); };

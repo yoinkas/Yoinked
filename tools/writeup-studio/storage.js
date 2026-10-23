@@ -88,6 +88,7 @@ var Storage={
     return Promise.resolve();
   }
 };
+var MEDIA_DB_NAME='writeup_media_v1', MEDIA_STORE_NAME='media';
 
 function openMediaDB(){
   return new Promise(function(res,rej){

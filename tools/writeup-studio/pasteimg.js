@@ -1,4 +1,4 @@
-/* pasteimg.js â€” Ctrl+V a screenshot from clipboard into an image block.
+/* pasteimg.js — Ctrl+V a screenshot from clipboard into an image block.
    Standalone. app.js untouched. */
 (function () {
   'use strict';

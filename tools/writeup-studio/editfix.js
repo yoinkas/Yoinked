@@ -1,4 +1,4 @@
-/* editfix.js â€” universal trash button + numbered list counter reset.
+/* editfix.js — universal trash button + numbered list counter reset.
    Never edits app.js. Attaches to blocks via MutationObserver. */
 (function () {
   'use strict';
@@ -14,21 +14,21 @@
       '  counter-reset: num;',
       '}',
 
-      /* --- Trash button on LEFT of every block --- */
+      /* --- Trash button (fallback only — app.js provides a rail-mounted one) --- */
       '.block-del {',
       '  position: absolute;',
       '  right: auto !important;',
-      '  left: -58px !important;',
+      '  left: -38px !important;',
       '  top: 4px !important;',
-      '  width: 24px;',
-      '  height: 26px;',
+      '  width: 22px;',
+      '  height: 20px;',
       '  display: none;',
       '  align-items: center;',
       '  justify-content: center;',
       '  color: var(--faint);',
       '  cursor: pointer;',
-      '  border-radius: 5px;',
-      '  font-size: 13px;',
+      '  border-radius: var(--r-xs);',
+      '  font-size: 11px;',
       '  border: 0;',
       '  background: transparent;',
       '  padding: 0;',
@@ -76,7 +76,8 @@
 
   function addTrash(blk) {
     if (!blk || !blk.querySelector) return;
-    if (blk.querySelector(':scope > .block-del')) return;
+    if (blk.querySelector('.block-del')) return;
+    if (blk.querySelector('.block-rail')) return;
     var del = document.createElement('button');
     del.type = 'button';
     del.className = 'block-del';
@@ -91,13 +92,15 @@
     for (var i = 0; i < blocks.length; i++) addTrash(blocks[i]);
   }
 
-  /* Capture-phase click â€” beats app.js and preventDefault stops caret loss */
+  /* Capture-phase click — beats app.js and preventDefault stops caret loss */
   document.addEventListener('click', function (e) {
     if (!e.target.closest) return;
     var del = e.target.closest('.block-del');
     if (!del) return;
     var blk = del.closest('.block');
     if (!blk) return;
+    /* app.js now ships its own rail-mounted delete button — leave it alone. */
+    if (blk.querySelector('.block-rail')) return;
     e.preventDefault();
     e.stopPropagation();
     if (e.stopImmediatePropagation) e.stopImmediatePropagation();

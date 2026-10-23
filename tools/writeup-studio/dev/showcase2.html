@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>feature showcase</title>
+<style>body{margin:0;background:#0b0d12}iframe{width:1280px;height:900px;border:0;display:block}</style></head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  setTimeout(function () {
+    var W = w.WriteUp, n = W.getCurrent();
+    n.tags = ['htb', 'privesc'];
+    n.blocks = [
+      { id: 's1', type: 'h2', html: 'Key findings' },
+      { id: 's2', type: 'text', html: 'The target 10.10.10.5 runs CVE-2021-44228. Flag was HTB{c0ffee}. Hash 5f4dcc3b5aa765d61d8327deb882cf99.' },
+      { id: 's3', type: 'code', lang: 'bash', theme: 'code', src: 'nmap -sC -sV -p- 10.10.10.5\n\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9p1\n80/tcp   open  http    nginx 1.18.0', lines: true },
+      { id: 's4', type: 'todo', html: 'Enumerate the web server', checked: true },
+      { id: 's5', type: 'todo', html: 'Escalate to root', checked: false },
+      { id: 's6', type: 'checklist' },
+      { id: 's7', type: 'mermaid', src: 'graph TD;\n  A[Scan] --> B[Login];\n  B --> C[LFI];\n  C --> D[Root];' }
+    ];
+    W.persist(); W.render();
+    
+  }, 700);
+});
+</script>
+</body></html>

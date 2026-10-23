@@ -1,5 +1,5 @@
-/* slashclick.js â€” makes every /slash menu item clickable.
-   Reuses the app's existing keyboard handler by dispatching ArrowDownÃ—N + Enter.
+/* slashclick.js — makes every /slash menu item clickable.
+   Reuses the app's existing keyboard handler by dispatching ArrowDown×N + Enter.
    Never edits app.js. */
 (function () {
   'use strict';

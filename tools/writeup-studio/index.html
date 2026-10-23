@@ -1,56 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Writeup Studio | Yoinked</title>
-<link rel="stylesheet" href="styles.css">
+<meta name="description" content="A fast, local-first writeup editor for Hack The Box, TryHackMe and self-hosted labs.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" media="print" onload="this.media='all'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236c7bff'/%3E%3Cpath d='M9 21l1-4 9-9 3 3-9 9-4 1z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="app">
+
+  <!-- ══════════ TOP BAR ══════════ -->
   <header class="topbar">
     <div class="topbar-left">
-      <div class="logo"><i class="fa-solid fa-pen-nib"></i><span>Writeup Studio</span></div>
-      <input type="text" id="note-title" placeholder="Untitled" maxlength="200" autocomplete="off">
+      <button class="btn icon-btn only-mobile" id="sidebar-toggle" title="Toggle sidebar" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="logo" title="Writeup Studio">
+        <span class="logo-mark"><i class="fa-solid fa-pen-nib"></i></span>
+        <span class="logo-text">Writeup Studio</span>
+      </div>
+      <div class="title-field">
+        <input type="text" id="note-title" placeholder="Untitled writeup" maxlength="200" autocomplete="off" spellcheck="false">
+        <div class="title-meta" id="title-meta"></div>
+      </div>
     </div>
+
     <div class="topbar-center">
-      <span class="status saved" id="save-status">Saved</span>
+      <span class="status saved" id="save-status"><i class="fa-solid fa-check"></i><span>Saved</span></span>
       <span class="word-count" id="word-count">0 words</span>
     </div>
+
     <div class="topbar-right">
-      <button class="btn" id="export-html-btn" title="Export standalone HTML"><i class="fa-solid fa-globe"></i><span>HTML</span></button>
-      <button class="btn" id="export-md-btn" title="Export Markdown"><i class="fa-brands fa-markdown"></i><span>MD</span></button>
-      <button class="btn" id="import-btn" title="Import HTML or Markdown file"><i class="fa-solid fa-file-import"></i><span>Import</span></button>
+      <!-- search.js injects #search-btn here -->
+      <!-- ai.js injects the AI button here -->
+      <!-- mediaupload.js injects the upload button here -->
+      <button class="btn icon-btn" id="toc-toggle" title="Toggle outline (Ctrl+Shift+O)" aria-label="Toggle outline">
+        <i class="fa-solid fa-sitemap"></i>
+      </button>
+      <button class="btn icon-btn" id="tips-btn" title="Tips" aria-label="Tips">
+        <i class="fa-solid fa-lightbulb"></i>
+      </button>
       <button class="btn yoinked-action" id="btn-save-disk" type="button" title="Save this writeup into the Yoinked project"><i class="fa-solid fa-folder-plus"></i><span>Add to Yoinked</span></button>
-      <button class="btn primary" id="new-note-btn" title="New writeup"><i class="fa-solid fa-plus"></i><span>New</span></button>
-      
-      <!-- Tools Dropdown -->
-      <div id="custom-tools-container" style="position: relative; display: inline-block; vertical-align: middle; margin-left: 10px;">
-          <button id="custom-tools-btn" class="btn" style="background: #4f46e5; color: white;">Ã¢Å¡â„¢Ã¯Â¸Â Tools</button>
-          <div id="custom-tools-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: #1e1e1e; border: 1px solid #333; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); min-width: 180px; margin-top: 5px; z-index: 9999;">
-              <a href="#" id="btn-pdf" style="display: block; padding: 10px 15px; text-decoration: none; color: #eee; font-size: 14px; border-bottom: 1px solid #333;">Ã°Å¸â€œâ€ž Save as PDF</a>
-              <a href="#" id="btn-json" style="display: block; padding: 10px 15px; text-decoration: none; color: #eee; font-size: 14px; border-bottom: 1px solid #333;">Ã°Å¸â€œÂ¦ Export as JSON</a>
-              <a href="#" id="btn-clear" style="display: block; padding: 10px 15px; text-decoration: none; color: #ff5555; font-size: 14px;">Ã°Å¸â€”â€˜Ã¯Â¸Â Clear Local Storage</a>
-          </div>
+      <button class="btn primary" id="new-note-btn" title="New writeup (Ctrl+N)">
+        <i class="fa-solid fa-plus"></i><span>New</span>
+      </button>
+      <div class="menu-wrap" id="more-wrap">
+        <button class="btn icon-btn" id="more-btn" title="More actions" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <div class="menu" id="more-menu" role="menu">
+          <div class="menu-label">Files</div>
+          <button class="menu-item" id="import-btn" role="menuitem"><i class="fa-solid fa-file-import"></i><span>Import HTML / Markdown</span></button>
+          <div class="menu-label">Export</div>
+          <button class="menu-item" id="export-html-btn" role="menuitem"><i class="fa-solid fa-globe"></i><span>Standalone HTML</span></button>
+          <button class="menu-item" id="export-md-btn" role="menuitem"><i class="fa-brands fa-markdown"></i><span>Markdown file</span></button>
+          <button class="menu-item" id="btn-json" role="menuitem"><i class="fa-solid fa-file-code"></i><span>Backup (JSON)</span></button>
+          <button class="menu-item" id="btn-pdf" role="menuitem"><i class="fa-solid fa-file-pdf"></i><span>Print / Save as PDF</span></button>
+          <div class="menu-sep"></div>
+          <div class="menu-label">View</div>
+          <button class="menu-item" id="toc-btn" role="menuitem"><i class="fa-solid fa-sitemap"></i><span>Outline</span><kbd>Ctrl+Shift+O</kbd></button>
+          <button class="menu-item" id="tips-menu-btn" role="menuitem"><i class="fa-solid fa-lightbulb"></i><span>Tips</span></button>
+          <button class="menu-item" id="focus-btn" role="menuitem"><i class="fa-solid fa-expand"></i><span>Focus mode</span><kbd>Ctrl+Shift+F</kbd></button>
+          <button class="menu-item" id="theme-btn" role="menuitem"><i class="fa-solid fa-moon"></i><span>Theme</span><em id="theme-label">Dark</em></button>
+          <button class="menu-item" id="width-btn" role="menuitem"><i class="fa-solid fa-arrows-left-right"></i><span>Editor width</span><em id="width-label">Comfortable</em></button>
+          <div class="menu-sep"></div>
+          <div class="menu-label">Data</div>
+          <button class="menu-item" id="shortcuts-btn" role="menuitem"><i class="fa-solid fa-keyboard"></i><span>Keyboard shortcuts</span><kbd>Ctrl+/</kbd></button>
+          <button class="menu-item danger" id="btn-clear" role="menuitem"><i class="fa-solid fa-trash"></i><span>Clear local storage</span></button>
+        </div>
       </div>
-      <input type="file" id="import-file" class="file-hidden" accept=".html,.htm,.md,.markdown,.txt">
     </div>
   </header>
+
+  <!-- ══════════ BODY ══════════ -->
   <div class="body-row">
     <aside class="sidebar" id="sidebar">
-      <div class="side-head"><span class="side-title">Writeups</span><span class="side-count" id="side-count">0</span></div>
-      <div class="side-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="side-search" placeholder="Search boxes..." autocomplete="off"></div>
+      <div class="side-head">
+        <span class="side-title">Writeups</span>
+        <span class="side-count" id="side-count">0</span>
+        <div class="side-head-actions">
+          <button class="icon-btn ghost" id="sort-btn" title="Sort writeups"><i class="fa-solid fa-arrow-down-short-wide"></i></button>
+          <button class="icon-btn ghost" id="new-note-btn-2" title="New writeup"><i class="fa-solid fa-plus"></i></button>
+        </div>
+      </div>
+      <div class="side-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="side-search" placeholder="Filter writeups…" autocomplete="off" spellcheck="false">
+        <button class="side-search-clear" id="side-search-clear" title="Clear"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <!-- ai.js injects the technique/tag list here -->
+      <div class="side-tags" id="side-tags"></div>
       <div class="notes-list" id="notes-list"></div>
+      <div class="side-foot">
+        <span id="side-foot-text">0 writeups</span>
+        <button class="link-btn" id="side-foot-action"><i class="fa-solid fa-plus"></i> New</button>
+      </div>
     </aside>
-    <main class="editor-wrap" id="editor-wrap"><div id="editor"></div></main>
+
+    <div class="scrim" id="scrim"></div>
+
+    <main class="editor-wrap" id="editor-wrap">
+      <div class="progress"><div class="progress-bar" id="read-progress"></div></div>
+      <div id="editor"></div>
+    </main>
+
+    <!-- Outline / table of contents -->
+    <aside class="toc-panel" id="toc-panel" aria-label="Outline">
+      <div class="toc-head">
+        <span class="toc-title">Outline</span>
+        <button class="icon-btn ghost" id="toc-close" title="Close outline"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="toc-list" id="toc-list"></div>
+    </aside>
+
   </div>
+
+  <!-- ══════════ BOTTOM BAR ══════════ -->
   <footer class="bottombar">
-    <div class="bottombar-left"><span id="save-text">Browser changes saved</span><span class="project-path" id="project-path">Checking project storage...</span></div>
-    <div class="bottombar-right"><span id="block-count">0 blocks</span><span class="dot"></span><span id="chars-count">0 chars</span><span class="dot"></span><span class="hint">Type <b>/</b> for commands</span></div>
+    <div class="bottombar-left">
+      <span id="save-text">Browser changes saved</span>
+      <span class="project-path" id="project-path">Checking project storage...</span>
+      <span class="disk-state" id="disk-state"></span>
+      <span id="read-time">1 min read</span>
+    </div>
+    <div class="bottombar-right">
+      <span id="block-count">0 blocks</span>
+      <span class="dot"></span>
+      <span id="chars-count">0 chars</span>
+      <span class="dot"></span>
+      <span class="hint">Type <b>/</b> for commands</span>
+    </div>
   </footer>
 </div>
+
+<!-- ══════════ FLOATING UI ══════════ -->
 <div class="slash-menu" id="slash-menu" style="display:none"></div>
+
 <div class="format-toolbar" id="format-toolbar" style="display:none">
   <button data-action="bold" title="Bold (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
   <button data-action="italic" title="Italic (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
@@ -64,18 +154,58 @@
   <span class="fmt-sep"></span>
   <button data-action="h1" title="Heading 1">H1</button>
   <button data-action="h2" title="Heading 2">H2</button>
+  <button data-action="h3" title="Heading 3">H3</button>
   <button data-action="clear" title="Clear formatting"><i class="fa-solid fa-eraser"></i></button>
 </div>
+
 <div class="color-pop" id="color-pop" style="display:none">
   <div class="color-label">Text</div><div class="color-grid" id="text-color-grid"></div>
   <div class="color-label">Highlight</div><div class="color-grid" id="bg-color-grid"></div>
 </div>
+
+<!-- Tip popup -->
+<div class="modal-back" id="tip-modal" style="display:none">
+  <div class="modal tip-modal" role="dialog" aria-modal="true" aria-label="Tip">
+    <div class="modal-head">
+      <div class="tip-head">
+        <span class="tip-badge"><i class="fa-solid fa-lightbulb"></i></span>
+        <div class="tip-head-text">
+          <h2 id="tip-modal-title">Tip</h2>
+          <p id="tip-modal-sub"></p>
+        </div>
+      </div>
+      <button class="modal-x" id="tip-modal-x" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="tip-view" id="tip-modal-view"></div>
+    <div class="tip-edit" id="tip-modal-edit" style="display:none">
+      <input class="tip-title-input" id="tip-modal-title-input" placeholder="Tip title" autocomplete="off">
+      <textarea class="tip-body-input" id="tip-modal-body" placeholder="Write the tip, hint or reminder…"></textarea>
+    </div>
+    <div class="tip-nav" id="tip-modal-nav"></div>
+    <div class="m-actions tip-actions">
+      <button class="btn" id="tip-modal-delete"><i class="fa-solid fa-trash"></i><span>Delete tip</span></button>
+      <span class="tip-spacer"></span>
+      <button class="btn" id="tip-modal-cancel" style="display:none">Cancel</button>
+      <button class="btn" id="tip-modal-edit-btn">Edit</button>
+      <button class="btn primary" id="tip-modal-save" style="display:none">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- New writeup modal -->
 <div class="modal-back" id="new-modal" style="display:none">
   <div class="modal" role="dialog" aria-modal="true" aria-label="New writeup">
-    <div class="modal-head"><div><h2>New writeup</h2><p>Fill out the box info to start.</p></div><button class="modal-x" id="new-modal-x" title="Cancel"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-head">
+      <div><h2>New writeup</h2><p>Give it a name to get started.</p></div>
+      <button class="modal-x" id="new-modal-x" title="Cancel"><i class="fa-solid fa-xmark"></i></button>
+    </div>
     <label class="m-field">Box name<input id="m-name" placeholder="e.g. Editorial" autocomplete="off"></label>
     <div class="m-field">Cover photo <span class="m-opt">(optional)</span>
-      <div class="m-upload-row"><button class="btn" id="m-cover-btn" type="button"><i class="fa-solid fa-upload"></i><span>Upload</span></button><span class="m-file-name" id="m-file-name">No file chosen</span><button class="btn m-rm" id="m-cover-rm" type="button" style="display:none">Remove</button></div>
+      <div class="m-upload-row">
+        <button class="btn" id="m-cover-btn" type="button"><i class="fa-solid fa-upload"></i><span>Upload</span></button>
+        <span class="m-file-name" id="m-file-name">No file chosen</span>
+        <button class="btn m-rm" id="m-cover-rm" type="button" style="display:none">Remove</button>
+      </div>
       <input type="file" id="m-cover-file" class="file-hidden" accept="image/*">
       <span class="m-preview" id="m-preview" style="display:none"><img id="m-preview-img" alt="Cover preview"></span>
     </div>
@@ -85,241 +215,68 @@
       <label class="m-field">OS<select id="m-os"><option>Linux</option><option>Windows</option><option>Other</option></select></label>
     </div>
     <div class="m-err" id="m-err" style="display:none">Box name is required.</div>
-    <div class="m-actions"><button class="btn" id="m-cancel">Cancel</button><button class="btn primary" id="m-create"><i class="fa-solid fa-plus"></i><span>Create</span></button></div>
+    <div class="m-actions">
+      <button class="btn" id="m-cancel">Cancel</button>
+      <button class="btn primary" id="m-create"><i class="fa-solid fa-plus"></i><span>Create</span></button>
+    </div>
   </div>
 </div>
+
+<!-- Keyboard shortcuts modal -->
+<div class="modal-back" id="shortcuts-modal" style="display:none">
+  <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+    <div class="modal-head">
+      <div><h2>Keyboard shortcuts</h2><p>Move faster without leaving the keyboard.</p></div>
+      <button class="modal-x" id="shortcuts-x" title="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="shortcut-grid">
+      <div class="shortcut-col">
+        <div class="shortcut-group">Documents</div>
+        <div class="shortcut-row"><span>New writeup</span><kbd>Ctrl</kbd><kbd>N</kbd></div>
+        <div class="shortcut-row"><span>Search everything</span><kbd>Ctrl</kbd><kbd>K</kbd></div>
+        <div class="shortcut-row"><span>Save now</span><kbd>Ctrl</kbd><kbd>S</kbd></div>
+        <div class="shortcut-row"><span>Export Markdown</span><kbd>Ctrl</kbd><kbd>E</kbd></div>
+        <div class="shortcut-row"><span>Print / PDF</span><kbd>Ctrl</kbd><kbd>P</kbd></div>
+      </div>
+      <div class="shortcut-col">
+        <div class="shortcut-group">Editing</div>
+        <div class="shortcut-row"><span>Bold</span><kbd>Ctrl</kbd><kbd>B</kbd></div>
+        <div class="shortcut-row"><span>Italic</span><kbd>Ctrl</kbd><kbd>I</kbd></div>
+        <div class="shortcut-row"><span>Underline</span><kbd>Ctrl</kbd><kbd>U</kbd></div>
+        <div class="shortcut-row"><span>Insert link</span><kbd>Ctrl</kbd><kbd>K</kbd></div>
+        <div class="shortcut-row"><span>Command palette</span><kbd>/</kbd></div>
+      </div>
+      <div class="shortcut-col">
+        <div class="shortcut-group">View</div>
+        <div class="shortcut-row"><span>Toggle outline</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>O</kbd></div>
+        <div class="shortcut-row"><span>Focus mode</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>F</kbd></div>
+        <div class="shortcut-row"><span>Cycle theme</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>L</kbd></div>
+        <div class="shortcut-row"><span>Toggle sidebar</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>S</kbd></div>
+        <div class="shortcut-row"><span>Shortcuts help</span><kbd>Ctrl</kbd><kbd>/</kbd></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<input type="file" id="import-file" class="file-hidden" accept=".html,.htm,.md,.markdown,.txt,.json">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script src="storage.js"></script>
 <script src="ollama.js"></script>
 <script src="ai.js"></script>
 <script src="app.js"></script>
+<script src="tips.js"></script>
+<script src="extras.js"></script>
+<script src="ui.js"></script>
+<script src="search.js"></script>
 <script src="slashclick.js"></script>
 <script src="editfix.js"></script>
 <script src="mediaupload.js"></script>
 <script src="codeblocks.js"></script>
+<script src="pasteimg.js"></script>
 <script src="project-sync.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('custom-tools-btn');
-    const dropdown = document.getElementById('custom-tools-dropdown');
-    
-    btn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'; });
-    document.addEventListener('click', () => { dropdown.style.display = 'none'; });
-
-    document.getElementById('btn-pdf').addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        alert('Generating PDF... This might take a moment.');
-        try {
-            const canvas = await html2canvas(document.body, { scale: 2 });
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('writeup.pdf');
-        } catch (e) { alert('Error generating PDF: ' + e.message); }
-    });
-
-    document.getElementById('btn-json').addEventListener('click', () => {
-        const data = localStorage.getItem('writeup_notes_v4') || '{}';
-        const blob = new Blob([data], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'writeup_backup.json'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    document.getElementById('btn-clear').addEventListener('click', () => {
-        if(confirm("WARNING: This will delete all your notes from this browser. Are you sure?")) { localStorage.clear(); location.reload(); }
-    });
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const importBtn = document.getElementById('import-btn');
-    let importFile = document.getElementById('import-file');
-    const editor = document.getElementById('editor');
-    const titleInput = document.getElementById('note-title');
-
-    if (importBtn && importFile) {
-        // Clone to remove app.js's broken listener
-        const newImportFile = importFile.cloneNode(true);
-        importFile.parentNode.replaceChild(newImportFile, importFile);
-
-        importBtn.addEventListener('click', () => { newImportFile.click(); });
-
-        newImportFile.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const fileContent = event.target.result;
-
-                if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(fileContent, 'text/html');
-
-                    const docTitle = doc.querySelector('title');
-                    if (titleInput) {
-                        titleInput.value = docTitle ? docTitle.innerText : file.name.replace(/\.[^/.]+$/, "");
-                        titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-
-                    // 1. Strip massive base64 video/images to prevent freezing
-                    let bodyHTML = doc.body.innerHTML;
-                    bodyHTML = bodyHTML.replace(/<video[^>]*>.*?<\/video>/gs, '<p style="color: #ff5555; font-weight: bold; padding: 10px; border: 1px solid #ff5555; border-radius: 5px; text-align:center;">[Video removed during import because it was too large]</p>');
-                    bodyHTML = bodyHTML.replace(/<img[^>]+src="data:image\/[^"]+"[^>]*>/g, '<p style="color: #ff5555; font-weight: bold; text-align:center;">[Image removed during import because it was too large]</p>');
-
-                    // 2. Parse cleaned HTML
-                    const cleanedDoc = new DOMParser().parseFromString(bodyHTML, 'text/html');
-
-                    // 3. Translate standard <pre> tags into app-specific code blocks
-                    const preBlocks = cleanedDoc.querySelectorAll('pre');
-                    preBlocks.forEach((pre, i) => {
-                        let code = pre.querySelector('code');
-                        let lang = 'bash';
-                        if (code && code.className) {
-                            let match = code.className.match(/language-(\w+)/);
-                            if (match) lang = match[1];
-                        }
-                        
-                        let contentText = pre.textContent || '';
-                        contentText = contentText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-                        let block = cleanedDoc.createElement('div');
-                        block.className = 'block';
-                        block.setAttribute('data-type', 'code');
-                        block.setAttribute('data-id', 'code-' + Date.now() + '-' + i);
-                        
-                        // This exact structure allows codeblocks.js to attach themes automatically
-                        block.innerHTML = `
-                            <div class="code-head">
-                                <div class="term-dots"><span></span><span></span><span></span></div>
-                                <div class="term-title">Terminal</div>
-                                <span class="code-lang">${lang}</span>
-                                <button class="code-copy" contenteditable="false"><i class="fa-solid fa-copy"></i></button>
-                            </div>
-                            <div class="block-content" contenteditable="true"><pre style="margin:0; padding:0; background:transparent; color:inherit; font-family:inherit; font-size:inherit; white-space:pre-wrap;">${contentText}</pre></div>
-                        `;
-                        
-                        pre.replaceWith(block);
-                    });
-
-                    // 4. Inject into editor
-                    if (editor) {
-                        editor.innerHTML = cleanedDoc.body.innerHTML;
-                        
-                        // Trigger input event so app.js saves it
-                        editor.dispatchEvent(new Event('input', { bubbles: true }));
-                        
-                        // Trigger a paste event just in case app.js parses pastes
-                        try {
-                            const pasteEvent = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: new DataTransfer() });
-                            editor.dispatchEvent(pasteEvent);
-                        } catch (err) {}
-                    }
-                } else if (file.name.match(/\.(md|txt|markdown)$/i)) {
-                    if (titleInput) {
-                        titleInput.value = file.name.replace(/\.[^/.]+$/, "");
-                        titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                    if (editor) {
-                        editor.innerText = fileContent;
-                        editor.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                }
-            };
-            reader.readAsText(file);
-            newImportFile.value = ''; 
-        });
-    }
-});
-</script>
-
-<!-- Retained for reference only: the old implicit autosync caused stale merges. -->
-<script type="text/plain">
-(function() {
-    const originalSetItem = Storage.prototype.setItem;
-    
-    // Intercept setItem to prevent QuotaExceededError from breaking app.js
-    Storage.prototype.setItem = function(key, value) {
-        if (key === 'writeup_notes_v4') {
-            try {
-                originalSetItem.call(this, key, value);
-            } catch (e) {
-                console.warn("LocalStorage full. Save will only go to backend.");
-            }
-            
-            // Sync the most recently updated note to the backend
-            try {
-                const notes = JSON.parse(value);
-                if (Array.isArray(notes) && notes.length > 0) {
-                    // Sort by updatedAt to find the one we just saved
-                    notes.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-                    const latest = notes[0];
-                    
-                    const formData = new FormData();
-                    formData.append('writeup', JSON.stringify(latest));
-                    
-                    fetch('/api/save', { method: 'POST', body: formData })
-                        .then(r => r.json())
-                        .then(d => {
-                            if(d.success) console.log('âœ… Synced to backend disk!');
-                        })
-                        .catch(err => console.error('Backend sync failed', err));
-                }
-            } catch (e) {
-                console.error("Failed to parse for backend sync", e);
-            }
-        } else {
-            originalSetItem.call(this, key, value);
-        }
-    };
-
-    // On load, fetch from backend and merge into UI
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(async () => {
-            try {
-                const res = await fetch('/api/writeups');
-                if (!res.ok) return;
-                const backendNotes = await res.json();
-                
-                if (Array.isArray(backendNotes) && backendNotes.length > 0) {
-                    let updated = false;
-                    const currentNotesStr = localStorage.getItem('writeup_notes_v4') || '[]';
-                    let currentNotes = JSON.parse(currentNotesStr);
-                    
-                    backendNotes.forEach(bNote => {
-                        if (!currentNotes.find(n => n.id === bNote.id)) {
-                            currentNotes.push(bNote);
-                            updated = true;
-                        }
-                    });
-
-                    if (updated) {
-                        console.log("Merged backend notes into local storage.");
-                        // Bypass interceptor so we don't re-upload everything
-                        originalSetItem.call(localStorage, 'writeup_notes_v4', JSON.stringify(currentNotes));
-                        
-                        // If the app's notes array is global, update it and re-render
-                        if (typeof notes !== 'undefined' && Array.isArray(notes)) {
-                             notes.length = 0;
-                             currentNotes.forEach(n => notes.push(n));
-                             if (typeof renderNotes === 'function') renderNotes();
-                        } else {
-                            location.reload(); // Fallback
-                        }
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to load backend notes", e);
-            }
-        }, 1500); // Wait 1.5s for app.js to finish booting
-    });
-})();
-</script>
 </body>
 </html>

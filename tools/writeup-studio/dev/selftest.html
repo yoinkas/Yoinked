@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>writeup selftest</title>
+<style>body{font:13px/1.6 monospace;background:#0d1117;color:#c9d1d9;padding:16px}
+pre{white-space:pre-wrap}iframe{width:1200px;height:800px;border:1px solid #30363d;margin-top:12px}
+.ok{color:#3fb950}.bad{color:#f85149}</style></head>
+<body>
+<pre id="out">running…</pre>
+<iframe id="f" src="/index.html"></iframe>
+<script>
+var log = [], fails = 0;
+function say(k, v, pass) {
+  if (!pass) fails++;
+  var line = (pass ? 'PASS ' : 'FAIL ') + k + ' :: ' + JSON.stringify(v);
+  log.push(line);
+  document.getElementById('out').innerHTML = log.map(function (l) {
+    return '<span class="' + (l.indexOf('PASS') === 0 ? 'ok' : 'bad') + '">' + l + '</span>';
+  }).join('\n');
+}
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  w.addEventListener('error', function (e) { say('JS ERROR: ' + e.message, e.filename + ':' + e.lineno, false); });
+  function q(s) { return d.querySelector(s); }
+  function qa(s) { return Array.prototype.slice.call(d.querySelectorAll(s)); }
+  function T(ms, fn) { return new Promise(function (r) { setTimeout(function () { fn(); r(); }, ms); }); }
+  function eq(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+
+  (async function () {
+    await T(700, function () {
+      say('app loaded', !!w.WriteUp, !!w.WriteUp);
+      var W = w.WriteUp, n = W.getCurrent();
+      n.blocks = [
+        { id: 'st-t1', type: 'h2', html: 'Section' },
+        { id: 'st-1', type: 'code', lang: 'bash', theme: 'code', src: 'id\nwhoami' },
+        { id: 'st-t2', type: 'text', html: 'after the code' }
+      ];
+      W.persist(); W.render();
+    });
+
+    await T(400, function () {
+      var W = w.WriteUp;
+      var before = W.getCurrent().blocks.length;
+      var code = q('.block[data-type=code]');
+      say('code block rendered', !!code, !!code);
+      say('rail delete button on code block', !!q('.block[data-type=code] .block-del'), !!q('.block[data-type=code] .block-del'));
+      say('code header delete button', !!q('.block[data-type=code] .code-del'), !!q('.block[data-type=code] .code-del'));
+      say('code header tools', qa('.block[data-type=code] .code-tools button').map(function (b) { return b.className; }), true);
+      /* is the block rail (+ button) actually visible on a code block? */
+      (function () {
+        var blk = q('.block[data-type=code]');
+        var add = blk.querySelector('.block-add');
+        var grip = blk.querySelector('.drag-handle');
+        var del = blk.querySelector('.block-del');
+        function visible(el) {
+          if (!el) return false;
+          var r = el.getBoundingClientRect();
+          if (!r.width || !r.height) return false;
+          var hit = d.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return !!(hit && (hit === el || el.contains(hit)));
+        }
+        say('code block: + button visible', visible(add), visible(add));
+        say('code block: grip visible', visible(grip), visible(grip));
+        say('code block: delete visible', visible(del), visible(del));
+        var br = blk.getBoundingClientRect();
+        var ar = add ? add.getBoundingClientRect() : null;
+        say('code block rail position', { blockLeft: Math.round(br.left), addRight: ar ? Math.round(ar.right) : null, addVisible: ar ? (ar.right <= br.left + 2) : null }, true);
+      })();
+    });
+
+    /* delete via the code header button */
+    await T(200, function () {
+      var W = w.WriteUp;
+      var before = W.getCurrent().blocks.length;
+      q('.block[data-type=code] .code-del').click();
+      setTimeout(function () {
+        var after = W.getCurrent().blocks.length;
+        say('code header delete removes the block', { before: before, after: after }, after === before - 1);
+        say('no code blocks left in the DOM', qa('.block[data-type=code]').length, qa('.block[data-type=code]').length === 0);
+        say('sibling text block kept', qa('.block[data-type=text]').length, qa('.block[data-type=text]').length === 1);
+        say('heading kept', qa('.block[data-type=h2]').length, qa('.block[data-type=h2]').length === 1);
+      }, 350);
+    });
+
+    /* the broom clears but keeps the block */
+    await T(1200, function () {
+      var W = w.WriteUp, n = W.getCurrent();
+      n.blocks = [{ id: 'st-c2', type: 'code', lang: 'bash', theme: 'code', src: 'rm -rf /' }];
+      W.persist(); W.render();
+    });
+    await T(400, function () {
+      var W = w.WriteUp;
+      var code = q('.block[data-type=code]');
+      say('wipe button present', !!code.querySelector('.code-wipe'), !!code.querySelector('.code-wipe'));
+      say('theme button present', !!code.querySelector('.code-theme-btn'), !!code.querySelector('.code-theme-btn'));
+      say('copy button present', !!code.querySelector('.code-copy'), !!code.querySelector('.code-copy'));
+    });
+
+    /* tip popup */
+    await T(300, function () {
+      var W = w.WriteUp, n = W.getCurrent();
+      n.blocks = [
+        { id: 'st-tip', type: 'tip', html: 'a tip', body: 'body text' },
+        { id: 'st-tip2', type: 'tip', html: 'another tip', body: 'more notes' }
+      ];
+      W.persist(); W.render();
+    });
+    await T(400, function () {
+      say('side panel gone', !q('#tips-panel'), !q('#tips-panel'));
+      say('tip popup exists', !!q('#tip-modal'), !!q('#tip-modal'));
+      /* clicking the tip in the document opens the popup */
+      var blk = q('.block[data-type=tip]');
+      blk.click();
+      setTimeout(function () {
+        say('popup opens on click', q('#tip-modal').style.display === 'flex', q('#tip-modal').style.display === 'flex');
+        say('popup shows the title', q('#tip-modal-title').textContent, q('#tip-modal-title').textContent === 'a tip');
+        say('popup shows the note', (q('#tip-modal-view').textContent || '').indexOf('body text') >= 0, (q('#tip-modal-view').textContent || '').indexOf('body text') >= 0);
+        say('other tips listed', qa('.tip-chip').length, qa('.tip-chip').length === 1);
+        /* edit mode */
+        q('#tip-modal-edit-btn').click();
+        setTimeout(function () {
+          say('edit mode shows inputs', q('#tip-modal-edit').style.display !== 'none', q('#tip-modal-edit').style.display !== 'none');
+          say('body input prefilled', q('#tip-modal-body').value, q('#tip-modal-body').value === 'body text');
+          try {
+            var W = w.WriteUp;
+            q('#tip-modal-body').value = 'edited note';
+            q('#tip-modal-save').click();
+            var t = W.getCurrent().blocks.filter(function (b) { return b.id === 'st-tip'; })[0];
+            say('save persists the note', t ? t.body : '', t && t.body === 'edited note');
+            say('back to view mode', q('#tip-modal-edit').style.display === 'none', q('#tip-modal-edit').style.display === 'none');
+            /* browse all tips */
+            q('#tips-btn').click();
+            say('browse lists every tip', qa('.tip-card').length, qa('.tip-card').length === 2);
+            /* delete */
+            q('#tip-modal-delete').click();
+            say('delete removes the tip', W.getCurrent().blocks.length, W.getCurrent().blocks.length === 1);
+            say('DONE', fails === 0, fails === 0);
+          } catch (err) { say('SAVE THREW: ' + err.message, String(err.stack).slice(0, 300), false); }
+        }, 200);
+      }, 250);
+    });
+  })();
+});
+</script>
+</body></html>

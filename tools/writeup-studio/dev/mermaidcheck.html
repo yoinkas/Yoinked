@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>mermaid check</title>
+<style>body{font:13px monospace;background:#0d1117;color:#c9d1d9;padding:12px}iframe{width:1200px;height:700px;border:1px solid #30363d}</style></head>
+<body><pre id="out">…</pre><iframe id="f" src="/index.html"></iframe>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  var d = this.contentDocument, w = this.contentWindow;
+  setTimeout(function () {
+    var W = w.WriteUp, n = W.getCurrent();
+    n.blocks = [{ id: 'm1', type: 'mermaid', src: 'graph TD;\n  A[Scan] --> B[Login];\n  B --> C[LFI];' }];
+    W.persist(); W.render();
+    setTimeout(function () {
+      var out = d.querySelector('.mermaid-out');
+      document.getElementById('out').textContent = JSON.stringify({
+        mermaidLoaded: !!w.mermaid,
+        outHtmlLen: out ? out.innerHTML.length : -1,
+        hasSvg: !!(out && out.querySelector('svg')),
+        outText: out ? out.textContent.slice(0, 120) : ''
+      }, null, 1);
+    }, 3000);
+  }, 800);
+});
+</script></body></html>

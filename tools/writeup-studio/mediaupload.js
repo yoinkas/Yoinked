@@ -1,4 +1,4 @@
-/* mediaupload.js â€” no URL prompts. /image and /video open a file picker.
+/* mediaupload.js — no URL prompts. /image and /video open a file picker.
    Also keeps uploaded videos rendered as real <video> elements.
    app.js untouched. */
 (function () {
@@ -102,10 +102,44 @@
       r.onprogress = function (e) {
         if (e.lengthComputable) {
           var pct = Math.round(e.loaded / e.total * 100);
-          showProg('Reading ' + file.name + ' â€” ' + pct + '%');
+          showProg('Reading ' + file.name + ' — ' + pct + '%');
         }
       };
       r.readAsDataURL(file);
+    });
+  }
+
+  /* ---------- image compression ----------
+     Screenshots straight off the clipboard are multi-megabyte PNGs. Downscale
+     and re-encode so a writeup does not blow the localStorage quota. */
+  var IMG_MAX = 1600, IMG_QUALITY = 0.86, IMG_SKIP_BYTES = 400 * 1024;
+
+  function optimizeImage(file) {
+    return new Promise(function (resolve) {
+      if (!/^image\//.test(file.type)) return resolve(null);
+      var reader = new FileReader();
+      reader.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+          var w = img.width, h = img.height;
+          if (w <= IMG_MAX && h <= IMG_MAX && file.size <= IMG_SKIP_BYTES) return resolve(reader.result);
+          var sc = Math.min(1, IMG_MAX / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * sc)), ch = Math.max(1, Math.round(h * sc));
+          var cvs = document.createElement('canvas');
+          cvs.width = cw; cvs.height = ch;
+          var ctx = cvs.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.drawImage(img, 0, 0, cw, ch);
+          var out;
+          try { out = cvs.toDataURL('image/jpeg', IMG_QUALITY); } catch (e) { out = reader.result; }
+          resolve(out);
+        };
+        img.onerror = function () { resolve(reader.result); };
+        img.src = reader.result;
+      };
+      reader.onerror = function () { resolve(null); };
+      reader.readAsDataURL(file);
     });
   }
 
@@ -123,7 +157,8 @@
         return;
       }
       showProg('Reading ' + file.name + '...');
-      return readFile(file).then(function (url) {
+      return optimizeImage(file).then(function (url) {
+        if (!url) { throw new Error('read failed'); }
         var img = blk.querySelector('img');
         if (img) { img.setAttribute('src', url); img.style.display = ''; }
         var cap = blk.querySelector('.img-cap');
@@ -245,7 +280,9 @@
     inp.id = 'media-upload-input';
 
     var importBtn = document.getElementById('import-btn');
-    if (importBtn && importBtn.parentNode === right) right.insertBefore(btn, importBtn);
+    var newBtn = document.getElementById('new-note-btn');
+    if (newBtn && newBtn.parentNode === right) right.insertBefore(btn, newBtn);
+    else if (importBtn && importBtn.parentNode === right) right.insertBefore(btn, importBtn);
     else right.appendChild(btn);
     btn.parentNode.insertBefore(inp, btn.nextSibling);
 
@@ -292,7 +329,9 @@
       var f = accepted[idx];
       var isImg = /^image\//.test(f.type);
       showProg('Reading ' + f.name + ' (' + (idx + 1) + '/' + accepted.length + ')');
-      readFile(f).then(function (url) {
+      var read = isImg ? optimizeImage(f) : readFile(f);
+      read.then(function (url) {
+        if (!url) { step(idx + 1); return; }
         var id = 'b-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
         var blk;
         if (isImg) {
