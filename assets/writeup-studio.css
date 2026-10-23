@@ -1,0 +1,388 @@
+/* ============================================================
+   Writeup Studio — reader skin for self-hosted writeups
+   Mirrors the design system of Writeup Studio (the notes app):
+   dark canvas, Inter + JetBrains Mono, #6c7bff accent,
+   Notion-style terminal code panels. Scoped under body.ws-doc
+   so the rest of the site keeps its green cyber theme.
+   Static posts use <article class="post">, JS-rendered ones use
+   <article class="post-shell"> — both are covered via :is().
+   ============================================================ */
+
+body.ws-doc {
+  /* ---------- Writeup Studio tokens (dark theme) ---------- */
+  --ws-bg: #0b0d12;
+  --ws-panel: #12151d;
+  --ws-panel-2: #171b25;
+  --ws-hover: #1f2532;
+  --ws-hover-2: #262d3d;
+  --ws-border: #242a38;
+  --ws-border-2: #323a4c;
+  --ws-text: #e7eaf3;
+  --ws-text-2: #99a1b3;
+  --ws-faint: #636c81;
+  --ws-accent: #6c7bff;
+  --ws-accent-2: #9d6bff;
+  --ws-accent-soft: rgba(108, 123, 255, 0.16);
+  --ws-blue: #4aa8e0;
+  --ws-callout-info-bg: rgba(74, 168, 224, 0.09);
+  --ws-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --ws-shadow-md: 0 10px 26px rgba(0, 0, 0, 0.42);
+  --ws-r-xs: 6px;
+  --ws-r-sm: 8px;
+  --ws-r-md: 11px;
+  --ws-r-lg: 15px;
+  --ws-mono: "JetBrains Mono", "Fira Code", Consolas, "SF Mono", monospace;
+  --ws-font: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, Arial,
+    sans-serif;
+
+  /* terminal code theme (as in the app's data-theme=term blocks) */
+  --ws-code-bg: #0c0f0a;
+  --ws-code-head-bg: #111510;
+  --ws-code-border: #1f2a1a;
+  --ws-code-ink: #c8f05a;
+
+  /* ---------- canvas ---------- */
+  position: relative;
+  min-height: 100vh;
+  background: var(--ws-bg);
+  color: var(--ws-text);
+  font-family: var(--ws-font);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* kill the green rain / scanline overlays from the site theme */
+body.ws-doc::before,
+body.ws-doc::after {
+  content: none;
+  animation: none;
+}
+
+body.ws-doc ::selection {
+  background: var(--ws-accent-soft);
+  color: var(--ws-text);
+}
+
+/* links, app style: accent + short underline offset */
+body.ws-doc a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+body.ws-doc a:hover {
+  color: var(--ws-accent);
+  text-shadow: none;
+}
+body.ws-doc :is(.post, .post-shell) a:not(.btn) {
+  color: var(--ws-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- chrome: header, container, footer ---------- */
+body.ws-doc .container {
+  width: min(920px, 92vw);
+}
+
+body.ws-doc .site-header {
+  background: rgba(18, 21, 29, 0.85);
+  border-bottom: 1px solid var(--ws-border);
+  box-shadow: var(--ws-shadow-md);
+}
+
+body.ws-doc .logo,
+body.ws-doc .nav a {
+  color: var(--ws-text-2);
+}
+body.ws-doc .nav a:hover,
+body.ws-doc .logo:hover,
+body.ws-doc .nav-current {
+  color: var(--ws-accent);
+  text-shadow: none;
+}
+
+body.ws-doc .site-footer {
+  border-top: 1px solid var(--ws-border);
+}
+body.ws-doc .site-footer,
+body.ws-doc .site-footer .muted {
+  color: var(--ws-faint);
+}
+
+/* buttons, app style */
+body.ws-doc .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ws-panel-2);
+  border: 1px solid var(--ws-border-2);
+  border-radius: var(--ws-r-sm);
+  color: var(--ws-text);
+  font-family: var(--ws-font);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  box-shadow: none;
+}
+body.ws-doc .btn:hover {
+  background: var(--ws-hover);
+  color: var(--ws-text);
+  text-shadow: none;
+}
+body.ws-doc .btn.primary,
+body.ws-doc .btn.ghost:hover {
+  background: var(--ws-accent);
+  border-color: var(--ws-accent);
+  color: #fff;
+}
+body.ws-doc .btn.primary:hover {
+  background: var(--ws-accent-2);
+  border-color: var(--ws-accent-2);
+}
+body.ws-doc .btn.ghost {
+  background: transparent;
+  border-color: var(--ws-border-2);
+  color: var(--ws-text-2);
+}
+
+/* ---------- document ---------- */
+/* app editor column width drives the same centered column here */
+body.ws-doc .post,
+body.ws-doc .post-shell {
+  margin: 0 auto;
+  padding: 44px 0 96px;
+  color: var(--ws-text);
+  font-family: var(--ws-font);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* .post-shell is normally a green-tinted site card; strip it */
+body.ws-doc .post-shell {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* eyebrow meta, like .title-meta / export .meta */
+body.ws-doc .meta,
+body.ws-doc :is(.post, .post-shell) .eyebrow {
+  color: var(--ws-faint);
+  font-family: var(--ws-font);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin: 0 0 4px;
+}
+
+/* headings — exact block typography from the app */
+body.ws-doc :is(.post, .post-shell) h1 {
+  font-size: 31px;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--ws-text);
+  margin: 0 0 10px;
+}
+body.ws-doc :is(.post, .post-shell) h2 {
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  color: var(--ws-text);
+  margin: 38px 0 10px;
+}
+body.ws-doc :is(.post, .post-shell) h3 {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ws-text);
+  margin: 28px 0 8px;
+}
+body.ws-doc :is(.post, .post-shell) h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ws-text-2);
+  margin: 20px 0 6px;
+}
+body.ws-doc :is(.post, .post-shell) h1:first-child {
+  margin-top: 0;
+}
+
+/* body text and lists */
+body.ws-doc :is(.post, .post-shell) p {
+  margin: 0 0 1em;
+  color: var(--ws-text);
+}
+body.ws-doc :is(.post, .post-shell) strong {
+  font-weight: 700;
+  color: #fff;
+}
+body.ws-doc :is(.post, .post-shell) .lede {
+  color: var(--ws-text-2);
+  font-size: 17px;
+  line-height: 1.6;
+}
+body.ws-doc :is(.post, .post-shell) em {
+  color: var(--ws-text-2);
+}
+body.ws-doc :is(.post, .post-shell) ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1em;
+}
+body.ws-doc :is(.post, .post-shell) ul li {
+  position: relative;
+  padding-left: 24px;
+  margin: 2px 0;
+}
+body.ws-doc :is(.post, .post-shell) ul li::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ws-text-2);
+}
+body.ws-doc :is(.post, .post-shell) ol {
+  padding-left: 1.4em;
+  margin: 0 0 1em;
+}
+body.ws-doc :is(.post, .post-shell) ol li::marker {
+  color: var(--ws-accent);
+  font-weight: 800;
+}
+body.ws-doc :is(.post, .post-shell) blockquote {
+  border-left: 3px solid var(--ws-accent);
+  padding: 2px 0 2px 16px;
+  margin: 1em 0;
+  color: var(--ws-text-2);
+  font-style: italic;
+}
+
+/* inline code — .block-content code chip */
+body.ws-doc :is(.post, .post-shell) code {
+  font-family: var(--ws-mono);
+  font-size: 0.87em;
+  background: var(--ws-hover);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-r-xs);
+  padding: 1px 5px;
+}
+
+/* terminal panels — app data-theme=term code block */
+body.ws-doc :is(.post, .post-shell) pre {
+  background: var(--ws-code-bg);
+  color: var(--ws-code-ink);
+  border: 1px solid var(--ws-code-border);
+  border-radius: var(--ws-r-md);
+  margin: 10px 0;
+  padding: 11px 16px 13px;
+  overflow-x: auto;
+  font-family: var(--ws-mono);
+  font-size: 13.5px;
+  line-height: 1.72;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-shadow: var(--ws-shadow-sm);
+}
+body.ws-doc :is(.post, .post-shell) pre code {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: inherit;
+}
+
+/* media — .img-wrap img */
+body.ws-doc :is(.post, .post-shell) figure {
+  margin: 18px 0;
+}
+body.ws-doc :is(.post, .post-shell) img {
+  max-width: 100%;
+  display: block;
+  border-radius: var(--ws-r-md);
+  box-shadow: var(--ws-shadow-sm);
+}
+body.ws-doc :is(.post, .post-shell) figcaption,
+body.ws-doc :is(.post, .post-shell) .img-cap {
+  font-size: 12.5px;
+  color: var(--ws-faint);
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* gallery cards — image-card keeps the app card shape */
+body.ws-doc :is(.post, .post-shell) .image-card {
+  background: var(--ws-panel-2);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-r-md);
+  padding: 12px;
+}
+
+/* quick-facts / info cards — .bookmark card shape */
+body.ws-doc :is(.post, .post-shell) .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+body.ws-doc :is(.post, .post-shell) .info-grid > div {
+  background: var(--ws-panel-2);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-r-md);
+  padding: 14px 16px;
+  box-shadow: var(--ws-shadow-sm);
+}
+body.ws-doc :is(.post, .post-shell) .info-grid h3 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ws-faint);
+  margin: 0 0 10px;
+}
+body.ws-doc :is(.post, .post-shell) .info-grid ul {
+  margin: 0;
+}
+body.ws-doc :is(.post, .post-shell) .info-grid li::before {
+  left: 4px;
+}
+
+/* callouts — app info callout block */
+body.ws-doc :is(.post, .post-shell) .callout {
+  background: var(--ws-callout-info-bg);
+  border: 1px solid var(--ws-border);
+  border-left: 3px solid var(--ws-blue);
+  border-radius: var(--ws-r-md);
+  padding: 12px 16px;
+  margin: 12px 0;
+  color: var(--ws-text);
+}
+body.ws-doc :is(.post, .post-shell) .callout strong {
+  color: var(--ws-blue);
+  font-weight: 700;
+}
+
+/* tags */
+body.ws-doc :is(.post, .post-shell) .tag {
+  color: var(--ws-accent);
+  background: var(--ws-accent-soft);
+  border-color: var(--ws-border-2);
+}
+
+/* cover image */
+body.ws-doc :is(.post, .post-shell) .post-cover {
+  max-height: 420px;
+  border-radius: var(--ws-r-md);
+  border: 1px solid var(--ws-border);
+  box-shadow: var(--ws-shadow-sm);
+}
