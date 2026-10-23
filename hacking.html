@@ -7,6 +7,7 @@
   <title>Hacking | Yoinked by Yoinkas</title>
   <meta name="description" content="Hacking research, exploit notes, and offensive workflow writeups." />
   <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="stylesheet" href="assets/book-cards.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
@@ -60,7 +61,7 @@
             <a class="btn ghost" href="https://www.exploit-db.com/" target="_blank" rel="noreferrer">Exploit-DB</a>
           </div>
         </div>
-        <div class="card-grid stack-top" id="all-posts"></div>
+        <div class="card-grid stack-top" id="all-posts" data-book-grid></div>
       </div>
     </section>
 
@@ -95,7 +96,7 @@
           <p class="box-rotation-note">The unfiltered selection rotates every four days and shows up to 12 boxes. Search or apply a filter to browse the full collection.</p>
           <p class="box-filter-empty" id="box-filter-empty" hidden>No writeups match those filters.</p>
         </div>
-        <div class="hacking-feature-grid" id="shared-box-cards">
+        <div class="hacking-feature-grid" id="shared-box-cards" data-book-grid>
           <article class="card hacking-note-card hacking-feature-card">
             <p class="eyebrow">TryHackMe &middot; Medium</p>
             <h3>The Hollow Shell</h3>
@@ -731,7 +732,7 @@ type C:\Users\Administrator\Desktop\flag.txt.txt</code></pre>
             <a class="btn" href="video.html">Watch Video</a>
           </article>
         </div>
-        <div class="hacking-feature-grid stack-top" id="featured-writeups-extra"></div>
+        <div class="hacking-feature-grid stack-top" id="featured-writeups-extra" data-book-grid></div>
       </div>
     </section>
 
@@ -763,6 +764,7 @@ type C:\Users\Administrator\Desktop\flag.txt.txt</code></pre>
   <script src="assets/boxes.js"></script>
   <script src="assets/main.js"></script>
   <script src="assets/video-return.js"></script>
+  <script src="assets/book-cards.js" defer></script>
 </body>
 </html>
 

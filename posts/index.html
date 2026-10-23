@@ -7,6 +7,7 @@
   <title>Writeups | Yoinked by Yoinkas</title>
   <meta name="description" content="All TryHackMe and Hack The Box writeups." />
   <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="stylesheet" href="../assets/book-cards.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
@@ -34,7 +35,7 @@
           <a class="btn" href="tryhackme-template.html">THM template</a>
           <a class="btn ghost" href="htb-template.html">HTB template</a>
         </div>
-        <div class="card-grid stack-top">
+        <div class="card-grid stack-top" data-book-grid>
           <article class="card">
             <p class="eyebrow">TryHackMe &middot; Medium</p>
             <h2>The Hollow Shell</h2>
@@ -43,7 +44,7 @@
             <a class="btn" href="the-hollow-shell.html">Read writeup</a>
           </article>
         </div>
-        <div class="card-grid stack-top">
+        <div class="card-grid stack-top" data-book-grid>
           <article class="card">
             <p class="eyebrow">TryHackMe &middot; Medium</p>
             <h2>Jackpot</h2>
@@ -52,7 +53,7 @@
             <a class="btn" href="jackpot.html">Read writeup</a>
           </article>
         </div>
-        <div class="card-grid stack-top" id="all-posts"></div>
+        <div class="card-grid stack-top" id="all-posts" data-book-grid></div>
       </div>
     </section>
   </main>
@@ -66,6 +67,7 @@
 
   <script src="../assets/content.js"></script>
   <script src="../assets/main.js"></script>
+  <script src="../assets/book-cards.js" defer></script>
 </body>
 </html>
 

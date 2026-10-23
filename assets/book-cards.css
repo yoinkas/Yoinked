@@ -1,0 +1,96 @@
+/* ============================================================
+   Ashen Press card port — writeup cards handled like art books.
+   No literal books, no shelf: the accent cards become tactile
+   3D volumes with pointer tilt, hover lift, press select,
+   specular sheen and a staggered "placed in" entrance.
+   Scoped to grids marked with data-book-grid.
+   ============================================================ */
+
+/* the grid is the table surface: gives children depth */
+[data-book-grid] {
+  perspective: 1400px;
+}
+
+/* ---------- book card ---------- */
+[data-book-grid] .book {
+  --px: 0;      /* pointer horizontal target (-1..1), JS-driven */
+  --py: 0;      /* pointer vertical target */
+  --pl: 0;      /* lift/press amount */
+  --rz: 0deg;   /* tiny rest rotation, hand-placed feel */
+  --amp: 1;     /* tilt amplitude (fades on tall cards) */
+  --sh: 0;      /* sheen opacity */
+  --mx: 50%;
+  --my: 18%;
+  position: relative;
+  transform-origin: 50% 82%;
+  transform:
+    rotateX(calc(var(--py) * -5deg * var(--amp)))
+    rotateY(calc(var(--px) * 7deg * var(--amp)))
+    rotateZ(var(--rz))
+    translateY(calc(var(--pl) * -12px))
+    scale(calc(1 + var(--pl) * 0.028));
+  will-change: transform;
+  transition: box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+/* hover: the volume lifts off the surface */
+[data-book-grid] .book.is-hover {
+  z-index: 6;
+  border-color: rgba(93, 255, 139, 0.38);
+  box-shadow:
+    0 28px 50px rgba(0, 0, 0, 0.55),
+    0 8px 18px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(93, 255, 139, 0.06);
+}
+
+/* pressed: select / pick-up squish */
+[data-book-grid] .book.is-pressed {
+  z-index: 7;
+}
+
+/* reflective sheen that tracks the cursor across the cover */
+[data-book-grid] .book::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    240px 200px at var(--mx) var(--my),
+    rgba(93, 255, 139, 0.18),
+    rgba(255, 255, 255, 0.09) 38%,
+    transparent 68%
+  );
+  opacity: var(--sh);
+  mix-blend-mode: screen;
+  transition: opacity 0.35s ease;
+}
+
+/* ---------- staggered "placed into the stack" entrance ---------- */
+[data-book-grid] .book.bc-in {
+  animation: bc-place 0.85s cubic-bezier(0.18, 1.48, 0.3, 1) both;
+  animation-delay: calc((var(--seq, 0) % 8) * 70ms);
+}
+
+@keyframes bc-place {
+  from {
+    opacity: 0;
+    transform: translateY(52px) rotateX(22deg) scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-book-grid] {
+    perspective: none;
+  }
+  [data-book-grid] .book {
+    transform: none;
+    transition: none;
+  }
+  [data-book-grid] .book.bc-in {
+    animation: none;
+  }
+  [data-book-grid] .book::after {
+    display: none;
+  }
+}
