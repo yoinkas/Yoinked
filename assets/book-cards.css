@@ -36,11 +36,11 @@
 /* hover: the volume lifts off the surface */
 [data-book-grid] .book.is-hover {
   z-index: 6;
-  border-color: rgba(93, 255, 139, 0.38);
+  border-color: rgba(var(--accent-rgb), 0.38);
   box-shadow:
     0 28px 50px rgba(0, 0, 0, 0.55),
     0 8px 18px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(93, 255, 139, 0.06);
+    0 0 0 1px rgba(var(--accent-rgb), 0.06);
 }
 
 /* pressed: select / pick-up squish */
@@ -57,7 +57,7 @@
   pointer-events: none;
   background: radial-gradient(
     240px 200px at var(--mx) var(--my),
-    rgba(93, 255, 139, 0.18),
+    rgba(var(--accent-rgb), 0.18),
     rgba(255, 255, 255, 0.09) 38%,
     transparent 68%
   );
