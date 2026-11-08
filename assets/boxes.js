@@ -1,5 +1,6 @@
 (() => {
   const boxMetadata = {
+    "The Hollow Shell": { platform: "thm", difficulty: "medium", os: "linux" },
     "Jackpot": { platform: "thm", difficulty: "medium", os: "linux" },
     "Tony the Tiger": { platform: "thm", difficulty: "easy", os: "linux" },
     "Gallery": { platform: "thm", difficulty: "easy", os: "linux" },
@@ -7,6 +8,7 @@
     "Opacity": { platform: "thm", difficulty: "easy", os: "linux" },
     "Pyrat": { platform: "thm", difficulty: "easy", os: "linux" },
     "Lian_Yu": { platform: "thm", difficulty: "easy", os: "linux" },
+    "mKingdom": { platform: "thm", difficulty: "unknown", os: "linux" },
     "Operation End-Game": { platform: "thm", difficulty: "hard", os: "windows" },
     "Operation Reroute": { platform: "thm", difficulty: "hard", os: "linux" },
     "B3dr0ck": { platform: "thm", difficulty: "easy", os: "linux" },
@@ -49,22 +51,37 @@
   generatedBoxes.forEach((box) => grid.appendChild(renderHackingCard(box)));
 
   const cards = Array.from(grid.querySelectorAll(".hacking-feature-card"));
+  const platformLabels = { thm: "TryHackMe", htb: "Hack The Box", other: "Other" };
+  const difficultyLabels = {
+    "very-easy": "Very Easy",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    insane: "Insane",
+    unknown: "Unspecified",
+  };
   cards.forEach((card) => {
     const title = card.querySelector("h3")?.textContent.trim() || "";
     const metadata = boxMetadata[title] || { platform: "other", difficulty: "unknown", os: "other" };
     Object.assign(card.dataset, metadata);
+    const listMeta = document.createElement("p");
+    listMeta.className = "box-list-meta";
+    listMeta.innerHTML = `<span>${platformLabels[metadata.platform] || "Other"}</span><span>${difficultyLabels[metadata.difficulty] || "Unspecified"}</span>`;
+    card.querySelector("h3")?.insertAdjacentElement("afterend", listMeta);
   });
 
   const platformFilter = document.getElementById("box-platform-filter");
   const difficultyFilter = document.getElementById("box-difficulty-filter");
   const osFilter = document.getElementById("box-os-filter");
   const nameFilter = document.getElementById("box-name-filter");
+  const viewAllButton = document.getElementById("box-view-all");
   const resetButton = document.getElementById("box-filter-reset");
   const count = document.getElementById("box-filter-count");
   const empty = document.getElementById("box-filter-empty");
   const DEFAULT_LIMIT = 12;
   const FOUR_DAYS_MS = 4 * 24 * 60 * 60 * 1000;
   const rotation = Math.floor(Date.now() / FOUR_DAYS_MS);
+  let listView = false;
 
   function rotationScore(card) {
     const title = card.querySelector("h3")?.textContent.trim() || "";
@@ -81,7 +98,7 @@
       os: osFilter?.value || "all",
     };
     const query = nameFilter?.value.trim().toLowerCase() || "";
-    const isBrowsing = query || Object.values(filters).some((value) => value !== "all");
+    const isBrowsing = listView || query || Object.values(filters).some((value) => value !== "all");
     const allowedByRotation = new Set(rotatingCards.slice(0, DEFAULT_LIMIT));
     let visible = 0;
     cards.forEach((card) => {
@@ -99,8 +116,19 @@
     if (empty) empty.hidden = visible !== 0;
   }
 
+  function setListView(enabled) {
+    listView = enabled;
+    grid.classList.toggle("box-list-view", listView);
+    if (viewAllButton) {
+      viewAllButton.textContent = listView ? "Card View" : "All Boxes";
+      viewAllButton.setAttribute("aria-pressed", String(listView));
+    }
+    applyFilters();
+  }
+
   [platformFilter, difficultyFilter, osFilter].forEach((select) => select?.addEventListener("change", applyFilters));
   nameFilter?.addEventListener("input", applyFilters);
+  viewAllButton?.addEventListener("click", () => setListView(!listView));
   resetButton?.addEventListener("click", () => {
     [platformFilter, difficultyFilter, osFilter].forEach((select) => { if (select) select.value = "all"; });
     if (nameFilter) nameFilter.value = "";
