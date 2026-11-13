@@ -1248,17 +1248,6 @@ body.page-hacking a:hover {
   padding: 8px 12px;
 }
 
-.hacking-card-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.hacking-card-actions .btn {
-  padding: 8px 12px;
-}
-
 .hacking-feature-image {
   width: 100%;
   height: 130px;
