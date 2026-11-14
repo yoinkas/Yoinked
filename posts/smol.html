@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/png" href="../assets/yoinked.png">
+  <title>Smol HTB Write-Up | Yoinked by Yoinkas</title>
+  <meta name="description" content="Smol HTB write-up covering reconnaissance, WordPress enumeration, and exploitation findings.">
+  <link rel="stylesheet" href="../assets/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/writeup-studio.css">
+</head>
+<body class="ws-doc">
+  <header class="site-header"><div class="container"><a class="logo" href="../index.html">Yoinked by Yoinkas</a><nav class="nav"><a href="../cybersecurity.html">CyberSecurity</a><a class="nav-current" href="../hacking.html">Hacking</a><a href="../index.html#about">About</a></nav></div></header>
+  <main><section class="section"><div class="container post">
+<header class="boxcard"><img class="cover" src="../assets/smol/cover.jpg" alt="Smol cover"><div class="meta">HTB &bull; Medium &bull; Linux</div><h1>Smol</h1></header>
+<pre><code>root in /home/yoinkas 
+❯ nmap -sC -sV -vv -<span class="tok-const">T4</span> -p- 10.64.185.131 
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-11-13 06:32 -0500
+<span class="tok-const">NSE</span>: Loaded 158 scripts for scanning.
+<span class="tok-const">NSE</span>: Script Pre-scanning.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:32
+Completed <span class="tok-const">NSE</span> at 06:32, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:32
+Completed <span class="tok-const">NSE</span> at 06:32, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:32
+Completed <span class="tok-const">NSE</span> at 06:32, 0.00s elapsed
+Initiating Ping Scan at 06:32
+Scanning 10.64.185.131 [4 ports]
+Completed Ping Scan at 06:32, 0.04s elapsed (1 total hosts)
+Initiating Parallel <span class="tok-const">DNS</span> resolution of 1 host. at 06:32
+Completed Parallel <span class="tok-const">DNS</span> resolution of 1 host. at 06:32, 0.50s elapsed
+Initiating <span class="tok-const">SYN</span> Stealth Scan at 06:32
+Scanning 10.64.185.131 [65535 ports]
+Discovered open port 22/tcp on 10.64.185.131
+Discovered open port 80/tcp on 10.64.185.131
+Completed <span class="tok-const">SYN</span> Stealth Scan at 06:32, 18.77s elapsed (65535 total ports)
+Initiating Service scan at 06:32
+Scanning 2 services on 10.64.185.131
+Completed Service scan at 06:33, 6.26s elapsed (2 services on 1 host)
+<span class="tok-const">NSE</span>: Script scanning 10.64.185.131.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 1.16s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 0.15s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 0.00s elapsed
+Nmap scan report for 10.64.185.131
+Host is up, received echo-reply ttl 62 (0.032s latency).
+Scanned at 2026-11-13 06:32:40 <span class="tok-const">EST</span> for 27s
+Not shown: 65533 closed tcp ports (reset)
+<span class="tok-const">PORT</span>   <span class="tok-const">STATE</span> <span class="tok-const">SERVICE</span> <span class="tok-const">REASON</span>         <span class="tok-const">VERSION</span>
+22/tcp open  ssh     syn-ack ttl 62 OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 4a:40:18:1b:15:bf:5c:62:08:8b:c7:1d:31:fe:db:2b (<span class="tok-const">RSA</span>)
+| ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2p43D+u+kH+OYs5+QucdQoxiSlPn0AiZujoeRjmYVxuEcXH0JSdHbO+JpseCW8GzcseHzyLfGpGOOKdAnBeT1kw0PLTohiRCMnxS2/gGUNUnauPz3yj7VC70Qdy075x/M1f8D6T37HyFiNmpjR51KKOqsq1NAV63KZmggqiK/6rm8zfL+CfBCEwx5MoB1WqvXD0eWnJmngR9NRU1qFBgFzH3oLygiOI61zEZD5Q9o5LQ41sGjT0PSFo9n16r3215DITu33L0cxS03otBwX0uTRdiN7PXabDuu6uXjPgjnwK36u/8HYe5nTZC6NWw7VIKkvpj6txJRg0A/fz3MpAoRsUVAa+DY0E433gFIXmgtcQ2NIUjHh3xeFeF7SVyk6zbBzJf64iPRaDFA6XfeGEsMyd7Ddv+Dz/1mjerpfcl+0lzppUYP+6np7VwFE0cIwBp6KLqmSaHBiXhHWYQb65rFGo63bt2sL0ttcE7w6aWHWxYo76o/mRGapUfzPYME4Ps=
+|   256 55:f8:f0:ea:21:5d:89:23:71:8e:48:60:48:d5:78:7c (<span class="tok-const">ECDSA</span>)
+| ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBG3w0lgD++kU15K28WldJb0hYBzESDrs5267ck4aAX/oPTNyNdJ6KGC6mZaW2589P26lodJOFT0vw92+zVsJL6o=
+|   256 d8:d7:f5:94:73:80:a0:62:20:80:1e:1e:44:9e:fb:ed (<span class="tok-const">ED25519</span>)
+|_ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMIBq8O4o8/lbEho+bP3y2wlqFBbmLAVwQgq0pChxfIn
+80/tcp open  http    syn-ack ttl 62 Apache httpd 2.4.41 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: <span class="tok-const">GET</span> <span class="tok-const">HEAD</span> <span class="tok-const">POST</span> <span class="tok-const">OPTIONS</span>
+|_http-title: Did not follow redirect to http://<span class="important-text">www.smol.thm</span>
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+Service Info: <span class="tok-const">OS</span>: Linux; <span class="tok-const">CPE</span>: cpe:/o:linux:linux_kernel
+
+
+<span class="tok-const">NSE</span>: Script Post-scanning.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 06:33
+Completed <span class="tok-const">NSE</span> at 06:33, 0.00s elapsed
+Read data files from: /usr/share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 <span class="tok-const">IP</span> address (1 host up) scanned in 31.07 seconds
+           Raw packets sent: 65539 (2.884<span class="tok-const">MB</span>) | Rcvd: 65536 (2.621<span class="tok-const">MB</span>)</code></pre>
+<p>you must add the sub directory in your /etc/hosts file&nbsp;</p>
+<p>then youre brought to this page&nbsp;<br><br></p>
+<figure><img src="../assets/smol/screenshot-1.png" alt="Smol write-up screenshot 1" loading="lazy"><figcaption>Pasted 11/13/2026, 3:04:34 PM</figcaption></figure>
+<p><br></p>
+<p>at the bottom you see this&nbsp;</p>
+
+<figure><img src="../assets/smol/screenshot-2.png" alt="Smol write-up screenshot 2" loading="lazy"><figcaption>Pasted 11/13/2026, 3:05:12 PM</figcaption></figure>
+<p>POWERED BY WORDPRESS&nbsp;</p>
+<p>clicking RCE on the homepage will bring you to that paage and if you scrool down you will see this&nbsp;</p>
+
+<figure><img src="../assets/smol/screenshot-3.png" alt="Smol write-up screenshot 3" loading="lazy"><figcaption>Pasted 11/13/2026, 3:06:51 PM</figcaption></figure>
+
+  </div></section></main>
+  <footer class="site-footer"><div class="container"><p>Yoinked by Yoinkas | Security writeups</p><p class="muted">Updated <span id="year"></span></p></div></footer>
+  <script src="../assets/main.js"></script>
+</body>
+</html>
